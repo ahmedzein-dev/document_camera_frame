@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class CameraFramePainter extends CustomPainter {
+class DocumentCameraFramePainter extends CustomPainter {
   final double frameWidth;
   final double frameHeight;
 
-  CameraFramePainter({required this.frameWidth, required this.frameHeight});
+  DocumentCameraFramePainter({required this.frameWidth, required this.frameHeight});
 
   @override
   void paint(Canvas canvas, Size size) {
