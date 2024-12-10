@@ -3,41 +3,102 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
-import '../../document_camera_controller.dart';
+import '../../controllers/document_camera_controller.dart';
 import '../../helper/document_camera_frame_painter.dart';
 import '../widgets/action_button.dart';
 import '../widgets/frame_capture_animation.dart';
 
-class DocumentCameraView extends StatefulWidget {
+/// A customizable camera view for capturing and cropping document images.
+///
+/// This widget provides a predefined frame for document capture,
+/// along with buttons for capturing, saving, and retaking the document.
+class DocumentCameraFrame extends StatefulWidget {
+  /// Width of the document capture frame.
   final double frameWidth;
+
+  /// Height of the document capture frame.
   final double frameHeight;
 
+  /// Widget to display as the screen's title (optional).
   final Widget? screenTitle;
+
+  /// Alignment of the screen title (optional).
   final Alignment? screenTitleAlignment;
+
+  /// Padding for the screen title (optional).
   final EdgeInsets? screenTitlePadding;
 
+  /// Text for the "Capture" button.
   final String? captureButtonText;
-  final TextStyle? captureButtonTextStyle;
+
+  /// Callback triggered when an image is captured.
   final Function(String imgPath)? onCaptured;
+
+  /// Style for the "Capture" button (optional).
   final ButtonStyle? captureButtonStyle;
+
+  /// Alignment of the "Capture" button (optional).
   final Alignment? captureButtonAlignment;
+
+  /// Padding for the "Capture" button (optional).
   final EdgeInsets? captureButtonPadding;
 
+  /// Text for the "Save" button.
   final String? saveButtonText;
-  final TextStyle? saveButtonTextStyle;
+
+  /// Callback triggered when an image is saved.
   final Function(String imgPath)? onSaved;
+
+  /// Style for the "Save" button (optional).
   final ButtonStyle? saveButtonStyle;
+
+  /// Alignment of the "Save" button (optional).
   final Alignment? saveButtonAlignment;
+
+  /// Padding for the "Save" button (optional).
   final EdgeInsets? saveButtonPadding;
 
+  /// Text for the "Retake" button.
   final String? retakeButtonText;
+
+  /// Callback triggered when the "Retake" button is pressed.
   final VoidCallback? onRetake;
-  final TextStyle? retakeButtonTextStyle;
+
+  /// Style for the "Retake" button (optional).
   final ButtonStyle? retakeButtonStyle;
+
+  /// Alignment of the "Retake" button (optional).
   final Alignment? retakeButtonAlignment;
+
+  /// Padding for the "Retake" button (optional).
   final EdgeInsets? retakeButtonPadding;
 
-  const DocumentCameraView({
+  /// Text style for the "Capture" button text (optional).
+  ///
+  /// **Important**: Avoid applying `textStyle` in the `ButtonStyle`
+  /// To apply a custom text style to the text on the button,
+  /// pass the style here. Do not pass it to the `ButtonStyle`
+  /// as it may cause conflicts or errors.
+  final TextStyle? captureButtonTextStyle;
+
+  /// Text style for the "Save" button text (optional).
+  ///
+  /// **Note**: Same as above, apply text styling here.
+  final TextStyle? saveButtonTextStyle;
+
+  /// Text style for the "Retake" button text (optional).
+  ///
+  /// **Note**: Same as above, apply text styling here.
+  final TextStyle? retakeButtonTextStyle;
+
+  final BoxBorder? imageBorder;
+
+  final Duration? animationDuration;
+
+  final Color? animationColor;
+
+  /// Constructor for the [DocumentCameraFrame].
+  const DocumentCameraFrame({
     super.key,
     required this.frameWidth,
     required this.frameHeight,
@@ -62,13 +123,16 @@ class DocumentCameraView extends StatefulWidget {
     this.retakeButtonStyle,
     this.retakeButtonAlignment,
     this.retakeButtonPadding,
+    this.imageBorder,
+    this.animationDuration,
+    this.animationColor,
   });
 
   @override
-  State<DocumentCameraView> createState() => _DocumentCameraViewState();
+  State<DocumentCameraFrame> createState() => _DocumentCameraFrameState();
 }
 
-class _DocumentCameraViewState extends State<DocumentCameraView> {
+class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
   late DocumentCameraController _controller;
   final ValueNotifier<bool> isInitializedNotifier = ValueNotifier(false);
   final ValueNotifier<bool> isLoadingNotifier = ValueNotifier(false);
@@ -79,6 +143,7 @@ class _DocumentCameraViewState extends State<DocumentCameraView> {
     _initializeCamera();
   }
 
+  /// Initializes the camera and updates the state when ready.
   Future<void> _initializeCamera() async {
     _controller = DocumentCameraController();
     await _controller.initialize();
@@ -98,7 +163,10 @@ class _DocumentCameraViewState extends State<DocumentCameraView> {
           return Stack(
             fit: StackFit.expand,
             children: [
+              // Display the camera preview
               CameraPreview(_controller.cameraController!),
+
+              // Draw the document frame
               Positioned.fill(
                 child: CustomPaint(
                   painter: DocumentCameraFramePainter(
@@ -107,6 +175,8 @@ class _DocumentCameraViewState extends State<DocumentCameraView> {
                   ),
                 ),
               ),
+
+              // Center alignment of the document frame
               Align(
                 alignment: Alignment.center,
                 child: Container(
@@ -117,6 +187,8 @@ class _DocumentCameraViewState extends State<DocumentCameraView> {
                   ),
                 ),
               ),
+
+              // Frame capture animation when loading
               ValueListenableBuilder<bool>(
                 valueListenable: isLoadingNotifier,
                 builder: (context, isLoading, child) {
@@ -124,18 +196,22 @@ class _DocumentCameraViewState extends State<DocumentCameraView> {
                     return FrameCaptureAnimation(
                       frameWidth: widget.frameWidth,
                       frameHeight: widget.frameHeight,
+                      animationDuration: widget.animationDuration,
+                      animationColor: widget.animationColor,
                     );
                   }
                   return const SizedBox.shrink();
                 },
               ),
+
+              // Display captured image
               if (_controller.imagePath.isNotEmpty)
                 Center(
                   child: Container(
                     width: widget.frameWidth,
                     height: widget.frameHeight,
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.green, width: 3),
+                      border: widget.imageBorder ?? Border.all(color: Colors.green, width: 3),
                       image: DecorationImage(
                         image: FileImage(File(_controller.imagePath)),
                         fit: BoxFit.fill,
@@ -143,6 +219,8 @@ class _DocumentCameraViewState extends State<DocumentCameraView> {
                     ),
                   ),
                 ),
+
+              // Display optional screen title
               if (widget.screenTitle != null)
                 Align(
                   alignment: widget.screenTitleAlignment ?? Alignment.topCenter,
@@ -151,6 +229,8 @@ class _DocumentCameraViewState extends State<DocumentCameraView> {
                     child: widget.screenTitle,
                   ),
                 ),
+
+              // Display action buttons
               _buildActionButtons(),
             ],
           );
@@ -159,6 +239,7 @@ class _DocumentCameraViewState extends State<DocumentCameraView> {
     );
   }
 
+  /// Builds the action buttons for capture, save, and retake.
   Widget _buildActionButtons() {
     return Align(
       alignment: widget.captureButtonAlignment ?? Alignment.bottomCenter,
@@ -201,6 +282,7 @@ class _DocumentCameraViewState extends State<DocumentCameraView> {
     );
   }
 
+  /// Captures the image and triggers the [onCaptured] callback.
   Future<void> _captureImage(Function(String imgPath)? onCaptured) async {
     isLoadingNotifier.value = true;
     await _controller.takeAndCropPicture(widget.frameWidth, widget.frameHeight, context);
@@ -213,6 +295,7 @@ class _DocumentCameraViewState extends State<DocumentCameraView> {
     isLoadingNotifier.value = false;
   }
 
+  /// Saves the captured image and triggers the [onSaved] callback.
   void _saveImage(Function(String imgPath)? onSaved) {
     final imagePath = _controller.imagePath;
 
@@ -221,10 +304,11 @@ class _DocumentCameraViewState extends State<DocumentCameraView> {
     }
 
     setState(() {
-      _controller.retakeImage();
+      _controller.resetImage();
     });
   }
 
+  /// Retakes the image and resets the UI.
   void _retakeImage(VoidCallback? onRetake) {
     if (onRetake != null) {
       onRetake();

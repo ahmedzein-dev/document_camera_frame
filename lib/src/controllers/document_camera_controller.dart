@@ -1,7 +1,8 @@
 import 'package:camera/camera.dart';
-import 'package:document_camera_frame/src/service/camera_service.dart';
-import 'package:document_camera_frame/src/service/image_processing_service.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+import '../services/camera_service.dart';
+import '../services/image_processing_service.dart';
 
 class DocumentCameraController {
   final CameraService _cameraService = CameraService();
@@ -22,7 +23,7 @@ class DocumentCameraController {
 
     try {
       final filePath = await _cameraService.captureImage();
-      
+
       if (!context.mounted) return;
 
       _imagePath = _imageProcessingService.cropImageToFrame(filePath, frameWidth, frameHeight, context);
