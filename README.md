@@ -100,17 +100,6 @@ class MyApp extends StatelessWidget {
 
 ---
 
-## Dependencies
-
-This widget depends on the following packages:
-
-- `camera`
-- `flutter`
-
-Make sure these packages are included in your `pubspec.yaml`.
-
----
-
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.

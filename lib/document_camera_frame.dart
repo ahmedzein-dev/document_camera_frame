@@ -1,5 +1,3 @@
-library document_camera_frame;
-
 export 'src/controllers/document_camera_controller.dart';
 export 'src/helper/document_camera_context_extensions.dart';
 export 'src/helper/document_camera_frame_painter.dart';

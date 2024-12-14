@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
         body: DocumentCameraFrame(
           frameWidth: 300.0,
           frameHeight: 400.0,
-          captureButtonTextStyle: const TextStyle(fontSize: 24),
+          // captureButtonTextStyle: const TextStyle(fontSize: 24),
           captureButtonStyle: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
             foregroundColor: Colors.black,
@@ -30,13 +30,13 @@ class MyApp extends StatelessWidget {
           saveButtonText: 'Keep',
           retakeButtonText: 'Retry',
           onCaptured: (imgPath) {
-            print('Captured image path: $imgPath');
+            debugPrint('Captured image path: $imgPath');
           },
           onSaved: (imgPath) {
-            print('Saved image path: $imgPath');
+            debugPrint('Saved image path: $imgPath');
           },
           onRetake: () {
-            print('Retake button pressed');
+            debugPrint('Retake button pressed');
           },
         ),
       ),
