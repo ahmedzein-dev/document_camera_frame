@@ -22,12 +22,15 @@ class FrameCaptureAnimation extends StatelessWidget {
       child: Container(
         width: frameWidth,
         height: frameHeight,
-        color: animationColor ?? Colors.black.withOpacity(0.5),
+        color: animationColor ?? Colors.black.withAlpha(127),
       )
           .animate(
-              onPlay: (controller) =>
-                  controller.repeat(period: animationDuration ?? const Duration(milliseconds: 1000)))
-          .fade(duration: animationDuration ?? const Duration(milliseconds: 1000)),
+              onPlay: (controller) => controller.repeat(
+                  period:
+                      animationDuration ?? const Duration(milliseconds: 1000)))
+          .fade(
+              duration:
+                  animationDuration ?? const Duration(milliseconds: 1000)),
     );
   }
 }

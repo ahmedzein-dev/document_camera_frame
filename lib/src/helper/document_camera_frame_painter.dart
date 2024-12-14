@@ -4,12 +4,13 @@ class DocumentCameraFramePainter extends CustomPainter {
   final double frameWidth;
   final double frameHeight;
 
-  DocumentCameraFramePainter({required this.frameWidth, required this.frameHeight});
+  DocumentCameraFramePainter(
+      {required this.frameWidth, required this.frameHeight});
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.black.withOpacity(0.5)
+      ..color = Colors.black.withAlpha(127)
       ..style = PaintingStyle.fill;
 
     final clearRect = Rect.fromLTWH(
