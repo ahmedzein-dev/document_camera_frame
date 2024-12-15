@@ -6,7 +6,8 @@ import 'package:path_provider/path_provider.dart';
 class CameraService {
   CameraController? cameraController;
 
-  bool get isInitialized => cameraController != null && cameraController!.value.isInitialized;
+  bool get isInitialized =>
+      cameraController != null && cameraController!.value.isInitialized;
 
   Future<void> initialize() async {
     final cameras = await availableCameras();
