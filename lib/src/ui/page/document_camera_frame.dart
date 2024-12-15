@@ -136,6 +136,7 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
   late DocumentCameraController _controller;
   final ValueNotifier<bool> isInitializedNotifier = ValueNotifier(false);
   final ValueNotifier<bool> isLoadingNotifier = ValueNotifier(false);
+  final ValueNotifier<String> capturedImageNotifier = ValueNotifier("");
 
   @override
   void initState() {
@@ -205,29 +206,34 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
               ),
 
               // Display captured image
-              if (_controller.imagePath.isNotEmpty)
-                Center(
-                  child: Container(
-                    width: widget.frameWidth,
-                    height: widget.frameHeight,
-                    decoration: BoxDecoration(
-                      border: widget.imageBorder ??
-                          Border.all(color: Colors.green, width: 2),
-                      image: DecorationImage(
-                        image: FileImage(File(_controller.imagePath)),
-                        fit: BoxFit.fill,
+              ValueListenableBuilder<String>(
+                valueListenable: capturedImageNotifier,
+                builder: (context, imagePath, child) {
+                  if (imagePath.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+                  return Center(
+                    child: Container(
+                      width: widget.frameWidth,
+                      height: widget.frameHeight,
+                      decoration: BoxDecoration(
+                        border: widget.imageBorder ?? Border.all(color: Colors.green, width: 2),
+                        image: DecorationImage(
+                          image: FileImage(File(imagePath)),
+                          fit: BoxFit.fill,
+                        ),
                       ),
                     ),
-                  ),
-                ),
+                  );
+                },
+              ),
 
               // Display optional screen title
               if (widget.screenTitle != null)
                 Align(
                   alignment: widget.screenTitleAlignment ?? Alignment.topCenter,
                   child: Padding(
-                    padding: widget.screenTitlePadding ??
-                        const EdgeInsets.only(top: 50.0),
+                    padding: widget.screenTitlePadding ?? const EdgeInsets.only(top: 50.0),
                     child: widget.screenTitle,
                   ),
                 ),
@@ -245,44 +251,46 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
   Widget _buildActionButtons() {
     return Align(
       alignment: widget.captureButtonAlignment ?? Alignment.bottomCenter,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (_controller.imagePath.isEmpty)
-            Padding(
-              padding: widget.captureButtonPadding ??
-                  const EdgeInsets.symmetric(vertical: 18.0),
-              child: ActionButton(
-                text: widget.captureButtonText ?? 'Capture',
-                onPressed: () => _captureImage(widget.onCaptured),
-                style: widget.captureButtonStyle,
-                textStyle: widget.captureButtonTextStyle,
-              ),
-            ),
-          if (_controller.imagePath.isNotEmpty) ...[
-            Padding(
-              padding: widget.saveButtonPadding ??
-                  const EdgeInsets.symmetric(vertical: 18.0, horizontal: 4),
-              child: ActionButton(
-                text: widget.saveButtonText ?? 'Save',
-                onPressed: () => _saveImage(widget.onSaved),
-                style: widget.saveButtonStyle,
-                textStyle: widget.saveButtonTextStyle,
-              ),
-            ),
-            const SizedBox(width: 15),
-            Padding(
-              padding: widget.retakeButtonPadding ??
-                  const EdgeInsets.symmetric(vertical: 18.0, horizontal: 4),
-              child: ActionButton(
-                text: widget.retakeButtonText ?? 'Retake',
-                onPressed: () => _retakeImage(widget.onRetake),
-                style: widget.retakeButtonStyle,
-                textStyle: widget.retakeButtonTextStyle,
-              ),
-            ),
-          ],
-        ],
+      child: ValueListenableBuilder<String>(
+        valueListenable: capturedImageNotifier,
+        builder: (context, imagePath, child) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (imagePath.isEmpty)
+                Padding(
+                  padding: widget.captureButtonPadding ?? const EdgeInsets.symmetric(vertical: 18.0),
+                  child: ActionButton(
+                    text: widget.captureButtonText ?? 'Capture',
+                    onPressed: () => _captureImage(widget.onCaptured),
+                    style: widget.captureButtonStyle,
+                    textStyle: widget.captureButtonTextStyle,
+                  ),
+                )
+              else ...[
+                Padding(
+                  padding: widget.saveButtonPadding ?? const EdgeInsets.symmetric(vertical: 18.0, horizontal: 4),
+                  child: ActionButton(
+                    text: widget.saveButtonText ?? 'Save',
+                    onPressed: () => _saveImage(widget.onSaved),
+                    style: widget.saveButtonStyle,
+                    textStyle: widget.saveButtonTextStyle,
+                  ),
+                ),
+                const SizedBox(width: 15),
+                Padding(
+                  padding: widget.retakeButtonPadding ?? const EdgeInsets.symmetric(vertical: 18.0, horizontal: 4),
+                  child: ActionButton(
+                    text: widget.retakeButtonText ?? 'Retake',
+                    onPressed: () => _retakeImage(widget.onRetake),
+                    style: widget.retakeButtonStyle,
+                    textStyle: widget.retakeButtonTextStyle,
+                  ),
+                ),
+              ],
+            ],
+          );
+        },
       ),
     );
   }
@@ -290,14 +298,14 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
   /// Captures the image and triggers the [onCaptured] callback.
   Future<void> _captureImage(Function(String imgPath)? onCaptured) async {
     isLoadingNotifier.value = true;
-    await _controller.takeAndCropPicture(
-        widget.frameWidth, widget.frameHeight, context);
+    await _controller.takeAndCropPicture(widget.frameWidth, widget.frameHeight, context);
+
+    capturedImageNotifier.value = _controller.imagePath;
 
     if (onCaptured != null) {
       onCaptured(_controller.imagePath);
     }
 
-    setState(() {});
     isLoadingNotifier.value = false;
   }
 
@@ -318,14 +326,17 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
       onRetake();
     }
 
-    setState(() {
-      _controller.retakeImage();
-    });
+    _controller.retakeImage();
+
+    capturedImageNotifier.value = _controller.imagePath;
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    isInitializedNotifier.dispose();
+    isLoadingNotifier.dispose();
+    capturedImageNotifier.dispose();
     super.dispose();
   }
 }
