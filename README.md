@@ -131,10 +131,9 @@ class MyApp extends StatelessWidget {
       home: Scaffold(
         body: Builder(
           builder: (context) =>
-              DocumentCameraView(
+                  DocumentCameraFrame(
                 frameWidth: 300.0,
                 frameHeight: 400.0,
-                captureButtonTextStyle: const TextStyle(fontSize: 24),
                 captureButtonStyle: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.black,

@@ -217,7 +217,8 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
                       width: widget.frameWidth,
                       height: widget.frameHeight,
                       decoration: BoxDecoration(
-                        border: widget.imageBorder ?? Border.all(color: Colors.green, width: 2),
+                        border: widget.imageBorder ??
+                            Border.all(color: Colors.green, width: 2),
                         image: DecorationImage(
                           image: FileImage(File(imagePath)),
                           fit: BoxFit.fill,
@@ -233,7 +234,8 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
                 Align(
                   alignment: widget.screenTitleAlignment ?? Alignment.topCenter,
                   child: Padding(
-                    padding: widget.screenTitlePadding ?? const EdgeInsets.only(top: 50.0),
+                    padding: widget.screenTitlePadding ??
+                        const EdgeInsets.only(top: 50.0),
                     child: widget.screenTitle,
                   ),
                 ),
@@ -259,7 +261,8 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
             children: [
               if (imagePath.isEmpty)
                 Padding(
-                  padding: widget.captureButtonPadding ?? const EdgeInsets.symmetric(vertical: 18.0),
+                  padding: widget.captureButtonPadding ??
+                      const EdgeInsets.symmetric(vertical: 18.0),
                   child: ActionButton(
                     text: widget.captureButtonText ?? 'Capture',
                     onPressed: () => _captureImage(widget.onCaptured),
@@ -269,7 +272,8 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
                 )
               else ...[
                 Padding(
-                  padding: widget.saveButtonPadding ?? const EdgeInsets.symmetric(vertical: 18.0, horizontal: 4),
+                  padding: widget.saveButtonPadding ??
+                      const EdgeInsets.symmetric(vertical: 18.0, horizontal: 4),
                   child: ActionButton(
                     text: widget.saveButtonText ?? 'Save',
                     onPressed: () => _saveImage(widget.onSaved),
@@ -279,7 +283,8 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
                 ),
                 const SizedBox(width: 15),
                 Padding(
-                  padding: widget.retakeButtonPadding ?? const EdgeInsets.symmetric(vertical: 18.0, horizontal: 4),
+                  padding: widget.retakeButtonPadding ??
+                      const EdgeInsets.symmetric(vertical: 18.0, horizontal: 4),
                   child: ActionButton(
                     text: widget.retakeButtonText ?? 'Retake',
                     onPressed: () => _retakeImage(widget.onRetake),
@@ -298,7 +303,8 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
   /// Captures the image and triggers the [onCaptured] callback.
   Future<void> _captureImage(Function(String imgPath)? onCaptured) async {
     isLoadingNotifier.value = true;
-    await _controller.takeAndCropPicture(widget.frameWidth, widget.frameHeight, context);
+    await _controller.takeAndCropPicture(
+        widget.frameWidth, widget.frameHeight, context);
 
     capturedImageNotifier.value = _controller.imagePath;
 
