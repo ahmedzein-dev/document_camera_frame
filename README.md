@@ -147,13 +147,13 @@ class MyApp extends StatelessWidget {
                 saveButtonText: 'Keep',
                 retakeButtonText: 'Retry',
                 onCaptured: (imgPath) {
-                  print('Captured image path: $imgPath');
+                  debugPrint('Captured image path: $imgPath');
                 },
                 onSaved: (imgPath) {
-                  print('Saved image path: $imgPath');
+                  debugPrint('Saved image path: $imgPath');
                 },
                 onRetake: () {
-                  print('Retake button pressed');
+                  debugPrint('Retake button pressed');
                 },
               ),
         ),
