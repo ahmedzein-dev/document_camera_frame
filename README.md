@@ -48,6 +48,7 @@ permissions:
 
 <plist version="1.0">
     <dict>
+        <!-- Add the following keys inside the <dict> section -->
         <key>NSCameraUsageDescription</key>
         <string>We need camera access to capture documents.</string>
         <key>NSMicrophoneUsageDescription</key>
