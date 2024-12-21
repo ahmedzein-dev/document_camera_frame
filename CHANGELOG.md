@@ -26,3 +26,8 @@
 ## 0.0.7
 
 - Update Readme.md.
+
+## 0.0.8
+
+- Add example.mp4
+- Update Readme.md.

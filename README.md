@@ -4,7 +4,7 @@ The `DocumentCameraFrame` package simplifies document scanning by providing a cu
 interface for capturing and cropping document images. It’s ideal for applications that require
 efficient and user-friendly document capture.
 
----
+![example.mp4](https://github.com/AhmedZein1996/document_camera_frame/raw/main/example.mp4)
 
 ## Features
 
