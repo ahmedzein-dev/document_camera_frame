@@ -31,3 +31,8 @@
 
 - Add example.mp4
 - Update Readme.md.
+
+## 0.0.9
+
+- Add example.gif
+- Update Readme.md.
