@@ -32,7 +32,7 @@ class DocumentCameraFrame extends StatefulWidget {
   final String? captureButtonText;
 
   /// Callback triggered when an image is captured.
-  final Function(String imgPath)? onCaptured;
+  final Function(String imgPath) onCaptured;
 
   /// Style for the "Capture" button (optional).
   final ButtonStyle? captureButtonStyle;
@@ -43,11 +43,17 @@ class DocumentCameraFrame extends StatefulWidget {
   /// Padding for the "Capture" button (optional).
   final EdgeInsets? captureButtonPadding;
 
+  /// width for the "Capture" button (optional).
+  final double? captureButtonWidth;
+
+  /// height for the "Capture" button (optional).
+  final double? captureButtonHeight;
+
   /// Text for the "Save" button.
   final String? saveButtonText;
 
   /// Callback triggered when an image is saved.
-  final Function(String imgPath)? onSaved;
+  final Function(String imgPath) onSaved;
 
   /// Style for the "Save" button (optional).
   final ButtonStyle? saveButtonStyle;
@@ -57,6 +63,12 @@ class DocumentCameraFrame extends StatefulWidget {
 
   /// Padding for the "Save" button (optional).
   final EdgeInsets? saveButtonPadding;
+
+  /// width for the "Save" button (optional).
+  final double? saveButtonWidth;
+
+  /// height for the "Save" button (optional).
+  final double? saveButtonHeight;
 
   /// Text for the "Retake" button.
   final String? retakeButtonText;
@@ -72,6 +84,12 @@ class DocumentCameraFrame extends StatefulWidget {
 
   /// Padding for the "Retake" button (optional).
   final EdgeInsets? retakeButtonPadding;
+
+  /// width for the "Retake" button (optional).
+  final double? retakeButtonWidth;
+
+  /// height for the "Retake" button (optional).
+  final double? retakeButtonHeight;
 
   /// Text style for the "Capture" button text (optional).
   ///
@@ -107,22 +125,28 @@ class DocumentCameraFrame extends StatefulWidget {
     this.screenTitlePadding,
     this.captureButtonText,
     this.captureButtonTextStyle,
-    this.onCaptured,
+    required this.onCaptured,
     this.captureButtonStyle,
     this.captureButtonAlignment,
     this.captureButtonPadding,
+    this.captureButtonWidth,
+    this.captureButtonHeight,
     this.saveButtonText,
     this.saveButtonTextStyle,
-    this.onSaved,
+    required this.onSaved,
     this.saveButtonStyle,
     this.saveButtonAlignment,
     this.saveButtonPadding,
+    this.saveButtonWidth,
+    this.saveButtonHeight,
     this.retakeButtonText,
     this.retakeButtonTextStyle,
     this.onRetake,
     this.retakeButtonStyle,
     this.retakeButtonAlignment,
     this.retakeButtonPadding,
+    this.retakeButtonWidth,
+    this.retakeButtonHeight,
     this.imageBorder,
     this.animationDuration,
     this.animationColor,
@@ -268,6 +292,8 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
                     onPressed: () => _captureImage(widget.onCaptured),
                     style: widget.captureButtonStyle,
                     textStyle: widget.captureButtonTextStyle,
+                    width: widget.captureButtonWidth,
+                    height: widget.captureButtonHeight,
                   ),
                 )
               else ...[
@@ -279,6 +305,8 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
                     onPressed: () => _saveImage(widget.onSaved),
                     style: widget.saveButtonStyle,
                     textStyle: widget.saveButtonTextStyle,
+                    width: widget.saveButtonWidth,
+                    height: widget.saveButtonHeight,
                   ),
                 ),
                 const SizedBox(width: 15),
@@ -290,6 +318,8 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
                     onPressed: () => _retakeImage(widget.onRetake),
                     style: widget.retakeButtonStyle,
                     textStyle: widget.retakeButtonTextStyle,
+                    width: widget.retakeButtonWidth,
+                    height: widget.retakeButtonHeight,
                   ),
                 ),
               ],
@@ -301,27 +331,23 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
   }
 
   /// Captures the image and triggers the [onCaptured] callback.
-  Future<void> _captureImage(Function(String imgPath)? onCaptured) async {
+  Future<void> _captureImage(Function(String imgPath) onCaptured) async {
     isLoadingNotifier.value = true;
     await _controller.takeAndCropPicture(
         widget.frameWidth, widget.frameHeight, context);
 
     capturedImageNotifier.value = _controller.imagePath;
 
-    if (onCaptured != null) {
-      onCaptured(_controller.imagePath);
-    }
+    onCaptured(_controller.imagePath);
 
     isLoadingNotifier.value = false;
   }
 
   /// Saves the captured image and triggers the [onSaved] callback.
-  void _saveImage(Function(String imgPath)? onSaved) {
+  void _saveImage(Function(String imgPath) onSaved) {
     final imagePath = _controller.imagePath;
 
-    if (onSaved != null) {
-      onSaved(imagePath);
-    }
+    onSaved(imagePath);
 
     _controller.resetImage();
   }

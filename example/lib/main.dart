@@ -14,14 +14,16 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: DocumentCameraFrame(
-          frameWidth: 300.0,
-          frameHeight: 400.0,
+          frameWidth: 330.0,
+          frameHeight: 240.0,
           // captureButtonTextStyle: const TextStyle(fontSize: 24),
-          captureButtonStyle: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-          ),
+          // captureButtonStyle: ElevatedButton.styleFrom(
+          //   backgroundColor: Colors.white,
+          //   foregroundColor: Colors.black,
+          //   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+          // ),
+          // captureButtonWidth: 140,
+          // captureButtonHeight: 40,
           screenTitle: const Text(
             'Capture Your Document',
             style: TextStyle(color: Colors.white, fontSize: 20),

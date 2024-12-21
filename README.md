@@ -1,4 +1,4 @@
-# DocumentCameraFrame Widget
+# Document Camera Frame
 
 The `DocumentCameraFrame` package simplifies document scanning by providing a customizable camera
 interface for capturing and cropping document images. It’s ideal for applications that require
@@ -129,72 +129,79 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        body: Builder(
-          builder: (context) =>
-                  DocumentCameraFrame(
-                frameWidth: 300.0,
-                frameHeight: 400.0,
-                captureButtonStyle: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-                ),
-                screenTitle: const Text(
-                  'Capture Your Document',
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                captureButtonText: 'Snap',
-                saveButtonText: 'Keep',
-                retakeButtonText: 'Retry',
-                onCaptured: (imgPath) {
-                  debugPrint('Captured image path: $imgPath');
-                },
-                onSaved: (imgPath) {
-                  debugPrint('Saved image path: $imgPath');
-                },
-                onRetake: () {
-                  debugPrint('Retake button pressed');
-                },
-              ),
+        body: DocumentCameraFrame(
+          frameWidth: 330.0,
+          frameHeight: 240.0,
+          // captureButtonTextStyle: const TextStyle(fontSize: 24),
+          // captureButtonStyle: ElevatedButton.styleFrom(
+          //   backgroundColor: Colors.white,
+          //   foregroundColor: Colors.black,
+          //   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+          // ),
+          // captureButtonWidth: 140,
+          // captureButtonHeight: 40,
+          screenTitle: const Text(
+            'Capture Your Document',
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          captureButtonText: 'Snap',
+          saveButtonText: 'Keep',
+          retakeButtonText: 'Retry',
+          onCaptured: (imgPath) {
+            debugPrint('Captured image path: $imgPath');
+          },
+          onSaved: (imgPath) {
+            debugPrint('Saved image path: $imgPath');
+          },
+          onRetake: () {
+            debugPrint('Retake button pressed');
+          },
         ),
       ),
     );
   }
 }
+
 ```
 
 ---
 
 ## Widget Parameters
 
-| Parameter                | Type               | Description                                          | Required | Default Value         |
-|--------------------------|--------------------|------------------------------------------------------|----------|-----------------------|
-| `frameWidth`             | `double`           | Width of the document capture frame.                 | ✅        | —                     |
-| `frameHeight`            | `double`           | Height of the document capture frame.                | ✅        | —                     |
-| `screenTitle`            | `Widget?`          | Title widget to display on the screen (optional).    | ❌        | `null`                |
-| `screenTitleAlignment`   | `Alignment?`       | Alignment of the screen title (optional).            | ❌        | `Alignment.topCenter` |
-| `screenTitlePadding`     | `EdgeInsets?`      | Padding for the screen title (optional).             | ❌        | `EdgeInsets.zero`     |
-| `captureButtonText`      | `String?`          | Text for the "Capture" button.                       | ❌        | `"Capture"`           |
-| `captureButtonTextStyle` | `TextStyle?`       | Text style for the "Capture" button text (optional). | ❌        | `null`                |
-| `captureButtonStyle`     | `ButtonStyle?`     | Style for the "Capture" button (optional).           | ❌        | `null`                |
-| `captureButtonAlignment` | `Alignment?`       | Alignment of the "Capture" button (optional).        | ❌        | `null`                |
-| `captureButtonPadding`   | `EdgeInsets?`      | Padding for the "Capture" button (optional).         | ❌        | `null`                |
-| `onCaptured`             | `Function(String)` | Callback when an image is captured.                  | ✅        | —                     |
-| `saveButtonText`         | `String?`          | Text for the "Save" button.                          | ❌        | `"Save"`              |
-| `saveButtonTextStyle`    | `TextStyle?`       | Text style for the "Save" button text (optional).    | ❌        | `null`                |
-| `saveButtonStyle`        | `ButtonStyle?`     | Style for the "Save" button (optional).              | ❌        | `null`                |
-| `saveButtonAlignment`    | `Alignment?`       | Alignment of the "Save" button (optional).           | ❌        | `null`                |
-| `saveButtonPadding`      | `EdgeInsets?`      | Padding for the "Save" button (optional).            | ❌        | `null`                |
-| `onSaved`                | `Function(String)` | Callback when an image is saved.                     | ✅        | —                     |
-| `retakeButtonText`       | `String?`          | Text for the "Retake" button.                        | ❌        | `"Retake"`            |
-| `retakeButtonTextStyle`  | `TextStyle?`       | Text style for the "Retake" button text (optional).  | ❌        | `null`                |
-| `retakeButtonStyle`      | `ButtonStyle?`     | Style for the "Retake" button (optional).            | ❌        | `null`                |
-| `retakeButtonAlignment`  | `Alignment?`       | Alignment of the "Retake" button (optional).         | ❌        | `null`                |
-| `retakeButtonPadding`    | `EdgeInsets?`      | Padding for the "Retake" button (optional).          | ❌        | `null`                |
-| `onRetake`               | `VoidCallback?`    | Callback when the "Retake" button is pressed.        | ❌        | `null`                |
-| `imageBorder`            | `BoxBorder?`       | Border for the captured image preview (optional).    | ❌        | `null`                |
-| `animationDuration`      | `Duration?`        | Duration for any animations (optional).              | ❌        | `null`                |
-| `animationColor`         | `Color?`           | Color for animation effects (optional).              | ❌        | `null`                |
+| Parameter                | Type               | Description                                          | Required   | Default Value         |
+|--------------------------|--------------------|------------------------------------------------------|------------|-----------------------|
+| `frameWidth`             | `double`           | Width of the document capture frame.                 | ✅          | —                     |
+| `frameHeight`            | `double`           | Height of the document capture frame.                | ✅          | —                     |
+| `screenTitle`            | `Widget?`          | Title widget to display on the screen (optional).    | ❌          | `null`                |
+| `screenTitleAlignment`   | `Alignment?`       | Alignment of the screen title (optional).            | ❌          | `Alignment.topCenter` |
+| `screenTitlePadding`     | `EdgeInsets?`      | Padding for the screen title (optional).             | ❌          | `EdgeInsets.zero`     |
+| `captureButtonText`      | `String?`          | Text for the "Capture" button.                       | ❌          | `"Capture"`           |
+| `captureButtonTextStyle` | `TextStyle?`       | Text style for the "Capture" button text (optional). | ❌          | `null`                |
+| `captureButtonStyle`     | `ButtonStyle?`     | Style for the "Capture" button (optional).           | ❌          | `null`                |
+| `captureButtonAlignment` | `Alignment?`       | Alignment of the "Capture" button (optional).        | ❌          | `null`                |
+| `captureButtonPadding`   | `EdgeInsets?`      | Padding for the "Capture" button (optional).         | ❌          | `null`                |
+| `captureButtonWidth`     | `double?`          | Width for the "Capture" button (optional).           | ❌          | `null`                |
+| `captureButtonHeight`    | `double?`          | Height for the "Capture" button (optional).          | ❌          | `null`                |
+| `onCaptured`             | `Function(String)` | Callback when an image is captured.                  | ✅          | —                     |
+| `saveButtonText`         | `String?`          | Text for the "Save" button.                          | ❌          | `"Save"`              |
+| `saveButtonTextStyle`    | `TextStyle?`       | Text style for the "Save" button text (optional).    | ❌          | `null`                |
+| `saveButtonStyle`        | `ButtonStyle?`     | Style for the "Save" button (optional).              | ❌          | `null`                |
+| `saveButtonAlignment`    | `Alignment?`       | Alignment of the "Save" button (optional).           | ❌          | `null`                |
+| `saveButtonPadding`      | `EdgeInsets?`      | Padding for the "Save" button (optional).            | ❌          | `null`                |
+| `saveButtonWidth`        | `double?`          | Width for the "Save" button (optional).              | ❌          | `null`                |
+| `saveButtonHeight`       | `double?`          | Height for the "Save" button (optional).             | ❌          | `null`                |
+| `onSaved`                | `Function(String)` | Callback when an image is saved.                     | ✅          | —                     |
+| `retakeButtonText`       | `String?`          | Text for the "Retake" button.                        | ❌          | `"Retake"`            |
+| `retakeButtonTextStyle`  | `TextStyle?`       | Text style for the "Retake" button text (optional).  | ❌          | `null`                |
+| `retakeButtonStyle`      | `ButtonStyle?`     | Style for the "Retake" button (optional).            | ❌          | `null`                |
+| `retakeButtonAlignment`  | `Alignment?`       | Alignment of the "Retake" button (optional).         | ❌          | `null`                |
+| `retakeButtonPadding`    | `EdgeInsets?`      | Padding for the "Retake" button (optional).          | ❌          | `null`                |
+| `retakeButtonWidth`      | `double?`          | Width for the "Retake" button (optional).            | ❌          | `null`                |
+| `retakeButtonHeight`     | `double?`          | Height for the "Retake" button (optional).           | ❌          | `null`                |
+| `onRetake`               | `VoidCallback?`    | Callback when the "Retake" button is pressed.        | ❌          | `null`                |
+| `imageBorder`            | `BoxBorder?`       | Border for the captured image preview (optional).    | ❌          | `null`                |
+| `animationDuration`      | `Duration?`        | Duration for any animations (optional).              | ❌          | `null`                |
+| `animationColor`         | `Color?`           | Color for animation effects (optional).              | ❌          | `null`                |
 
 ---
 
