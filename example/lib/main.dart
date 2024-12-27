@@ -28,9 +28,6 @@ class MyApp extends StatelessWidget {
             'Capture Your Document',
             style: TextStyle(color: Colors.white, fontSize: 20),
           ),
-          captureButtonText: 'Snap',
-          saveButtonText: 'Keep',
-          retakeButtonText: 'Retry',
           onCaptured: (imgPath) {
             debugPrint('Captured image path: $imgPath');
           },

@@ -1,12 +1,13 @@
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:document_camera_frame/document_camera_frame.dart';
 import 'package:flutter/material.dart';
 
-import '../../controllers/document_camera_controller.dart';
-import '../../helper/document_camera_frame_painter.dart';
-import '../widgets/action_button.dart';
-import '../widgets/frame_capture_animation.dart';
+import '../../core/app_constants.dart';
+import '../widgets/bottom_frame_container.dart';
+import '../widgets/capture_button.dart';
+import '../widgets/corner_border_box.dart';
 
 /// A customizable camera view for capturing and cropping document images.
 ///
@@ -115,6 +116,8 @@ class DocumentCameraFrame extends StatefulWidget {
 
   final Color? animationColor;
 
+  final double borderRadius;
+
   /// Constructor for the [DocumentCameraFrame].
   const DocumentCameraFrame({
     super.key,
@@ -150,6 +153,7 @@ class DocumentCameraFrame extends StatefulWidget {
     this.imageBorder,
     this.animationDuration,
     this.animationColor,
+    this.borderRadius = 12,
   });
 
   @override
@@ -196,37 +200,23 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
                 child: CustomPaint(
                   painter: DocumentCameraFramePainter(
                     frameWidth: widget.frameWidth,
-                    frameHeight: widget.frameHeight,
+                    frameHeight: widget.frameHeight + AppConstants.bottomFrameContainerHeight,
+                    borderRadius: widget.borderRadius,
                   ),
                 ),
               ),
 
-              // Center alignment of the document frame
+              // Border of the document frame
               Align(
                 alignment: Alignment.center,
                 child: Container(
                   width: widget.frameWidth,
-                  height: widget.frameHeight,
+                  height: widget.frameHeight + AppConstants.bottomFrameContainerHeight,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white, width: 2),
+                    border: Border.all(color: Colors.white, width: 3),
+                    borderRadius: BorderRadius.circular(widget.borderRadius),
                   ),
                 ),
-              ),
-
-              // Frame capture animation when loading
-              ValueListenableBuilder<bool>(
-                valueListenable: isLoadingNotifier,
-                builder: (context, isLoading, child) {
-                  if (isLoading) {
-                    return FrameCaptureAnimation(
-                      frameWidth: widget.frameWidth,
-                      frameHeight: widget.frameHeight,
-                      animationDuration: widget.animationDuration,
-                      animationColor: widget.animationColor,
-                    );
-                  }
-                  return const SizedBox.shrink();
-                },
               ),
 
               // Display captured image
@@ -236,21 +226,107 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
                   if (imagePath.isEmpty) {
                     return const SizedBox.shrink();
                   }
-                  return Center(
-                    child: Container(
+                  return Align(
+                    alignment: Alignment.center,
+                    child: SizedBox(
                       width: widget.frameWidth,
-                      height: widget.frameHeight,
-                      decoration: BoxDecoration(
-                        border: widget.imageBorder ??
-                            Border.all(color: Colors.green, width: 2),
-                        image: DecorationImage(
-                          image: FileImage(File(imagePath)),
-                          fit: BoxFit.fill,
-                        ),
+                      height: widget.frameHeight + AppConstants.bottomFrameContainerHeight,
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            top: 3,
+                            left: 3,
+                            right: 3,
+                            child: Container(
+                              width: widget.frameWidth,
+                              height: widget.frameHeight + AppConstants.bottomFrameContainerHeight / 2,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(12),
+                                  topRight: Radius.circular(12),
+                                ),
+                                image: DecorationImage(
+                                  image: FileImage(File(imagePath)),
+                                  fit: BoxFit.fill,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   );
+                  // return Center(
+                  //   child: Container(
+                  //     width: widget.frameWidth,
+                  //     height: widget.frameHeight + AppConstants.bottomFrameContainerHeight,
+                  //     padding: EdgeInsets.only(
+                  //       top: (AppConstants.bottomFrameContainerHeight / 2 -
+                  //               AppConstants.kCornerBorderBoxVerticalPadding) +
+                  //           20,
+                  //       bottom: (AppConstants.bottomFrameContainerHeight / 2 -
+                  //               AppConstants.kCornerBorderBoxVerticalPadding) +
+                  //           20,
+                  //     ),
+                  //     decoration: BoxDecoration(
+                  //       border: widget.imageBorder ?? Border.all(color: Colors.white, width: 3),
+                  //       borderRadius: BorderRadius.circular(widget.borderRadius),
+                  //     ),
+                  //     child: Center(
+                  //       child: Container(
+                  //         width: widget.frameWidth - AppConstants.kCornerBorderBoxHorizontalPadding - 40,
+                  //         height: widget.frameHeight,
+                  //         //   color: Colors.blue,
+                  //         decoration: BoxDecoration(
+                  //           image: DecorationImage(
+                  //             image: FileImage(File(imagePath)),
+                  //             fit: BoxFit.fill,
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // );
                 },
+              ),
+
+              // CornerBorderBox of the document frame
+              Align(
+                alignment: Alignment.center,
+                child: CornerBorderBox(
+                  width: widget.frameWidth - AppConstants.kCornerBorderBoxHorizontalPadding,
+                  height: widget.frameHeight + AppConstants.bottomFrameContainerHeight,
+                  top: AppConstants.kCornerBorderBoxVerticalPadding,
+                  bottom: AppConstants.bottomFrameContainerHeight / 2 + AppConstants.kCornerBorderBoxVerticalPadding,
+                  cornerSize: 16,
+                  // Size of the corner
+                  borderColor: Colors.white,
+                  // Color of the corner border
+                  cornerRadius: 8, // Corner radius
+                ),
+              ),
+
+              // Frame capture animation when loading
+              // ValueListenableBuilder<bool>(
+              //   valueListenable: isLoadingNotifier,
+              //   builder: (context, isLoading, child) {
+              //     if (isLoading) {
+              //       return FrameCaptureAnimation(
+              //         frameWidth: widget.frameWidth,
+              //         frameHeight: widget.frameHeight + AppConstants.bottomFrameContainerHeight,
+              //         animationDuration: widget.animationDuration,
+              //         animationColor: widget.animationColor,
+              //       );
+              //     }
+              //     return const SizedBox.shrink();
+              //   },
+              // ),
+
+              // Frame Bottom Frame Container
+              BottomFrameContainer(
+                width: widget.frameWidth,
+                height: widget.frameHeight,
+                borderRadius: widget.borderRadius,
               ),
 
               // Display optional screen title
@@ -258,8 +334,7 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
                 Align(
                   alignment: widget.screenTitleAlignment ?? Alignment.topCenter,
                   child: Padding(
-                    padding: widget.screenTitlePadding ??
-                        const EdgeInsets.only(top: 50.0),
+                    padding: widget.screenTitlePadding ?? const EdgeInsets.only(top: 50.0),
                     child: widget.screenTitle,
                   ),
                 ),
@@ -280,44 +355,51 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
       child: ValueListenableBuilder<String>(
         valueListenable: capturedImageNotifier,
         builder: (context, imagePath, child) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
               if (imagePath.isEmpty)
                 Padding(
-                  padding: widget.captureButtonPadding ??
-                      const EdgeInsets.symmetric(vertical: 18.0),
-                  child: ActionButton(
-                    text: widget.captureButtonText ?? 'Capture',
+                  padding: widget.captureButtonPadding ?? const EdgeInsets.symmetric(vertical: 18.0),
+                  child: CaptureButton(
                     onPressed: () => _captureImage(widget.onCaptured),
-                    style: widget.captureButtonStyle,
-                    textStyle: widget.captureButtonTextStyle,
-                    width: widget.captureButtonWidth,
-                    height: widget.captureButtonHeight,
+                    width: 70,
+                    height: 70,
                   ),
                 )
               else ...[
                 Padding(
-                  padding: widget.saveButtonPadding ??
-                      const EdgeInsets.symmetric(vertical: 18.0, horizontal: 4),
+                  padding: widget.saveButtonPadding ?? const EdgeInsets.only(bottom: 20.0),
                   child: ActionButton(
-                    text: widget.saveButtonText ?? 'Save',
+                    text: widget.saveButtonText ?? 'Use this photo',
                     onPressed: () => _saveImage(widget.onSaved),
                     style: widget.saveButtonStyle,
-                    textStyle: widget.saveButtonTextStyle,
+                    textStyle: widget.saveButtonTextStyle ??
+                        TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
+                        ),
                     width: widget.saveButtonWidth,
                     height: widget.saveButtonHeight,
                   ),
                 ),
-                const SizedBox(width: 15),
                 Padding(
-                  padding: widget.retakeButtonPadding ??
-                      const EdgeInsets.symmetric(vertical: 18.0, horizontal: 4),
+                  padding: widget.retakeButtonPadding ?? const EdgeInsets.only(bottom: 20.0),
                   child: ActionButton(
-                    text: widget.retakeButtonText ?? 'Retake',
+                    text: widget.retakeButtonText ?? 'Retake photo',
                     onPressed: () => _retakeImage(widget.onRetake),
-                    style: widget.retakeButtonStyle,
-                    textStyle: widget.retakeButtonTextStyle,
+                    style: widget.retakeButtonStyle ??
+                        ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          side: BorderSide(width: 1, color: Colors.white),
+                        ),
+                    textStyle: widget.retakeButtonTextStyle ??
+                        TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
                     width: widget.retakeButtonWidth,
                     height: widget.retakeButtonHeight,
                   ),
@@ -333,8 +415,7 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
   /// Captures the image and triggers the [onCaptured] callback.
   Future<void> _captureImage(Function(String imgPath) onCaptured) async {
     isLoadingNotifier.value = true;
-    await _controller.takeAndCropPicture(
-        widget.frameWidth, widget.frameHeight, context);
+    await _controller.takeAndCropPicture(widget.frameWidth, widget.frameHeight, context);
 
     capturedImageNotifier.value = _controller.imagePath;
 

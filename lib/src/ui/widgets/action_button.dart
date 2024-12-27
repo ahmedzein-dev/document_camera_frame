@@ -1,3 +1,4 @@
+import 'package:document_camera_frame/src/core/document_camera_context_extensions.dart';
 import 'package:flutter/material.dart';
 
 class ActionButton extends StatelessWidget {
@@ -21,8 +22,8 @@ class ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: width,
-      height: height,
+      width: width ?? .8.sw(context),
+      height: height ?? 50,
       child: ElevatedButton(
         onPressed: onPressed,
         style: style,
