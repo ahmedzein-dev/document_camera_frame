@@ -1,13 +1,13 @@
-import 'dart:io';
-
 import 'package:camera/camera.dart';
 import 'package:document_camera_frame/document_camera_frame.dart';
+import 'package:document_camera_frame/src/ui/widgets/actions_buttons.dart';
+import 'package:document_camera_frame/src/ui/widgets/animated_frame.dart';
+import 'package:document_camera_frame/src/ui/widgets/screen_title.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/app_constants.dart';
 import '../widgets/bottom_frame_container.dart';
-import '../widgets/capture_button.dart';
-import '../widgets/corner_border_box.dart';
+import '../widgets/captured_image_preview.dart';
 
 /// A customizable camera view for capturing and cropping document images.
 ///
@@ -21,13 +21,21 @@ class DocumentCameraFrame extends StatefulWidget {
   final double frameHeight;
 
   /// Widget to display as the screen's title (optional).
-  final Widget? screenTitle;
+  final Widget? title;
 
   /// Alignment of the screen title (optional).
   final Alignment? screenTitleAlignment;
 
   /// Padding for the screen title (optional).
   final EdgeInsets? screenTitlePadding;
+
+  /// Radius of the outer circle of the capture button (optional).
+  /// This defines the size of the outermost circle displayed.
+  final double? captureOuterCircleRadius;
+
+  ///	Radius of the inner circle of the capture button (optional).
+  /// This defines the size of the innermost circle displayed.
+  final double? captureInnerCircleRadius;
 
   /// Text for the "Capture" button.
   final String? captureButtonText;
@@ -110,20 +118,47 @@ class DocumentCameraFrame extends StatefulWidget {
   /// **Note**: Same as above, apply text styling here.
   final TextStyle? retakeButtonTextStyle;
 
-  final BoxBorder? imageBorder;
+  /// Border for the displayed Frame (optional).
+  final BoxBorder? frameBorder;
 
-  final Duration? animationDuration;
+  /// Duration for the capturing animation (optional).
+  /// This controls how long the animation plays during the capture process.
+  final Duration? capturingAnimationDuration;
 
-  final Color? animationColor;
+  /// Color for the capturing animation (optional).
+  /// Used to visually indicate the capture animation.
+  final Color? capturingAnimationColor;
 
-  final double borderRadius;
+  /// Curve for the capturing animation (optional).
+  /// Determines the easing of the animation during the capture process.
+  final Curve? capturingAnimationCurve;
+
+  /// Radius of the outer border of the frame.
+  /// Controls the rounded edges of the outer frame.
+  final double outerFrameBorderRadius;
+
+  /// Radius of the inner corners of the frame.
+  /// Controls the rounded edges of the inner frame corners.
+  final double innerCornerBroderRadius;
+
+  /// Duration for the frame animation (optional).
+  /// Controls the animation timing for the frame.
+  final Duration animatedFrameDuration;
+
+  /// Curve for the frame animation (optional).
+  /// Determines the easing of the frame animation.
+  final Curve animatedFrameCurve;
+
+  /// Child widget for the bottom frame container (optional).
+  /// Allows for customization of the content displayed within the bottom container.
+  final Widget? bottomFrameContainerChild;
 
   /// Constructor for the [DocumentCameraFrame].
   const DocumentCameraFrame({
     super.key,
     required this.frameWidth,
     required this.frameHeight,
-    this.screenTitle,
+    this.title,
     this.screenTitleAlignment,
     this.screenTitlePadding,
     this.captureButtonText,
@@ -150,10 +185,17 @@ class DocumentCameraFrame extends StatefulWidget {
     this.retakeButtonPadding,
     this.retakeButtonWidth,
     this.retakeButtonHeight,
-    this.imageBorder,
-    this.animationDuration,
-    this.animationColor,
-    this.borderRadius = 12,
+    this.frameBorder,
+    this.capturingAnimationDuration,
+    this.capturingAnimationColor,
+    this.animatedFrameDuration = const Duration(milliseconds: 800),
+    this.animatedFrameCurve = Curves.easeIn,
+    this.outerFrameBorderRadius = 12,
+    this.innerCornerBroderRadius = 8,
+    this.capturingAnimationCurve,
+    this.bottomFrameContainerChild,
+    this.captureInnerCircleRadius,
+    this.captureOuterCircleRadius,
   });
 
   @override
@@ -182,266 +224,99 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: ValueListenableBuilder<bool>(
         valueListenable: isInitializedNotifier,
-        builder: (context, isInitialized, child) {
-          if (!isInitialized) {
-            return const Center(child: CircularProgressIndicator());
-          }
+        builder: (context, isInitialized, child) => Stack(
+          fit: StackFit.expand,
+          children: [
+            // Display the camera preview
+            if (isInitialized) CameraPreview(_controller.cameraController!),
 
-          return Stack(
-            fit: StackFit.expand,
-            children: [
-              // Display the camera preview
-              CameraPreview(_controller.cameraController!),
-
-              // Draw the document frame
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: DocumentCameraFramePainter(
-                    frameWidth: widget.frameWidth,
-                    frameHeight: widget.frameHeight + AppConstants.bottomFrameContainerHeight,
-                    borderRadius: widget.borderRadius,
-                  ),
-                ),
+            /// Display captured image
+            if (isInitialized)
+              CapturedImagePreview(
+                capturedImageNotifier: capturedImageNotifier,
+                frameWidth: widget.frameWidth,
+                frameHeight: widget.frameHeight,
+                borderRadius: widget.outerFrameBorderRadius,
               ),
 
-              // Border of the document frame
-              Align(
-                alignment: Alignment.center,
-                child: Container(
-                  width: widget.frameWidth,
-                  height: widget.frameHeight + AppConstants.bottomFrameContainerHeight,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white, width: 3),
-                    borderRadius: BorderRadius.circular(widget.borderRadius),
-                  ),
-                ),
-              ),
-
-              // Display captured image
-              ValueListenableBuilder<String>(
-                valueListenable: capturedImageNotifier,
-                builder: (context, imagePath, child) {
-                  if (imagePath.isEmpty) {
-                    return const SizedBox.shrink();
+            /// Frame capture animation when loading
+            if (isInitialized)
+              ValueListenableBuilder<bool>(
+                valueListenable: isLoadingNotifier,
+                builder: (context, isLoading, child) {
+                  if (isLoading) {
+                    return FrameCaptureAnimation(
+                      frameWidth: widget.frameWidth,
+                      frameHeight: widget.frameHeight,
+                      animationDuration: widget.capturingAnimationDuration,
+                      animationColor: widget.capturingAnimationColor,
+                      curve: widget.capturingAnimationCurve,
+                    );
                   }
-                  return Align(
-                    alignment: Alignment.center,
-                    child: SizedBox(
-                      width: widget.frameWidth,
-                      height: widget.frameHeight + AppConstants.bottomFrameContainerHeight,
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            top: 3,
-                            left: 3,
-                            right: 3,
-                            child: Container(
-                              width: widget.frameWidth,
-                              height: widget.frameHeight + AppConstants.bottomFrameContainerHeight / 2,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(12),
-                                  topRight: Radius.circular(12),
-                                ),
-                                image: DecorationImage(
-                                  image: FileImage(File(imagePath)),
-                                  fit: BoxFit.fill,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                  // return Center(
-                  //   child: Container(
-                  //     width: widget.frameWidth,
-                  //     height: widget.frameHeight + AppConstants.bottomFrameContainerHeight,
-                  //     padding: EdgeInsets.only(
-                  //       top: (AppConstants.bottomFrameContainerHeight / 2 -
-                  //               AppConstants.kCornerBorderBoxVerticalPadding) +
-                  //           20,
-                  //       bottom: (AppConstants.bottomFrameContainerHeight / 2 -
-                  //               AppConstants.kCornerBorderBoxVerticalPadding) +
-                  //           20,
-                  //     ),
-                  //     decoration: BoxDecoration(
-                  //       border: widget.imageBorder ?? Border.all(color: Colors.white, width: 3),
-                  //       borderRadius: BorderRadius.circular(widget.borderRadius),
-                  //     ),
-                  //     child: Center(
-                  //       child: Container(
-                  //         width: widget.frameWidth - AppConstants.kCornerBorderBoxHorizontalPadding - 40,
-                  //         height: widget.frameHeight,
-                  //         //   color: Colors.blue,
-                  //         decoration: BoxDecoration(
-                  //           image: DecorationImage(
-                  //             image: FileImage(File(imagePath)),
-                  //             fit: BoxFit.fill,
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ),
-                  // );
+                  return const SizedBox.shrink();
                 },
               ),
 
-              // CornerBorderBox of the document frame
-              Align(
-                alignment: Alignment.center,
-                child: CornerBorderBox(
-                  width: widget.frameWidth - AppConstants.kCornerBorderBoxHorizontalPadding,
-                  height: widget.frameHeight + AppConstants.bottomFrameContainerHeight,
-                  top: AppConstants.kCornerBorderBoxVerticalPadding,
-                  bottom: AppConstants.bottomFrameContainerHeight / 2 + AppConstants.kCornerBorderBoxVerticalPadding,
-                  cornerSize: 16,
-                  // Size of the corner
-                  borderColor: Colors.white,
-                  // Color of the corner border
-                  cornerRadius: 8, // Corner radius
+            //  Draw the document frame
+            Positioned.fill(
+              child: CustomPaint(
+                painter: DocumentCameraFramePainter(
+                  frameWidth: widget.frameWidth,
+                  frameHeight: widget.frameHeight + AppConstants.bottomFrameContainerHeight,
+                  borderRadius: widget.outerFrameBorderRadius,
                 ),
               ),
+            ),
 
-              // Frame capture animation when loading
-              // ValueListenableBuilder<bool>(
-              //   valueListenable: isLoadingNotifier,
-              //   builder: (context, isLoading, child) {
-              //     if (isLoading) {
-              //       return FrameCaptureAnimation(
-              //         frameWidth: widget.frameWidth,
-              //         frameHeight: widget.frameHeight + AppConstants.bottomFrameContainerHeight,
-              //         animationDuration: widget.animationDuration,
-              //         animationColor: widget.animationColor,
-              //       );
-              //     }
-              //     return const SizedBox.shrink();
-              //   },
-              // ),
+            /// Border of the document frame
+            ///
+            /// CornerBorderBox of the document frame
+            AnimatedFrame(
+              frameWidth: widget.frameWidth,
+              frameHeight: widget.frameHeight,
+              outerFrameBorderRadius: widget.outerFrameBorderRadius,
+              innerCornerBroderRadius: widget.innerCornerBroderRadius,
+              animatedFrameDuration: widget.animatedFrameDuration,
+              animatedFrameCurve: widget.animatedFrameCurve,
+              border: widget.frameBorder,
+            ),
 
-              // Frame Bottom Frame Container
-              BottomFrameContainer(
-                width: widget.frameWidth,
-                height: widget.frameHeight,
-                borderRadius: widget.borderRadius,
+            /// Frame Bottom Container
+            BottomFrameContainer(
+              width: widget.frameWidth,
+              height: widget.frameHeight,
+              borderRadius: widget.outerFrameBorderRadius,
+              bottomFrameContainerChild: widget.bottomFrameContainerChild,
+            ),
+
+            /// Screen Title
+            if (widget.title != null)
+              ScreenTitle(
+                title: widget.title,
+                screenTitleAlignment: widget.screenTitleAlignment,
+                screenTitlePadding: widget.screenTitlePadding,
               ),
 
-              // Display optional screen title
-              if (widget.screenTitle != null)
-                Align(
-                  alignment: widget.screenTitleAlignment ?? Alignment.topCenter,
-                  child: Padding(
-                    padding: widget.screenTitlePadding ?? const EdgeInsets.only(top: 50.0),
-                    child: widget.screenTitle,
-                  ),
-                ),
-
-              // Display action buttons
-              _buildActionButtons(),
-            ],
-          );
-        },
+            /// Display action buttons
+            ActionButtons(
+              frameWidth: widget.frameWidth,
+              frameHeight: widget.frameHeight,
+              bottomFrameContainerHeight: AppConstants.bottomFrameContainerHeight,
+              capturedImageNotifier: capturedImageNotifier,
+              isLoadingNotifier: isLoadingNotifier,
+              onSave: widget.onSaved,
+              onRetake: widget.onRetake,
+              controller: _controller,
+              onCaptured: widget.onCaptured,
+              onSaved: widget.onSaved,
+            )
+          ],
+        ),
       ),
     );
-  }
-
-  /// Builds the action buttons for capture, save, and retake.
-  Widget _buildActionButtons() {
-    return Align(
-      alignment: widget.captureButtonAlignment ?? Alignment.bottomCenter,
-      child: ValueListenableBuilder<String>(
-        valueListenable: capturedImageNotifier,
-        builder: (context, imagePath, child) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              if (imagePath.isEmpty)
-                Padding(
-                  padding: widget.captureButtonPadding ?? const EdgeInsets.symmetric(vertical: 18.0),
-                  child: CaptureButton(
-                    onPressed: () => _captureImage(widget.onCaptured),
-                    width: 70,
-                    height: 70,
-                  ),
-                )
-              else ...[
-                Padding(
-                  padding: widget.saveButtonPadding ?? const EdgeInsets.only(bottom: 20.0),
-                  child: ActionButton(
-                    text: widget.saveButtonText ?? 'Use this photo',
-                    onPressed: () => _saveImage(widget.onSaved),
-                    style: widget.saveButtonStyle,
-                    textStyle: widget.saveButtonTextStyle ??
-                        TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black,
-                        ),
-                    width: widget.saveButtonWidth,
-                    height: widget.saveButtonHeight,
-                  ),
-                ),
-                Padding(
-                  padding: widget.retakeButtonPadding ?? const EdgeInsets.only(bottom: 20.0),
-                  child: ActionButton(
-                    text: widget.retakeButtonText ?? 'Retake photo',
-                    onPressed: () => _retakeImage(widget.onRetake),
-                    style: widget.retakeButtonStyle ??
-                        ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          side: BorderSide(width: 1, color: Colors.white),
-                        ),
-                    textStyle: widget.retakeButtonTextStyle ??
-                        TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        ),
-                    width: widget.retakeButtonWidth,
-                    height: widget.retakeButtonHeight,
-                  ),
-                ),
-              ],
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  /// Captures the image and triggers the [onCaptured] callback.
-  Future<void> _captureImage(Function(String imgPath) onCaptured) async {
-    isLoadingNotifier.value = true;
-    await _controller.takeAndCropPicture(widget.frameWidth, widget.frameHeight, context);
-
-    capturedImageNotifier.value = _controller.imagePath;
-
-    onCaptured(_controller.imagePath);
-
-    isLoadingNotifier.value = false;
-  }
-
-  /// Saves the captured image and triggers the [onSaved] callback.
-  void _saveImage(Function(String imgPath) onSaved) {
-    final imagePath = _controller.imagePath;
-
-    onSaved(imagePath);
-
-    _controller.resetImage();
-  }
-
-  /// Retakes the image and resets the UI.
-  void _retakeImage(VoidCallback? onRetake) {
-    if (onRetake != null) {
-      onRetake();
-    }
-
-    _controller.retakeImage();
-
-    capturedImageNotifier.value = _controller.imagePath;
   }
 
   @override

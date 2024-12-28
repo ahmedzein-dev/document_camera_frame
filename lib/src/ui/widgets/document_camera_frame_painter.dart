@@ -6,7 +6,11 @@ class DocumentCameraFramePainter extends CustomPainter {
 
   final double borderRadius;
 
-  DocumentCameraFramePainter({required this.frameWidth, required this.frameHeight, required this.borderRadius});
+  DocumentCameraFramePainter({
+    required this.frameWidth,
+    required this.frameHeight,
+    required this.borderRadius,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -15,7 +19,8 @@ class DocumentCameraFramePainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     final clearRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH((size.width - frameWidth) / 2, (size.height - frameHeight) / 2, frameWidth, frameHeight),
+      Rect.fromLTWH((size.width - frameWidth) / 2,
+          (size.height - frameHeight) / 2, frameWidth, frameHeight),
       Radius.circular(borderRadius),
     );
 

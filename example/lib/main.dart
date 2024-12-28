@@ -16,17 +16,13 @@ class MyApp extends StatelessWidget {
         body: DocumentCameraFrame(
           frameWidth: 330.0,
           frameHeight: 240.0,
-          // captureButtonTextStyle: const TextStyle(fontSize: 24),
-          // captureButtonStyle: ElevatedButton.styleFrom(
-          //   backgroundColor: Colors.white,
-          //   foregroundColor: Colors.black,
-          //   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-          // ),
-          // captureButtonWidth: 140,
-          // captureButtonHeight: 40,
-          screenTitle: const Text(
+          title: Text(
             'Capture Your Document',
-            style: TextStyle(color: Colors.white, fontSize: 20),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           onCaptured: (imgPath) {
             debugPrint('Captured image path: $imgPath');

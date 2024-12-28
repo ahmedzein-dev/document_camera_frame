@@ -8,7 +8,8 @@ import '../services/image_processing_service.dart';
 
 class DocumentCameraController {
   final CameraService _cameraService = CameraService();
-  final ImageProcessingService _imageProcessingService = ImageProcessingService();
+  final ImageProcessingService _imageProcessingService =
+      ImageProcessingService();
   String _imagePath = '';
 
   String get imagePath => _imagePath;
@@ -20,7 +21,8 @@ class DocumentCameraController {
 
   bool get isInitialized => _cameraService.isInitialized;
 
-  Future<void> takeAndCropPicture(double frameWidth, double frameHeight, BuildContext context) async {
+  Future<void> takeAndCropPicture(
+      double frameWidth, double frameHeight, BuildContext context) async {
     if (!_cameraService.isInitialized) return;
 
     try {
@@ -28,7 +30,8 @@ class DocumentCameraController {
 
       if (!context.mounted) return;
 
-      _imagePath = _imageProcessingService.cropImageToFrame(filePath, frameWidth, frameHeight, context);
+      _imagePath = _imageProcessingService.cropImageToFrame(
+          filePath, frameWidth, frameHeight, context);
     } catch (e) {
       log('Error capturing or cropping image: $e');
       rethrow;

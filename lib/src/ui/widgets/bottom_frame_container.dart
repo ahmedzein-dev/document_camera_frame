@@ -6,8 +6,15 @@ class BottomFrameContainer extends StatelessWidget {
   final double width;
   final double height;
   final double borderRadius;
+  final Widget? bottomFrameContainerChild;
 
-  const BottomFrameContainer({super.key, required this.width, required this.height, required this.borderRadius});
+  const BottomFrameContainer({
+    super.key,
+    required this.width,
+    required this.height,
+    required this.borderRadius,
+    this.bottomFrameContainerChild,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +30,22 @@ class BottomFrameContainer extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border(
-              right: BorderSide(color: Colors.white, width: 3, strokeAlign: BorderSide.strokeAlignInside),
-              left: BorderSide(color: Colors.white, width: 3, strokeAlign: BorderSide.strokeAlignInside),
-              top: BorderSide(color: Colors.white, width: 3, strokeAlign: BorderSide.strokeAlignInside),
-              bottom: BorderSide(color: Colors.white, width: 3, strokeAlign: BorderSide.strokeAlignInside),
+              right: BorderSide(
+                  color: Colors.white,
+                  width: 3,
+                  strokeAlign: BorderSide.strokeAlignInside),
+              left: BorderSide(
+                  color: Colors.white,
+                  width: 3,
+                  strokeAlign: BorderSide.strokeAlignInside),
+              top: BorderSide(
+                  color: Colors.white,
+                  width: 3,
+                  strokeAlign: BorderSide.strokeAlignInside),
+              bottom: BorderSide(
+                  color: Colors.white,
+                  width: 3,
+                  strokeAlign: BorderSide.strokeAlignInside),
             ),
             borderRadius: BorderRadius.only(
               topRight: Radius.circular(borderRadius),
@@ -35,62 +54,28 @@ class BottomFrameContainer extends StatelessWidget {
               bottomRight: Radius.circular(borderRadius),
             ),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.credit_card_outlined, // Icon representing the ID
-                color: Colors.black54,
-                size: 24,
+          child: bottomFrameContainerChild ??
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.credit_card_outlined, // Icon representing the ID
+                    color: Colors.black54,
+                    size: 24,
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    'Your ID',
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(width: 8),
-              Text(
-                'Back of ID',
-                style: TextStyle(
-                  color: Colors.black87,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
   }
 }
-
-// Positioned(
-// top: .5.sh(context) + (widget.frameHeight / 2) - 20,
-// left: 0,
-// right: 0,
-// child: Center(
-// child: Container(
-// width: widget.frameWidth * 1.2, // Slightly wider than the frame
-// padding: EdgeInsets.symmetric(vertical: 10),
-// decoration: BoxDecoration(
-// color: Colors.white,
-// borderRadius: BorderRadius.circular(8),
-// ),
-// child: Row(
-// mainAxisSize: MainAxisSize.min,
-// children: [
-// Icon(
-// Icons.credit_card, // Icon representing the ID
-// color: Colors.black54,
-// size: 24,
-// ),
-// SizedBox(width: 8),
-// Text(
-// "Back of ID",
-// style: TextStyle(
-// color: Colors.black87,
-// fontSize: 16,
-// fontWeight: FontWeight.w500,
-// ),
-// ),
-// ],
-// ),
-// ),
-// ),
-// ),

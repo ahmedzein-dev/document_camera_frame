@@ -132,21 +132,14 @@ class MyApp extends StatelessWidget {
         body: DocumentCameraFrame(
           frameWidth: 330.0,
           frameHeight: 240.0,
-          // captureButtonTextStyle: const TextStyle(fontSize: 24),
-          // captureButtonStyle: ElevatedButton.styleFrom(
-          //   backgroundColor: Colors.white,
-          //   foregroundColor: Colors.black,
-          //   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-          // ),
-          // captureButtonWidth: 140,
-          // captureButtonHeight: 40,
-          screenTitle: const Text(
+          title: Text(
             'Capture Your Document',
-            style: TextStyle(color: Colors.white, fontSize: 20),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          captureButtonText: 'Snap',
-          saveButtonText: 'Keep',
-          retakeButtonText: 'Retry',
           onCaptured: (imgPath) {
             debugPrint('Captured image path: $imgPath');
           },
@@ -168,40 +161,48 @@ class MyApp extends StatelessWidget {
 
 ## Widget Parameters
 
-| Parameter                | Type               | Description                                          | Required   | Default Value         |
-|--------------------------|--------------------|------------------------------------------------------|------------|-----------------------|
-| `frameWidth`             | `double`           | Width of the document capture frame.                 | ✅          | —                     |
-| `frameHeight`            | `double`           | Height of the document capture frame.                | ✅          | —                     |
-| `screenTitle`            | `Widget?`          | Title widget to display on the screen (optional).    | ❌          | `null`                |
-| `screenTitleAlignment`   | `Alignment?`       | Alignment of the screen title (optional).            | ❌          | `Alignment.topCenter` |
-| `screenTitlePadding`     | `EdgeInsets?`      | Padding for the screen title (optional).             | ❌          | `EdgeInsets.zero`     |
-| `captureButtonText`      | `String?`          | Text for the "Capture" button.                       | ❌          | `"Capture"`           |
-| `captureButtonTextStyle` | `TextStyle?`       | Text style for the "Capture" button text (optional). | ❌          | `null`                |
-| `captureButtonStyle`     | `ButtonStyle?`     | Style for the "Capture" button (optional).           | ❌          | `null`                |
-| `captureButtonAlignment` | `Alignment?`       | Alignment of the "Capture" button (optional).        | ❌          | `null`                |
-| `captureButtonPadding`   | `EdgeInsets?`      | Padding for the "Capture" button (optional).         | ❌          | `null`                |
-| `captureButtonWidth`     | `double?`          | Width for the "Capture" button (optional).           | ❌          | `null`                |
-| `captureButtonHeight`    | `double?`          | Height for the "Capture" button (optional).          | ❌          | `null`                |
-| `onCaptured`             | `Function(String)` | Callback when an image is captured.                  | ✅          | —                     |
-| `saveButtonText`         | `String?`          | Text for the "Save" button.                          | ❌          | `"Save"`              |
-| `saveButtonTextStyle`    | `TextStyle?`       | Text style for the "Save" button text (optional).    | ❌          | `null`                |
-| `saveButtonStyle`        | `ButtonStyle?`     | Style for the "Save" button (optional).              | ❌          | `null`                |
-| `saveButtonAlignment`    | `Alignment?`       | Alignment of the "Save" button (optional).           | ❌          | `null`                |
-| `saveButtonPadding`      | `EdgeInsets?`      | Padding for the "Save" button (optional).            | ❌          | `null`                |
-| `saveButtonWidth`        | `double?`          | Width for the "Save" button (optional).              | ❌          | `null`                |
-| `saveButtonHeight`       | `double?`          | Height for the "Save" button (optional).             | ❌          | `null`                |
-| `onSaved`                | `Function(String)` | Callback when an image is saved.                     | ✅          | —                     |
-| `retakeButtonText`       | `String?`          | Text for the "Retake" button.                        | ❌          | `"Retake"`            |
-| `retakeButtonTextStyle`  | `TextStyle?`       | Text style for the "Retake" button text (optional).  | ❌          | `null`                |
-| `retakeButtonStyle`      | `ButtonStyle?`     | Style for the "Retake" button (optional).            | ❌          | `null`                |
-| `retakeButtonAlignment`  | `Alignment?`       | Alignment of the "Retake" button (optional).         | ❌          | `null`                |
-| `retakeButtonPadding`    | `EdgeInsets?`      | Padding for the "Retake" button (optional).          | ❌          | `null`                |
-| `retakeButtonWidth`      | `double?`          | Width for the "Retake" button (optional).            | ❌          | `null`                |
-| `retakeButtonHeight`     | `double?`          | Height for the "Retake" button (optional).           | ❌          | `null`                |
-| `onRetake`               | `VoidCallback?`    | Callback when the "Retake" button is pressed.        | ❌          | `null`                |
-| `imageBorder`            | `BoxBorder?`       | Border for the captured image preview (optional).    | ❌          | `null`                |
-| `animationDuration`      | `Duration?`        | Duration for any animations (optional).              | ❌          | `null`                |
-| `animationColor`         | `Color?`           | Color for animation effects (optional).              | ❌          | `null`                |
+| Parameter                   | Type               | Description                                                             | Required      | Default Value                 |
+|-----------------------------|--------------------|-------------------------------------------------------------------------|---------------|-------------------------------|
+| `frameWidth`                | `double`           | Width of the document capture frame.                                    | ✅            | —                             |
+| `frameHeight`               | `double`           | Height of the document capture frame.                                   | ✅            | —                             |
+| `title`                     | `Widget?`          | Widget to display as the screen's title (optional).                     | ❌            | `null`                        |
+| `screenTitleAlignment`      | `Alignment?`       | Alignment of the screen title (optional).                               | ❌            | `Alignment.topCenter`         |
+| `screenTitlePadding`        | `EdgeInsets?`      | Padding for the screen title (optional).                                | ❌            | `EdgeInsets.zero`             |
+| `captureButtonText`         | `String?`          | Text for the "Capture" button.                                          | ❌            | `"Capture"`                   |
+| `captureButtonTextStyle`    | `TextStyle?`       | Text style for the "Capture" button text (optional)                     | ❌            | `null`                        |
+| `captureInnerCircleRadius`  | `double?`          | Radius of the inner circle of the capture button (optional).            | ❌            | `59`                          |
+| `captureOuterCircleRadius`  | `double?`          | Radius of the outer circle of the capture button (optional).            | ❌            | `70`                          |
+| `captureButtonStyle`        | `ButtonStyle?`     | Style for the "Capture" button (optional).                              | ❌            | `null`                        |
+| `captureButtonAlignment`    | `Alignment?`       | Alignment of the "Capture" button (optional).                           | ❌            | `Alignment.bottomCenter`      |
+| `captureButtonPadding`      | `EdgeInsets?`      | Padding for the "Capture" button (optional).                            | ❌            | `null`                        |
+| `captureButtonWidth`        | `double?`          | Width for the "Capture" button (optional).                              | ❌            | `null`                        |
+| `captureButtonHeight`       | `double?`          | Height for the "Capture" button (optional).                             | ❌            | `null`                        |
+| `onCaptured`                | `Function(String)` | Callback triggered when an image is captured.                           | ✅            | —                             |
+| `saveButtonText`            | `String?`          | Text for the "Save" button.                                             | ❌            | `"Save"`                      |
+| `saveButtonTextStyle`       | `TextStyle?`       | Text style for the "Save" button text (optional).                       | ❌            | `null`                        |
+| `saveButtonStyle`           | `ButtonStyle?`     | Style for the "Save" button (optional).                                 | ❌            | `null`                        |
+| `saveButtonAlignment`       | `Alignment?`       | Alignment of the "Save" button (optional).                              | ❌            | `Alignment.bottomRight`       |
+| `saveButtonPadding`         | `EdgeInsets?`      | Padding for the "Save" button (optional).                               | ❌            | `null`                        |
+| `saveButtonWidth`           | `double?`          | Width for the "Save" button (optional).                                 | ❌            | `null`                        |
+| `saveButtonHeight`          | `double?`          | Height for the "Save" button (optional).                                | ❌            | `null`                        |
+| `onSaved`                   | `Function(String)` | Callback triggered when an image is saved.                              | ✅            | —                             |
+| `retakeButtonText`          | `String?`          | Text for the "Retake" button.                                           | ❌            | `"Retake"`                    |
+| `retakeButtonTextStyle`     | `TextStyle?`       | Text style for the "Retake" button text (optional).                     | ❌            | `null`                        |
+| `retakeButtonStyle`         | `ButtonStyle?`     | Style for the "Retake" button (optional).                               | ❌            | `null`                        |
+| `retakeButtonAlignment`     | `Alignment?`       | Alignment of the "Retake" button (optional).                            | ❌            | `Alignment.bottomLeft`        |
+| `retakeButtonPadding`       | `EdgeInsets?`      | Padding for the "Retake" button (optional).                             | ❌            | `null`                        |
+| `retakeButtonWidth`         | `double?`          | Width for the "Retake" button (optional).                               | ❌            | `null`                        |
+| `retakeButtonHeight`        | `double?`          | Height for the "Retake" button (optional).                              | ❌            | `null`                        |
+| `onRetake`                  | `VoidCallback?`    | Callback triggered when the "Retake" button is pressed.                 | ❌            | `null`                        |
+| `frameBorder`               | `BoxBorder?`       | Border for the displayed frame (optional).                              | ❌            | `null`                        |
+| `capturingAnimationDuration`| `Duration?`        | Duration for the capturing animation (optional).                        | ❌            | `Duration(milliseconds: 500)` |
+| `capturingAnimationColor`   | `Color?`           | Color for the capturing animation (optional).                           | ❌            | `Colors.black26`              |
+| `capturingAnimationCurve`   | `Curve?`           | Curve for the capturing animation (optional).                           | ❌            | `Curves.easeInOut`            |
+| `outerFrameBorderRadius`    | `double`           | Radius of the outer border of the frame.                                | ❌            | `12.0`                        |
+| `innerCornerBroderRadius`   | `double`           | Radius of the inner corners of the frame.                               | ❌            | `8.0`                         |
+| `animatedFrameDuration`     | `Duration`         | Duration for the frame animation (optional).                            | ❌            | `Duration(milliseconds: 800)` |
+| `animatedFrameCurve`        | `Curve`            | Curve for the frame animation (optional).                               | ❌            | `Curves.easeIn`               |
+| `bottomFrameContainerChild` | `Widget?`          | Custom content for the bottom container (optional).                     | ❌            | `null`                        |
 
 ---
 
