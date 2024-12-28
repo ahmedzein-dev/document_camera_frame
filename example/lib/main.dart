@@ -14,8 +14,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: DocumentCameraFrame(
-          frameWidth: 330.0,
-          frameHeight: 240.0,
+          frameWidth: 300.0,
+          frameHeight: 200.0,
           title: Text(
             'Capture Your Document',
             style: TextStyle(

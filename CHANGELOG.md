@@ -36,3 +36,13 @@
 
 - Add example.gif
 - Update Readme.md.
+
+## 0.1.0
+
+- Enhanced widget UI for `DocumentCameraFrame` to improve design aesthetics.
+- Added customizable parameters for the capture button:
+  - `captureOuterCircleRadius`: Radius of the outer circle for the capture button.
+  - `captureInnerCircleRadius`: Radius of the inner circle for the capture button.
+- Implemented an animation for smoother transitions:
+  - The container now animates from bottom to top when opened.
+- Updated documentation to reflect these changes.
