@@ -265,7 +265,8 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
               child: CustomPaint(
                 painter: DocumentCameraFramePainter(
                   frameWidth: widget.frameWidth,
-                  frameHeight: widget.frameHeight + AppConstants.bottomFrameContainerHeight,
+                  frameHeight: widget.frameHeight +
+                      AppConstants.bottomFrameContainerHeight,
                   borderRadius: widget.outerFrameBorderRadius,
                 ),
               ),
@@ -304,7 +305,8 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
             ActionButtons(
               frameWidth: widget.frameWidth,
               frameHeight: widget.frameHeight,
-              bottomFrameContainerHeight: AppConstants.bottomFrameContainerHeight,
+              bottomFrameContainerHeight:
+                  AppConstants.bottomFrameContainerHeight,
               capturedImageNotifier: capturedImageNotifier,
               isLoadingNotifier: isLoadingNotifier,
               onSave: widget.onSaved,

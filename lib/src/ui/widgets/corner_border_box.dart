@@ -41,7 +41,8 @@ class CornerBorderBox extends StatelessWidget {
                   right: BorderSide.none,
                   bottom: BorderSide.none,
                 ),
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(cornerRadius)),
+                borderRadius:
+                    BorderRadius.only(topLeft: Radius.circular(cornerRadius)),
               ),
             ),
           ),
@@ -60,7 +61,8 @@ class CornerBorderBox extends StatelessWidget {
                   left: BorderSide.none,
                   bottom: BorderSide.none,
                 ),
-                borderRadius: BorderRadius.only(topRight: Radius.circular(cornerRadius)),
+                borderRadius:
+                    BorderRadius.only(topRight: Radius.circular(cornerRadius)),
               ),
             ),
           ),
@@ -79,7 +81,8 @@ class CornerBorderBox extends StatelessWidget {
                   left: BorderSide(color: Colors.white, width: 2),
                   bottom: BorderSide(color: Colors.white, width: 2),
                 ),
-                borderRadius: BorderRadius.only(bottomLeft: Radius.circular(cornerRadius)),
+                borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(cornerRadius)),
               ),
             ),
           ),
@@ -98,7 +101,8 @@ class CornerBorderBox extends StatelessWidget {
                   right: BorderSide(color: Colors.white, width: 2),
                   bottom: BorderSide(color: Colors.white, width: 2),
                 ),
-                borderRadius: BorderRadius.only(bottomRight: Radius.circular(cornerRadius)),
+                borderRadius: BorderRadius.only(
+                    bottomRight: Radius.circular(cornerRadius)),
               ),
             ),
           ),

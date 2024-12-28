@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 
 class ImageProcessingService {
-  String cropImageToFrame(String filePath, double frameWidth, double frameHeight, BuildContext context) {
+  String cropImageToFrame(String filePath, double frameWidth,
+      double frameHeight, BuildContext context) {
     final File imageFile = File(filePath);
-    final img.Image originalImage = img.decodeImage(imageFile.readAsBytesSync())!;
+    final img.Image originalImage =
+        img.decodeImage(imageFile.readAsBytesSync())!;
 
     final int screenWidth = 1.sw(context).toInt();
     final int screenHeight = 1.sh(context).toInt();
@@ -18,8 +20,8 @@ class ImageProcessingService {
     final int cropX = (originalImage.width - cropWidth) ~/ 2;
     final int cropY = (originalImage.height - cropHeight) ~/ 2;
 
-    final img.Image croppedImage =
-        img.copyCrop(originalImage, x: cropX, y: cropY, width: cropWidth, height: cropHeight);
+    final img.Image croppedImage = img.copyCrop(originalImage,
+        x: cropX, y: cropY, width: cropWidth, height: cropHeight);
 
     final String croppedFilePath = filePath.replaceAll('.jpg', '_cropped.jpg');
     File(croppedFilePath).writeAsBytesSync(img.encodeJpg(croppedImage));

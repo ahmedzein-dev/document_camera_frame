@@ -37,8 +37,11 @@ class _AnimatedFrameState extends State<AnimatedFrame> {
     // Trigger the animation after the first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
-        _frameHeight = widget.frameHeight + AppConstants.bottomFrameContainerHeight;
-        _cornerBorderBoxHeight = widget.frameHeight + AppConstants.bottomFrameContainerHeight / 2 - 34;
+        _frameHeight =
+            widget.frameHeight + AppConstants.bottomFrameContainerHeight;
+        _cornerBorderBoxHeight = widget.frameHeight +
+            AppConstants.bottomFrameContainerHeight / 2 -
+            34;
       });
     });
   }
@@ -49,7 +52,10 @@ class _AnimatedFrameState extends State<AnimatedFrame> {
       children: [
         // Border of the document frame
         Positioned(
-          bottom: (1.sh(context) - widget.frameHeight - AppConstants.bottomFrameContainerHeight) / 2,
+          bottom: (1.sh(context) -
+                  widget.frameHeight -
+                  AppConstants.bottomFrameContainerHeight) /
+              2,
           right: (1.sw(context) - widget.frameWidth) / 2,
           child: AnimatedContainer(
             width: widget.frameWidth,
@@ -57,8 +63,10 @@ class _AnimatedFrameState extends State<AnimatedFrame> {
             duration: widget.animatedFrameDuration,
             curve: widget.animatedFrameCurve,
             decoration: BoxDecoration(
-              border: widget.border ?? Border.all(color: Colors.white, width: 3),
-              borderRadius: BorderRadius.circular(widget.innerCornerBroderRadius),
+              border:
+                  widget.border ?? Border.all(color: Colors.white, width: 3),
+              borderRadius:
+                  BorderRadius.circular(widget.innerCornerBroderRadius),
             ),
           ),
         ),
@@ -71,14 +79,18 @@ class _AnimatedFrameState extends State<AnimatedFrame> {
           child: Align(
             child: AnimatedContainer(
               height: _cornerBorderBoxHeight,
-              width: widget.frameWidth - AppConstants.kCornerBorderBoxHorizontalPadding,
+              width: widget.frameWidth -
+                  AppConstants.kCornerBorderBoxHorizontalPadding,
               duration: widget.animatedFrameDuration,
               curve: widget.animatedFrameCurve,
               child: Stack(
                 children: [
                   // Top-left corner
                   Positioned(
-                    bottom: widget.frameHeight + AppConstants.bottomFrameContainerHeight / 2 - 34 - 18,
+                    bottom: widget.frameHeight +
+                        AppConstants.bottomFrameContainerHeight / 2 -
+                        34 -
+                        18,
                     left: 0,
                     child: Container(
                       width: 16,
@@ -93,14 +105,19 @@ class _AnimatedFrameState extends State<AnimatedFrame> {
                           right: BorderSide.none,
                           bottom: BorderSide.none,
                         ),
-                        borderRadius: BorderRadius.only(topLeft: Radius.circular(widget.innerCornerBroderRadius)),
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(
+                                widget.innerCornerBroderRadius)),
                       ),
                     ),
                   ),
 
                   // Top-right corner
                   Positioned(
-                    bottom: widget.frameHeight + AppConstants.bottomFrameContainerHeight / 2 - 34 - 18,
+                    bottom: widget.frameHeight +
+                        AppConstants.bottomFrameContainerHeight / 2 -
+                        34 -
+                        18,
                     right: 0,
                     child: Container(
                       width: 16,
@@ -112,7 +129,9 @@ class _AnimatedFrameState extends State<AnimatedFrame> {
                           left: BorderSide.none,
                           bottom: BorderSide.none,
                         ),
-                        borderRadius: BorderRadius.only(topRight: Radius.circular(widget.innerCornerBroderRadius)),
+                        borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(
+                                widget.innerCornerBroderRadius)),
                       ),
                     ),
                   ),
@@ -131,7 +150,9 @@ class _AnimatedFrameState extends State<AnimatedFrame> {
                           left: BorderSide(color: Colors.white, width: 2),
                           bottom: BorderSide(color: Colors.white, width: 2),
                         ),
-                        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(widget.innerCornerBroderRadius)),
+                        borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(
+                                widget.innerCornerBroderRadius)),
                       ),
                     ),
                   ),
@@ -150,7 +171,9 @@ class _AnimatedFrameState extends State<AnimatedFrame> {
                           right: BorderSide(color: Colors.white, width: 2),
                           bottom: BorderSide(color: Colors.white, width: 2),
                         ),
-                        borderRadius: BorderRadius.only(bottomRight: Radius.circular(widget.innerCornerBroderRadius)),
+                        borderRadius: BorderRadius.only(
+                            bottomRight: Radius.circular(
+                                widget.innerCornerBroderRadius)),
                       ),
                     ),
                   ),

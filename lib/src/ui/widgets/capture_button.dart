@@ -21,7 +21,10 @@ class CaptureButton extends StatelessWidget {
         width: captureOuterCircleRadius ?? 70, // Outer circle size
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 3, strokeAlign: BorderSide.strokeAlignInside),
+          border: Border.all(
+              color: Colors.white,
+              width: 3,
+              strokeAlign: BorderSide.strokeAlignInside),
         ),
         child: Center(
           child: Container(

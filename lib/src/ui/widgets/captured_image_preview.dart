@@ -39,7 +39,8 @@ class CapturedImagePreview extends StatelessWidget {
                   right: 3,
                   child: Container(
                     width: frameWidth,
-                    height: frameHeight + AppConstants.bottomFrameContainerHeight,
+                    height:
+                        frameHeight + AppConstants.bottomFrameContainerHeight,
                     decoration: BoxDecoration(
                       image: DecorationImage(
                         image: FileImage(File(imagePath)),

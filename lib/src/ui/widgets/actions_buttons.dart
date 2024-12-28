@@ -28,7 +28,8 @@ class ActionButtons extends StatelessWidget {
   final double frameWidth;
   final double frameHeight;
   final double bottomFrameContainerHeight;
-  final DocumentCameraController controller; // Replace with your controller type
+  final DocumentCameraController
+      controller; // Replace with your controller type
   final Function(String imgPath) onCaptured;
   final Function(String imgPath) onSaved;
 
@@ -62,9 +63,11 @@ class ActionButtons extends StatelessWidget {
     required this.onSaved,
   });
 
-  Future<void> _captureImage(Function(String imgPath) onCaptured, BuildContext context) async {
+  Future<void> _captureImage(
+      Function(String imgPath) onCaptured, BuildContext context) async {
     isLoadingNotifier.value = true;
-    await controller.takeAndCropPicture(frameWidth, frameHeight + bottomFrameContainerHeight, context);
+    await controller.takeAndCropPicture(
+        frameWidth, frameHeight + bottomFrameContainerHeight, context);
 
     capturedImageNotifier.value = controller.imagePath;
 
@@ -103,7 +106,8 @@ class ActionButtons extends StatelessWidget {
             children: [
               if (imagePath.isEmpty)
                 Padding(
-                  padding: captureButtonPadding ?? const EdgeInsets.symmetric(vertical: 18.0),
+                  padding: captureButtonPadding ??
+                      const EdgeInsets.symmetric(vertical: 18.0),
                   child: ValueListenableBuilder<bool>(
                     valueListenable: isLoadingNotifier,
                     builder: (context, isLoading, child) {
@@ -122,7 +126,8 @@ class ActionButtons extends StatelessWidget {
                 )
               else ...[
                 Padding(
-                  padding: saveButtonPadding ?? const EdgeInsets.only(bottom: 20.0),
+                  padding:
+                      saveButtonPadding ?? const EdgeInsets.only(bottom: 20.0),
                   child: ActionButton(
                     text: saveButtonText ?? 'Use this photo',
                     onPressed: () => _saveImage(onSaved),
@@ -138,7 +143,8 @@ class ActionButtons extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: retakeButtonPadding ?? const EdgeInsets.only(bottom: 20.0),
+                  padding: retakeButtonPadding ??
+                      const EdgeInsets.only(bottom: 20.0),
                   child: ActionButton(
                     text: retakeButtonText ?? 'Retake photo',
                     onPressed: () => _retakeImage(onRetake),
