@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/app_constants.dart';
+
 class ScreenTitle extends StatelessWidget {
   final Widget? title;
 
@@ -20,44 +22,50 @@ class ScreenTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (showCloseButton && title != null) {
-      return Align(
-        alignment: screenTitleAlignment ?? Alignment.topCenter,
-        child: Padding(
-          padding: screenTitlePadding ?? EdgeInsets.only(top: 9),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              CloseButton(
-                color: Colors.white,
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                ),
-              ), // Back button remains on the left
-              Spacer(),
-              title!,
-              Spacer(),
-              const SizedBox(width: 48),
-            ],
+      return SafeArea(
+        child: Align(
+          alignment: screenTitleAlignment ?? Alignment.topCenter,
+          child: Padding(
+            padding: screenTitlePadding ?? EdgeInsets.only(top: AppConstants.screenVerticalPadding),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CloseButton(
+                  color: Colors.white,
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                  ),
+                ), // Back button remains on the left
+                Spacer(),
+                title!,
+                Spacer(),
+                const SizedBox(width: 48),
+              ],
+            ),
           ),
         ),
       );
     } else if (showCloseButton == false && title != null) {
-      return Align(
-        alignment: screenTitleAlignment ?? Alignment.topCenter,
-        child: Padding(
-          padding: screenTitlePadding ?? EdgeInsets.only(top: 9 * 2),
-          child: title!,
+      return SafeArea(
+        child: Align(
+          alignment: screenTitleAlignment ?? Alignment.topCenter,
+          child: Padding(
+            padding: screenTitlePadding ?? EdgeInsets.only(top: AppConstants.screenVerticalPadding + 10),
+            child: title!,
+          ),
         ),
       );
     } else {
-      return Align(
-        alignment: screenTitleAlignment ?? Alignment.topLeft,
-        child: Padding(
-          padding: screenTitlePadding ?? EdgeInsets.only(top: 9),
-          child: CloseButton(
-            color: Colors.white,
-            style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.zero,
+      return SafeArea(
+        child: Align(
+          alignment: screenTitleAlignment ?? Alignment.topLeft,
+          child: Padding(
+            padding: screenTitlePadding ?? EdgeInsets.only(top: AppConstants.screenVerticalPadding),
+            child: CloseButton(
+              color: Colors.white,
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.zero,
+              ),
             ),
           ),
         ),

@@ -230,98 +230,96 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: SafeArea(
-        child: ValueListenableBuilder<bool>(
-          valueListenable: isInitializedNotifier,
-          builder: (context, isInitialized, child) => Stack(
-            fit: StackFit.expand,
-            children: [
-              // Display the camera preview
-              if (isInitialized) CameraPreview(_controller.cameraController!),
+      body: ValueListenableBuilder<bool>(
+        valueListenable: isInitializedNotifier,
+        builder: (context, isInitialized, child) => Stack(
+          fit: StackFit.expand,
+          children: [
+            // Display the camera preview
+            if (isInitialized) CameraPreview(_controller.cameraController!),
 
-              /// Display captured image
-              if (isInitialized)
-                CapturedImagePreview(
-                  capturedImageNotifier: capturedImageNotifier,
+            /// Display captured image
+            if (isInitialized)
+              CapturedImagePreview(
+                capturedImageNotifier: capturedImageNotifier,
+                frameWidth: widget.frameWidth,
+                frameHeight: widget.frameHeight,
+                borderRadius: widget.outerFrameBorderRadius,
+              ),
+
+            /// Frame capture animation when loading
+            if (isInitialized)
+              ValueListenableBuilder<bool>(
+                valueListenable: isLoadingNotifier,
+                builder: (context, isLoading, child) {
+                  if (isLoading) {
+                    return FrameCaptureAnimation(
+                      frameWidth: widget.frameWidth,
+                      frameHeight: widget.frameHeight,
+                      animationDuration: widget.capturingAnimationDuration,
+                      animationColor: widget.capturingAnimationColor,
+                      curve: widget.capturingAnimationCurve,
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+
+            //  Draw the document frame
+            Positioned.fill(
+              child: CustomPaint(
+                painter: DocumentCameraFramePainter(
                   frameWidth: widget.frameWidth,
-                  frameHeight: widget.frameHeight,
+                  frameHeight: widget.frameHeight + AppConstants.bottomFrameContainerHeight,
                   borderRadius: widget.outerFrameBorderRadius,
                 ),
+              ),
+            ),
 
-              /// Frame capture animation when loading
-              if (isInitialized)
-                ValueListenableBuilder<bool>(
-                  valueListenable: isLoadingNotifier,
-                  builder: (context, isLoading, child) {
-                    if (isLoading) {
-                      return FrameCaptureAnimation(
-                        frameWidth: widget.frameWidth,
-                        frameHeight: widget.frameHeight,
-                        animationDuration: widget.capturingAnimationDuration,
-                        animationColor: widget.capturingAnimationColor,
-                        curve: widget.capturingAnimationCurve,
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
-                ),
+            /// Border of the document frame
+            ///
+            /// CornerBorderBox of the document frame
+            AnimatedFrame(
+              frameWidth: widget.frameWidth,
+              frameHeight: widget.frameHeight,
+              outerFrameBorderRadius: widget.outerFrameBorderRadius,
+              innerCornerBroderRadius: widget.innerCornerBroderRadius,
+              animatedFrameDuration: widget.animatedFrameDuration,
+              animatedFrameCurve: widget.animatedFrameCurve,
+              border: widget.frameBorder,
+            ),
 
-              //  Draw the document frame
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: DocumentCameraFramePainter(
-                    frameWidth: widget.frameWidth,
-                    frameHeight: widget.frameHeight + AppConstants.bottomFrameContainerHeight,
-                    borderRadius: widget.outerFrameBorderRadius,
-                  ),
-                ),
+            /// Frame Bottom Container
+            BottomFrameContainer(
+              width: widget.frameWidth,
+              height: widget.frameHeight,
+              borderRadius: widget.outerFrameBorderRadius,
+              bottomFrameContainerChild: widget.bottomFrameContainerChild,
+            ),
+
+            /// Screen Title
+            if (widget.title != null || widget.showCloseButton)
+              ScreenTitle(
+                title: widget.title,
+                showCloseButton: widget.showCloseButton,
+                screenTitleAlignment: widget.screenTitleAlignment,
+                screenTitlePadding: widget.screenTitlePadding,
               ),
 
-              /// Border of the document frame
-              ///
-              /// CornerBorderBox of the document frame
-              AnimatedFrame(
-                frameWidth: widget.frameWidth,
-                frameHeight: widget.frameHeight,
-                outerFrameBorderRadius: widget.outerFrameBorderRadius,
-                innerCornerBroderRadius: widget.innerCornerBroderRadius,
-                animatedFrameDuration: widget.animatedFrameDuration,
-                animatedFrameCurve: widget.animatedFrameCurve,
-                border: widget.frameBorder,
-              ),
-
-              /// Frame Bottom Container
-              BottomFrameContainer(
-                width: widget.frameWidth,
-                height: widget.frameHeight,
-                borderRadius: widget.outerFrameBorderRadius,
-                bottomFrameContainerChild: widget.bottomFrameContainerChild,
-              ),
-
-              /// Screen Title
-              if (widget.title != null || widget.showCloseButton)
-                ScreenTitle(
-                  title: widget.title,
-                  showCloseButton: widget.showCloseButton,
-                  screenTitleAlignment: widget.screenTitleAlignment,
-                  screenTitlePadding: widget.screenTitlePadding,
-                ),
-
-              /// Display action buttons
-              ActionButtons(
-                frameWidth: widget.frameWidth,
-                frameHeight: widget.frameHeight,
-                bottomFrameContainerHeight: AppConstants.bottomFrameContainerHeight,
-                capturedImageNotifier: capturedImageNotifier,
-                isLoadingNotifier: isLoadingNotifier,
-                onSave: widget.onSaved,
-                onRetake: widget.onRetake,
-                controller: _controller,
-                onCaptured: widget.onCaptured,
-                onSaved: widget.onSaved,
-              ),
-            ],
-          ),
+            /// Display action buttons
+            ActionButtons(
+              frameWidth: widget.frameWidth,
+              frameHeight: widget.frameHeight,
+              bottomFrameContainerHeight: AppConstants.bottomFrameContainerHeight,
+              capturedImageNotifier: capturedImageNotifier,
+              isLoadingNotifier: isLoadingNotifier,
+              onSave: widget.onSaved,
+              onRetake: widget.onRetake,
+              controller: _controller,
+              onCaptured: widget.onCaptured,
+              onSaved: widget.onSaved,
+            ),
+          ],
         ),
       ),
     );

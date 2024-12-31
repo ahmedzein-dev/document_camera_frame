@@ -12,9 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: HomeScreen(),
-      ),
+      home: const HomeScreen(),
     );
   }
 }
@@ -25,13 +23,17 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Document camera frame example')),
+      appBar: AppBar(title: Text('Document Capture Frame')),
       body: Center(
         child: ElevatedButton(
-            onPressed: () async {
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => DocumentCameraFrameExample()));
-            },
-            child: Text('Open document camera frame')),
+          onPressed: () {
+            // Navigate to the DocumentCameraFrame example screen when the button is pressed
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const DocumentCameraFrameExample()),
+            );
+          },
+          child: const Text('Start Document Capture'),
+        ),
       ),
     );
   }
@@ -42,27 +44,42 @@ class DocumentCameraFrameExample extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DocumentCameraFrame(
-      frameWidth: 300.0,
-      frameHeight: 200.0,
-      title: Text(
-        'Capture Your Document',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
+    return Scaffold(
+      body: DocumentCameraFrame(
+        // Document frame dimensions
+        frameWidth: 300.0,
+        frameHeight: 200.0,
+
+        // Title displayed at the top
+        title: const Text(
+          'Capture Your Document',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
         ),
+
+        // Show Close button
+        showCloseButton: true,
+
+        // Callback when the document is captured
+        onCaptured: (imgPath) {
+          debugPrint('Captured image path: $imgPath');
+        },
+
+        // Callback when the document is saved
+        onSaved: (imgPath) {
+          debugPrint('Saved image path: $imgPath');
+        },
+
+        // Callback when the retake button is pressed
+        onRetake: () {
+          debugPrint('Retake button pressed');
+        },
+
+        // Optional: Customize Capture button, Save button, etc. if needed
       ),
-      showCloseButton: true,
-      onCaptured: (imgPath) {
-        debugPrint('Captured image path: $imgPath');
-      },
-      onSaved: (imgPath) {
-        debugPrint('Saved image path: $imgPath');
-      },
-      onRetake: () {
-        debugPrint('Retake button pressed');
-      },
     );
   }
 }
