@@ -26,7 +26,8 @@ class ScreenTitle extends StatelessWidget {
         child: Align(
           alignment: screenTitleAlignment ?? Alignment.topCenter,
           child: Padding(
-            padding: screenTitlePadding ?? EdgeInsets.only(top: AppConstants.screenVerticalPadding),
+            padding: screenTitlePadding ??
+                EdgeInsets.only(top: AppConstants.screenVerticalPadding),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -50,7 +51,8 @@ class ScreenTitle extends StatelessWidget {
         child: Align(
           alignment: screenTitleAlignment ?? Alignment.topCenter,
           child: Padding(
-            padding: screenTitlePadding ?? EdgeInsets.only(top: AppConstants.screenVerticalPadding + 10),
+            padding: screenTitlePadding ??
+                EdgeInsets.only(top: AppConstants.screenVerticalPadding + 10),
             child: title!,
           ),
         ),
@@ -60,7 +62,8 @@ class ScreenTitle extends StatelessWidget {
         child: Align(
           alignment: screenTitleAlignment ?? Alignment.topLeft,
           child: Padding(
-            padding: screenTitlePadding ?? EdgeInsets.only(top: AppConstants.screenVerticalPadding),
+            padding: screenTitlePadding ??
+                EdgeInsets.only(top: AppConstants.screenVerticalPadding),
             child: CloseButton(
               color: Colors.white,
               style: ElevatedButton.styleFrom(
