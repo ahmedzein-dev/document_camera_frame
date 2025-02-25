@@ -157,6 +157,10 @@ class DocumentCameraFrame extends StatefulWidget {
   /// If `true`, the CloseButton will be displayed; otherwise, it will be hidden.
   final bool showCloseButton;
 
+  /// Manually set camera index
+  /// If null, camera 0 will be used.
+  final int? cameraIndex;
+
   /// Constructor for the [DocumentCameraFrame].
   const DocumentCameraFrame({
     super.key,
@@ -201,6 +205,7 @@ class DocumentCameraFrame extends StatefulWidget {
     this.captureInnerCircleRadius,
     this.captureOuterCircleRadius,
     this.showCloseButton = false,
+    this.cameraIndex,
   });
 
   @override
@@ -222,7 +227,7 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> {
   /// Initializes the camera and updates the state when ready.
   Future<void> _initializeCamera() async {
     _controller = DocumentCameraController();
-    await _controller.initialize();
+    await _controller.initialize(widget.cameraIndex ?? 0);
     isInitializedNotifier.value = true;
   }
 

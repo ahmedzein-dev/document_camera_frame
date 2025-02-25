@@ -9,10 +9,10 @@ class CameraService {
   bool get isInitialized =>
       cameraController != null && cameraController!.value.isInitialized;
 
-  Future<void> initialize() async {
+  Future<void> initialize(int cameraIndex) async {
     final cameras = await availableCameras();
     if (cameras.isNotEmpty) {
-      cameraController = CameraController(cameras[0], ResolutionPreset.high);
+      cameraController = CameraController(cameras[cameraIndex], ResolutionPreset.high);
       await cameraController!.initialize();
     }
   }

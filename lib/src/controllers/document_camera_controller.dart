@@ -17,7 +17,7 @@ class DocumentCameraController {
   // Expose the cameraController for CameraPreview
   CameraController? get cameraController => _cameraService.cameraController;
 
-  Future<void> initialize() async => _cameraService.initialize();
+  Future<void> initialize(int cameraIndex) async => _cameraService.initialize(cameraIndex);
 
   bool get isInitialized => _cameraService.isInitialized;
 
