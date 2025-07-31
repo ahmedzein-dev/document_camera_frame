@@ -26,16 +26,15 @@ class ScreenTitle extends StatelessWidget {
         child: Align(
           alignment: screenTitleAlignment ?? Alignment.topCenter,
           child: Padding(
-            padding: screenTitlePadding ??
+            padding:
+                screenTitlePadding ??
                 EdgeInsets.only(top: AppConstants.screenVerticalPadding),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 CloseButton(
                   color: Colors.white,
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                  ),
+                  style: ElevatedButton.styleFrom(padding: EdgeInsets.zero),
                 ), // Back button remains on the left
                 Spacer(),
                 title!,
@@ -51,7 +50,8 @@ class ScreenTitle extends StatelessWidget {
         child: Align(
           alignment: screenTitleAlignment ?? Alignment.topCenter,
           child: Padding(
-            padding: screenTitlePadding ??
+            padding:
+                screenTitlePadding ??
                 EdgeInsets.only(top: AppConstants.screenVerticalPadding + 10),
             child: title!,
           ),
@@ -62,13 +62,12 @@ class ScreenTitle extends StatelessWidget {
         child: Align(
           alignment: screenTitleAlignment ?? Alignment.topLeft,
           child: Padding(
-            padding: screenTitlePadding ??
+            padding:
+                screenTitlePadding ??
                 EdgeInsets.only(top: AppConstants.screenVerticalPadding),
             child: CloseButton(
               color: Colors.white,
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.zero,
-              ),
+              style: ElevatedButton.styleFrom(padding: EdgeInsets.zero),
             ),
           ),
         ),

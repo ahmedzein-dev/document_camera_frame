@@ -54,7 +54,9 @@ class _TwoSidedAnimatedFrameState extends State<TwoSidedAnimatedFrame>
 
     _flipAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
-          parent: _flipAnimationController, curve: widget.flipAnimationCurve),
+        parent: _flipAnimationController,
+        curve: widget.flipAnimationCurve,
+      ),
     );
 
     widget.currentSideNotifier?.addListener(_onSideChanged);
@@ -133,7 +135,8 @@ class _TwoSidedAnimatedFrameState extends State<TwoSidedAnimatedFrame>
       builder: (context, child) {
         final animatedFrameHeight = _getAnimatedFrameHeight();
         final animatedCornerHeight = _getAnimatedCornerHeight();
-        final bottomPosition = (1.sh(context) -
+        final bottomPosition =
+            (1.sh(context) -
                 widget.frameHeight -
                 AppConstants.bottomFrameContainerHeight) /
             2;
@@ -162,14 +165,17 @@ class _TwoSidedAnimatedFrameState extends State<TwoSidedAnimatedFrame>
               child: AnimatedContainer(
                 width: widget.frameWidth,
                 height: animatedFrameHeight,
-                duration:
-                    _isFlipping ? Duration.zero : widget.animatedFrameDuration,
+                duration: _isFlipping
+                    ? Duration.zero
+                    : widget.animatedFrameDuration,
                 curve: widget.animatedFrameCurve,
                 decoration: BoxDecoration(
-                  border: widget.border ??
+                  border:
+                      widget.border ??
                       Border.all(color: Colors.white, width: 3),
-                  borderRadius:
-                      BorderRadius.circular(widget.innerCornerBroderRadius),
+                  borderRadius: BorderRadius.circular(
+                    widget.innerCornerBroderRadius,
+                  ),
                 ),
               ),
             ),
@@ -182,7 +188,8 @@ class _TwoSidedAnimatedFrameState extends State<TwoSidedAnimatedFrame>
               child: Align(
                 child: AnimatedContainer(
                   height: animatedCornerHeight,
-                  width: widget.frameWidth -
+                  width:
+                      widget.frameWidth -
                       AppConstants.kCornerBorderBoxHorizontalPadding,
                   duration: _isFlipping
                       ? Duration.zero
@@ -197,8 +204,8 @@ class _TwoSidedAnimatedFrameState extends State<TwoSidedAnimatedFrame>
                               //     AppConstants.bottomFrameContainerHeight / 2 -
                               //     34 -
                               //     18,
-
-                              bottom: widget.frameHeight -
+                              bottom:
+                                  widget.frameHeight -
                                   (AppConstants.bottomFrameContainerHeight / 2),
                               left: 0,
                               child: _cornerBox(topLeft: true),
@@ -206,7 +213,8 @@ class _TwoSidedAnimatedFrameState extends State<TwoSidedAnimatedFrame>
 
                             // Top-right corner
                             Positioned(
-                              bottom: widget.frameHeight +
+                              bottom:
+                                  widget.frameHeight +
                                   AppConstants.bottomFrameContainerHeight / 2 -
                                   34 -
                                   18,

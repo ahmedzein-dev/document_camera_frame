@@ -16,8 +16,9 @@ class CameraService {
 
     cameraController = CameraController(camera, ResolutionPreset.ultraHigh);
     await cameraController!.initialize();
-    await cameraController!
-        .setFlashMode(FlashMode.auto); // Optional: Set flash mode
+    await cameraController!.setFlashMode(
+      FlashMode.auto,
+    ); // Optional: Set flash mode
   }
 
   Future<String> captureImage() async {

@@ -240,10 +240,12 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
   final ValueNotifier<String> capturedImageNotifier = ValueNotifier("");
 
   // Two-sided document specific state
-  final ValueNotifier<DocumentSide> currentSideNotifier =
-      ValueNotifier(DocumentSide.front);
-  final ValueNotifier<DocumentCaptureData> documentDataNotifier =
-      ValueNotifier(DocumentCaptureData());
+  final ValueNotifier<DocumentSide> currentSideNotifier = ValueNotifier(
+    DocumentSide.front,
+  );
+  final ValueNotifier<DocumentCaptureData> documentDataNotifier = ValueNotifier(
+    DocumentCaptureData(),
+  );
 
   late AnimationController _progressAnimationController;
   late Animation<double> _progressAnimation;
@@ -260,13 +262,12 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    _progressAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _progressAnimationController,
-      curve: Curves.easeInOut,
-    ));
+    _progressAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _progressAnimationController,
+        curve: Curves.easeInOut,
+      ),
+    );
   }
 
   /// Initializes the camera and updates the state when ready.
@@ -282,8 +283,9 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
     final currentData = documentDataNotifier.value;
 
     if (currentSide == DocumentSide.front) {
-      documentDataNotifier.value =
-          currentData.copyWith(frontImagePath: imagePath);
+      documentDataNotifier.value = currentData.copyWith(
+        frontImagePath: imagePath,
+      );
       widget.onFrontCaptured?.call(imagePath);
 
       // Auto-progress to back side if both sides are required
@@ -292,8 +294,9 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
         // They can click "Next Side" button to proceed
       }
     } else {
-      documentDataNotifier.value =
-          currentData.copyWith(backImagePath: imagePath);
+      documentDataNotifier.value = currentData.copyWith(
+        backImagePath: imagePath,
+      );
       widget.onBackCaptured?.call(imagePath);
     }
   }
@@ -377,9 +380,9 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
       builder: (context, currentSide, child) {
         final instruction = currentSide == DocumentSide.front
             ? (widget.frontSideInstruction ??
-                "Position the front side of your document within the frame")
+                  "Position the front side of your document within the frame")
             : (widget.backSideInstruction ??
-                "Now position the back side of your document within the frame");
+                  "Now position the back side of your document within the frame");
 
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -390,7 +393,8 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
           ),
           child: Text(
             instruction,
-            style: widget.instructionTextStyle ??
+            style:
+                widget.instructionTextStyle ??
                 const TextStyle(
                   color: Colors.white,
                   fontSize: 14,
@@ -540,7 +544,8 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
                 currentSideNotifier: currentSideNotifier,
                 documentDataNotifier: documentDataNotifier,
                 rightPosition: 20,
-                backgroundColor: widget.sideIndicatorBackgroundColor ??
+                backgroundColor:
+                    widget.sideIndicatorBackgroundColor ??
                     Colors.black.withAlpha((0.8 * 255).toInt()),
                 borderColor: widget.sideIndicatorBorderColor,
                 activeColor: widget.sideIndicatorActiveColor ?? Colors.blue,

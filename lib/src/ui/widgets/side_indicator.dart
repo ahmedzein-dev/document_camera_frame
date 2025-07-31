@@ -40,14 +40,18 @@ class SideIndicator extends StatelessWidget {
               top: topPosition ?? (MediaQuery.of(context).padding.top + 80),
               right: rightPosition ?? 20,
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: backgroundColor ??
+                  color:
+                      backgroundColor ??
                       Colors.black.withAlpha((0.7 * 255).toInt()),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: borderColor ??
+                    color:
+                        borderColor ??
                         Colors.white.withAlpha((0.3 * 255).toInt()),
                     width: 1,
                   ),
@@ -58,13 +62,15 @@ class SideIndicator extends StatelessWidget {
                     // Front side indicator
                     _buildSideDot(
                       isActive: currentSide == DocumentSide.front,
-                      isCompleted: documentData.frontImagePath != null &&
+                      isCompleted:
+                          documentData.frontImagePath != null &&
                           documentData.frontImagePath!.isNotEmpty,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'Front',
-                      style: textStyle?.copyWith(
+                      style:
+                          textStyle?.copyWith(
                             color: currentSide == DocumentSide.front
                                 ? (activeColor ?? Colors.white)
                                 : (inactiveColor ?? Colors.grey),
@@ -81,13 +87,15 @@ class SideIndicator extends StatelessWidget {
                     // Back side indicator
                     _buildSideDot(
                       isActive: currentSide == DocumentSide.back,
-                      isCompleted: documentData.backImagePath != null &&
+                      isCompleted:
+                          documentData.backImagePath != null &&
                           documentData.backImagePath!.isNotEmpty,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'Back',
-                      style: textStyle?.copyWith(
+                      style:
+                          textStyle?.copyWith(
                             color: currentSide == DocumentSide.back
                                 ? (activeColor ?? Colors.white)
                                 : (inactiveColor ?? Colors.grey),
@@ -111,10 +119,7 @@ class SideIndicator extends StatelessWidget {
   }
 
   /// Builds a colored dot to indicate the state of each side
-  Widget _buildSideDot({
-    required bool isActive,
-    required bool isCompleted,
-  }) {
+  Widget _buildSideDot({required bool isActive, required bool isCompleted}) {
     Color dotColor;
     if (isCompleted) {
       dotColor = completedColor ?? Colors.green;
@@ -127,10 +132,7 @@ class SideIndicator extends StatelessWidget {
     return Container(
       width: 8,
       height: 8,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: dotColor,
-      ),
+      decoration: BoxDecoration(shape: BoxShape.circle, color: dotColor),
     );
   }
 }
