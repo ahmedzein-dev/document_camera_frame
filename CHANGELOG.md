@@ -111,6 +111,7 @@
 - Better state management for multi-side capture workflow.
 - Enhanced error handling for camera operations.
 
-## 1.0.1
+## 1.0.2
 
-- Update screenshot.
+- Update metadata.
+
