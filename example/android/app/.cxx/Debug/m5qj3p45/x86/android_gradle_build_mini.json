@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/alidabol/development/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/alidabol/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/alidabol/StudioProjects/document_camera_frame/example/android/app/.cxx/Debug/m5qj3p45/x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/alidabol/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/alidabol/StudioProjects/document_camera_frame/example/android/app/.cxx/Debug/m5qj3p45/x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

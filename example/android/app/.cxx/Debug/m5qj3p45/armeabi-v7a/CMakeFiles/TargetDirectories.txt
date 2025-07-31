@@ -1,0 +1,2 @@
+/Users/alidabol/StudioProjects/document_camera_frame/example/android/app/.cxx/Debug/m5qj3p45/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/alidabol/StudioProjects/document_camera_frame/example/android/app/.cxx/Debug/m5qj3p45/armeabi-v7a/CMakeFiles/rebuild_cache.dir
