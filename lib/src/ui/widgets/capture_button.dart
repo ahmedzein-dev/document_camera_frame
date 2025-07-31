@@ -22,9 +22,10 @@ class CaptureButton extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
-              color: Colors.white,
-              width: 3,
-              strokeAlign: BorderSide.strokeAlignInside),
+            color: Colors.white,
+            width: 3,
+            strokeAlign: BorderSide.strokeAlignInside,
+          ),
         ),
         child: Center(
           child: Container(

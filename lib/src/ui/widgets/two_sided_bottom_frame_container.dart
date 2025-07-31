@@ -44,14 +44,16 @@ class TwoSidedBottomFrameContainer extends StatelessWidget {
             border: Border.all(color: Colors.white, width: 3),
             borderRadius: BorderRadius.circular(borderRadius),
           ),
-          child: bottomFrameContainerChild ??
+          child:
+              bottomFrameContainerChild ??
               ValueListenableBuilder<DocumentSide>(
                 valueListenable: currentSideNotifier,
                 builder: (context, side, _) {
                   final isFront = side == DocumentSide.front;
                   final label = isFront ? 'Front' : 'Back';
-                  final icon =
-                      isFront ? Icons.credit_card_outlined : Icons.credit_card;
+                  final icon = isFront
+                      ? Icons.credit_card_outlined
+                      : Icons.credit_card;
 
                   final imagePath = isFront
                       ? documentDataNotifier.value.frontImagePath

@@ -1,6 +1,6 @@
 name: document_camera_frame
 description: Flutter package for capturing and cropping document images with a customizable camera interface.
-version: 1.0.2
+version: 1.0.3
 homepage: https://github.com/AhmedZein1996/document_camera_frame.git
 
 environment:

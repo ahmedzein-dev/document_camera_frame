@@ -102,7 +102,10 @@ class TwoSidedActionButtons extends StatelessWidget {
   Future<void> _captureImage(BuildContext context) async {
     isLoadingNotifier.value = true;
     await controller.takeAndCropPicture(
-        frameWidth, frameHeight + bottomFrameContainerHeight, context);
+      frameWidth,
+      frameHeight + bottomFrameContainerHeight,
+      context,
+    );
 
     capturedImageNotifier.value = controller.imagePath;
     onCapture(controller.imagePath);
@@ -194,9 +197,12 @@ class TwoSidedActionButtons extends StatelessWidget {
                         if (imagePath.isEmpty)
                           // Capture mode with camera switcher like original ActionButtons
                           Padding(
-                            padding: captureButtonPadding ??
+                            padding:
+                                captureButtonPadding ??
                                 const EdgeInsets.symmetric(
-                                    horizontal: 8.0, vertical: 32.0),
+                                  horizontal: 8.0,
+                                  vertical: 32.0,
+                                ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
@@ -231,7 +237,8 @@ class TwoSidedActionButtons extends StatelessWidget {
                                 text: nextButtonText ?? 'Next Side',
                                 onPressed: onNext,
                                 style: actionButtonStyle,
-                                textStyle: actionButtonTextStyle ??
+                                textStyle:
+                                    actionButtonTextStyle ??
                                     const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,
@@ -248,13 +255,17 @@ class TwoSidedActionButtons extends StatelessWidget {
                               child: ActionButton(
                                 text: previousButtonText ?? 'Previous Side',
                                 onPressed: onPrevious,
-                                style: actionButtonStyle ??
+                                style:
+                                    actionButtonStyle ??
                                     ElevatedButton.styleFrom(
                                       backgroundColor: Colors.transparent,
                                       side: const BorderSide(
-                                          width: 1, color: Colors.white),
+                                        width: 1,
+                                        color: Colors.white,
+                                      ),
                                     ),
-                                textStyle: actionButtonTextStyle ??
+                                textStyle:
+                                    actionButtonTextStyle ??
                                     const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,
@@ -272,7 +283,8 @@ class TwoSidedActionButtons extends StatelessWidget {
                                 text: saveButtonText ?? 'Use this photo',
                                 onPressed: onSave,
                                 style: actionButtonStyle,
-                                textStyle: actionButtonTextStyle ??
+                                textStyle:
+                                    actionButtonTextStyle ??
                                     const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,
@@ -288,13 +300,17 @@ class TwoSidedActionButtons extends StatelessWidget {
                             child: ActionButton(
                               text: retakeButtonText ?? 'Retake photo',
                               onPressed: _retakeImage,
-                              style: retakeButtonStyle ??
+                              style:
+                                  retakeButtonStyle ??
                                   ElevatedButton.styleFrom(
                                     backgroundColor: Colors.transparent,
                                     side: const BorderSide(
-                                        width: 1, color: Colors.white),
+                                      width: 1,
+                                      color: Colors.white,
+                                    ),
                                   ),
-                              textStyle: retakeButtonTextStyle ??
+                              textStyle:
+                                  retakeButtonTextStyle ??
                                   const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,

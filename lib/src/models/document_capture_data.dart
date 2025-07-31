@@ -4,13 +4,12 @@ class DocumentCaptureData {
   final String? backImagePath;
   final bool isComplete;
 
-  DocumentCaptureData({
-    this.frontImagePath,
-    this.backImagePath,
-  }) : isComplete = frontImagePath != null &&
-            frontImagePath.isNotEmpty &&
-            backImagePath != null &&
-            backImagePath.isNotEmpty;
+  DocumentCaptureData({this.frontImagePath, this.backImagePath})
+    : isComplete =
+          frontImagePath != null &&
+          frontImagePath.isNotEmpty &&
+          backImagePath != null &&
+          backImagePath.isNotEmpty;
 
   /// Create a copy of this object with some fields replaced with new values
   DocumentCaptureData copyWith({

@@ -23,19 +23,23 @@ class FrameCaptureAnimation extends StatelessWidget {
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.center,
-      child: Container(
-        width: frameWidth,
-        height: frameHeight + AppConstants.bottomFrameContainerHeight,
-        color: animationColor ?? Colors.black.withAlpha(127),
-      )
-          .animate(
-              onPlay: (controller) => controller.repeat(
+      child:
+          Container(
+                width: frameWidth,
+                height: frameHeight + AppConstants.bottomFrameContainerHeight,
+                color: animationColor ?? Colors.black.withAlpha(127),
+              )
+              .animate(
+                onPlay: (controller) => controller.repeat(
                   period:
-                      animationDuration ?? const Duration(milliseconds: 1000)))
-          .fade(
-            duration: animationDuration ?? const Duration(milliseconds: 1000),
-            curve: curve,
-          ),
+                      animationDuration ?? const Duration(milliseconds: 1000),
+                ),
+              )
+              .fade(
+                duration:
+                    animationDuration ?? const Duration(milliseconds: 1000),
+                curve: curve,
+              ),
     );
   }
 }
