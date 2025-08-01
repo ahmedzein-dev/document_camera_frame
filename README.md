@@ -1,30 +1,28 @@
 # Document Camera Frame
 
-The `DocumentCameraFrame` package simplifies document scanning by providing a customizable camera
-interface for capturing and cropping document images. It’s ideal for applications that require
-efficient and user-friendly document capture.
+[![Pub Version](https://img.shields.io/pub/v/document_camera_frame.svg)](https://pub.dev/packages/document_camera_frame)
+[![Likes](https://badges.bar/document_camera_frame/likes)](https://pub.dev/packages/document_camera_frame/score)
+[![Pub Points](https://badges.bar/document_camera_frame/pub%20points)](https://pub.dev/packages/document_camera_frame/score)
 
-## Screenshot
+`DocumentCameraFrame` is a Flutter package for scanning documents using a live camera feed. It provides a customizable frame UI, dual-side capture support (e.g., front/back of ID cards), and easy integration for OCR or document processing workflows.
 
-<img src="https://github.com/AhmedZein1996/document_camera_frame/raw/main/screenshots/two_sided_ui.jpg" width="400" height="868" alt="Two-Sided Document Capture UI" />
+## Demo
 
-![example.gif](https://github.com/AhmedZein1996/document_camera_frame/raw/main/example.gif)
+Here’s a quick preview of `DocumentCameraFrame` in action:
+
+![example1](https://github.com/ahmedzein-dev/document_camera_frame/raw/main/example1.gif)
+![example2](https://github.com/ahmedzein-dev/document_camera_frame/raw/main/example2.gif)
+![example3](https://github.com/ahmedzein-dev/document_camera_frame/raw/main/example3.gif)
 
 ## Features
 
-- **Document Frame**: Customizable dimensions for focused document capture.
-- **Camera Preview**: Real-time camera feed for instant feedback.
-- **User-Friendly Controls**:
-    - **Capture**: Take a snapshot of the document.
-    - **Save**: Save the captured image.
-    - **Retake**: Retake the image if unsatisfactory.
-- **Customizable UI**:
-    - Define frame dimensions, button styles, and positions.
-    - Add optional titles with alignment and padding options.
-- **Event Callbacks**: Handle events like `onCaptured`, `onSaved`, and `onRetake` easily.
+- 📸 **Live Camera Preview** with adjustable document frame
+- ✂️ **Custom Frame Dimensions** for precise cropping
+- 🔄 **Dual-Side Capture Support** (e.g., ID front/back)
+- 🎛️ **Fully Customizable UI** — titles, padding, button styles
+- 🪝 **Easy Event Callbacks** — `onCaptured`, `onRetake`, `onSaved`
 
----
-
+## Quick Start
 ## Installation
 
 Add the package to your Flutter project using:
@@ -33,15 +31,30 @@ Add the package to your Flutter project using:
 flutter pub add document_camera_frame
 ```
 
-Then run:
-
-```bash
-flutter pub get
-```
-
 ---
 
-## Setup
+## Minimal Example
+```dart
+import 'package:document_camera_frame/document_camera_frame.dart';
+import 'package:flutter/material.dart';
+
+class QuickExample extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return DocumentCameraFrame(
+      frameWidth: 320,
+      frameHeight: 200,
+      requireBothSides: false,
+      onBothSidesSaved: (documentData) {
+        print('Document saved: ${documentData.frontImagePath}');
+        Navigator.pop(context);
+      },
+    );
+  }
+}
+```
+
+## Setup Requirements
 
 ### iOS Setup
 
@@ -111,250 +124,55 @@ are the possible error codes:
 
 ---
 
-## Usage
+## Common Use Cases
 
-### Import the Package
-
-```dart
-import 'package:document_camera_frame/document_camera_frame.dart';
-```
-
-### Example
+### Driver's License (Both Sides)
 
 ```dart
-import 'package:document_camera_frame/document_camera_frame.dart';
-import 'package:flutter/material.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const HomeScreen(),
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: DocumentTypeSelectionScreen(),
-    );
-  }
-}
-
-/// Example for different document types
-class DocumentTypeSelectionScreen extends StatelessWidget {
-  const DocumentTypeSelectionScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Select Document Type'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            _buildDocumentTypeCard(
-              context,
-              'Driver\'s License',
-              'Capture both front and back sides',
-              Icons.credit_card,
-                      () => _navigateToCamera(context, DocumentType.driverLicense),
-            ),
-            const SizedBox(height: 16),
-            _buildDocumentTypeCard(
-              context,
-              'Passport',
-              'Capture the main page only',
-              Icons.book,
-                      () => _navigateToCamera(context, DocumentType.passport),
-            ),
-            const SizedBox(height: 16),
-            _buildDocumentTypeCard(
-              context,
-              'ID Card',
-              'Capture both sides',
-              Icons.badge,
-                      () => _navigateToCamera(context, DocumentType.idCard),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDocumentTypeCard(
-          BuildContext context,
-          String title,
-          String subtitle,
-          IconData icon,
-          VoidCallback onTap,
-          ) {
-    return Card(
-      child: ListTile(
-        leading: Icon(icon, size: 40, color: Theme.of(context).primaryColor),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(subtitle),
-        trailing: const Icon(Icons.arrow_forward_ios),
-        onTap: onTap,
-      ),
-    );
-  }
-
-  void _navigateToCamera(BuildContext context, DocumentType documentType) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-                _buildCameraForDocumentType(context, documentType),
-      ),
-    );
-  }
-
-  Widget _buildCameraForDocumentType(
-          BuildContext context, DocumentType documentType) {
-    switch (documentType) {
-      case DocumentType.driverLicense:
-        return DocumentCameraFrame(
-          frameWidth: 320,
-          frameHeight: 200,
-          frontSideTitle: const Text('Scan Front of License',
-                  style: TextStyle(color: Colors.white)),
-          backSideTitle: const Text('Scan Back of License',
-                  style: TextStyle(color: Colors.white)),
-          requireBothSides: true,
-          // Callbacks
-          onFrontCaptured: (imagePath) {
-            debugPrint('Front side captured: $imagePath');
-            // You can perform additional actions here
-            // such as uploading to server, saving locally, etc.
-          },
-
-          onBackCaptured: (imagePath) {
-            debugPrint('Back side captured: $imagePath');
-            // You can perform additional actions here
-          },
-
-          onBothSidesSaved: (documentData) {
-            debugPrint('Document capture completed!');
-            debugPrint('Front: ${documentData.frontImagePath}');
-            debugPrint('Back: ${documentData.backImagePath}');
-            debugPrint('Is complete: ${documentData.isComplete}');
-
-            // Navigate to next screen or process the captured document
-            _handleDocumentSaved(context, documentData);
-          },
-        );
-
-      case DocumentType.passport:
-        return DocumentCameraFrame(
-          frameWidth: 300,
-          frameHeight: 450,
-          actionButtonHeight: 40,
-          title: const Text('Scan Passport',
-                  style: TextStyle(color: Colors.white)),
-          requireBothSides: false,
-          showSideIndicator: false,
-          frontSideInstruction:
-          "Position the main page of your passport within the frame",
-          onBothSidesSaved: (data) {
-            debugPrint('Passport captured');
-            Navigator.of(context).pop();
-          },
-        );
-
-      case DocumentType.idCard:
-        return DocumentCameraFrame(
-          frameWidth: 320,
-          frameHeight: 200,
-          frontSideTitle: const Text('Scan Front of ID',
-                  style: TextStyle(color: Colors.white)),
-          backSideTitle: const Text('Scan Back of ID',
-                  style: TextStyle(color: Colors.white)),
-          requireBothSides: true,
-          showSideIndicator: false,
-          onBothSidesSaved: (documentData) {
-            // Handle the saved document
-            _processDocument(context, documentData);
-            Navigator.of(context).pop();
-          },
-        );
-    }
-  }
-
-  void _handleDocumentSaved(
-          BuildContext context, DocumentCaptureData documentData) {
-    // Show success dialog
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Document Captured Successfully'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Your document has been captured successfully.'),
-            const SizedBox(height: 10),
-            Text(
-                    'Front side: ${documentData.frontImagePath != null ? "✓" : "✗"}'),
-            Text(
-                    'Back side: ${documentData.backImagePath != null ? "✓" : "✗"}'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close dialog
-              Navigator.of(context).pop(); // Go back to previous screen
-            },
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  static void _processDocument(
-          BuildContext context, DocumentCaptureData documentData) {
-    // Process the captured document data
-    final hasBackSide = documentData.backImagePath != null;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          hasBackSide
-                  ? 'Document captured with both sides!'
-                  : 'Document captured (front side only)',
-        ),
-        backgroundColor: Colors.green,
-      ),
-    );
-  }
-}
-
-enum DocumentType {
-  driverLicense,
-  passport,
-  idCard,
-}
-
+DocumentCameraFrame(
+  frameWidth: 320,
+  frameHeight: 200,
+  frontSideTitle: Text('Scan Front of License', 
+    style: TextStyle(color: Colors.white)),
+  backSideTitle: Text('Scan Back of License',
+    style: TextStyle(color: Colors.white)),
+  requireBothSides: true,
+  onFrontCaptured: (imagePath) => print('Front: $imagePath'),
+  onBackCaptured: (imagePath) => print('Back: $imagePath'),
+  onBothSidesSaved: (data) => handleDocument(data),
+)
 ```
 
----
+### Passport (Single Side)
 
-## Widget Parameters
+```dart
+DocumentCameraFrame(
+  frameWidth: 300,
+  frameHeight: 450,
+  title: Text('Scan Passport', style: TextStyle(color: Colors.white)),
+  requireBothSides: false,
+  showSideIndicator: false,
+  frontSideInstruction: "Position passport within the frame",
+  onBothSidesSaved: (data) => handlePassport(data),
+)
+```
+
+### ID Card with Custom Styling
+
+```dart
+DocumentCameraFrame(
+  frameWidth: 320,
+  frameHeight: 200,
+  requireBothSides: true,
+  captureButtonText: "Take Photo",
+  saveButtonText: "Done",
+  retakeButtonText: "Try Again",
+  progressIndicatorColor: Colors.blue,
+  outerFrameBorderRadius: 16.0,
+  onBothSidesSaved: (data) => processIdCard(data),
+)
+```
+
 ## Widget Parameters
 
 | Parameter                      | Type                            | Description                                                                      | Required    | Default Value                   |
@@ -433,6 +251,48 @@ enum DocumentType {
 | `sideIndicatorTextStyle`       | `TextStyle?`                    | Text style for side indicator text.                                              | ❌           | `null`                          |
 
 ---
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+**Camera not initializing:**
+- ✅ Check camera permissions in device settings
+- ✅ Ensure `minSdkVersion` is at least **21** (Android)
+- ✅ Verify camera permissions in **Info.plist** (iOS)
+
+**Build errors:**
+- 💡 Run `flutter clean && flutter pub get`
+- 💡 Confirm all platform-specific setup is complete
+
+**Permission denied errors:**
+- ⚠️ Handle permission errors gracefully in your app UI
+- ⚠️ Guide users to enable permissions in device settings
+
+---
+
+### ⚙️ Performance Tips
+
+- 📱 The package automatically manages camera resources
+- 🗂️ Images are saved to the **temporary directory** by default
+- 🚫 Consider implementing proper **error handling** for production apps
+
+---
+
+## 📌 Full Example
+
+For a comprehensive example with multiple document types, see  
+[`example/main.dart`](https://github.com/ahmedzein-dev/document_camera_frame/blob/main/example/lib/main.dart).
+
+## Contributing
+
+Contributions are welcome! If you find a bug or have a feature request, please open an issue or submit a pull request.
+
+## 🙌 Support
+
+- 🐛 **Bug reports:** Please open issues on [GitHub Issues](https://github.com/ahmedzein-dev/document_camera_frame/issues)
+- 💡 **Feature requests:** Share your ideas on [GitHub Discussions](https://github.com/ahmedzein-dev/document_camera_frame/discussions)
+- ⭐ **Enjoying this package?** Please give it a star on [GitHub](https://github.com/ahmedzein-dev/document_camera_frame) or like it on [pub.dev](https://pub.dev/packages/document_camera_frame)
 
 ## License
 

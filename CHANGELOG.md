@@ -119,3 +119,9 @@
 
 - Update metadata.
 
+- ## 1.0.4
+
+- Update examples.
+- Update Readme.md.
+- Update metadata.
+
