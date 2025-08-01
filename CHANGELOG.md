@@ -149,3 +149,9 @@
 - Update Readme.md.
 - Update metadata.
 
+- ## 1.0.9
+
+- Update examples.gif.
+- Update Readme.md.
+- Update metadata.
+
