@@ -10,11 +10,7 @@
 
 Here’s a quick preview of `DocumentCameraFrame` in action:
 
-<img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example1.gif" width="400" alt="example1" /> <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example2.gif" width="400" alt="example2" />
-
-<br />
-
-<img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example3.gif" width="400" alt="example3" />
+<img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example1.gif" width="300" alt="example1" /> <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example2.gif" width="300" alt="example2" /> <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example3.gif" width="300" alt="example3" />
 
 ## Features
 
