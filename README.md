@@ -1,8 +1,8 @@
 # Document Camera Frame
 
 [![Pub Version](https://img.shields.io/pub/v/document_camera_frame.svg)](https://pub.dev/packages/document_camera_frame)
-[![Likes](https://badges.bar/document_camera_frame/likes)](https://pub.dev/packages/document_camera_frame/score)
-[![Pub Points](https://badges.bar/document_camera_frame/pub%20points)](https://pub.dev/packages/document_camera_frame/score)
+[![Pub Points](https://img.shields.io/pub/points/document_camera_frame)](https://pub.dev/packages/document_camera_frame/score)
+[![Likes](https://img.shields.io/pub/likes/document_camera_frame)](https://pub.dev/packages/document_camera_frame/score)
 
 `DocumentCameraFrame` is a Flutter package for scanning documents using a live camera feed. It provides a customizable frame UI, dual-side capture support (e.g., front/back of ID cards), and easy integration for OCR or document processing workflows.
 
@@ -10,9 +10,11 @@
 
 Here’s a quick preview of `DocumentCameraFrame` in action:
 
-![example1](https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example1.gif)
-![example2](https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example2.gif)
-![example3](https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example3.gif)
+<img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example1.gif" width="600" alt="example1" />
+<br />
+<img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example2.gif" width="600" alt="example2" />
+<br />
+<img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example3.gif" width="600" alt="example3" />
 
 ## Features
 
