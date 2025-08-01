@@ -131,3 +131,15 @@
 - Update Readme.md.
 - Update metadata.
 
+- ## 1.0.6
+
+- Update examples.gif.
+- Update Readme.md.
+- Update metadata.
+
+- ## 1.0.7
+
+- Update examples.gif.
+- Update Readme.md.
+- Update metadata.
+
