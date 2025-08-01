@@ -121,7 +121,13 @@
 
 - ## 1.0.4
 
-- Update examples.
+- Update examples.gif.
+- Update Readme.md.
+- Update metadata.
+
+- ## 1.0.5
+
+- Update examples.gif.
 - Update Readme.md.
 - Update metadata.
 
