@@ -8,30 +8,35 @@
 
 ## Demo
 
-Here’s a quick preview of `DocumentCameraFrame` in action:
+Here's a quick preview of `DocumentCameraFrame` in action:
 
-<div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
-  <figure style="display: flex; flex-direction: column; align-items: center; margin: 0;">
-    <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example_auto_detect.gif" width="350" alt="Auto Detection Example" />
-    <figcaption>Auto document edge detection in real-time</figcaption>
-  </figure>
+<div style="display: flex; flex-direction: column; gap: 20px; align-items: center;">
+  <!-- First row: 2 images side by side -->
+  <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+    <figure style="display: flex; flex-direction: column; align-items: center; margin: 0;">
+      <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example_auto_detect.gif" width="350" alt="Auto Detection Example" />
+      <figcaption style="margin-top: 8px; text-align: center; font-style: italic;">Auto document edge detection in real-time</figcaption>
+    </figure>
 
-  <figure style="display: flex; flex-direction: column; align-items: center; margin: 0;">
-    <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example1.gif?v=2" width="350" alt="example1" />
-    <figcaption>Manual frame adjustment example</figcaption>
-  </figure>
+    <figure style="display: flex; flex-direction: column; align-items: center; margin: 0;">
+      <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example1.gif?v=2" width="350" alt="example1" />
+      <figcaption style="margin-top: 8px; text-align: center; font-style: italic;">Manual frame adjustment example</figcaption>
+    </figure>
+  </div>
 
-  <figure style="display: flex; flex-direction: column; align-items: center; margin: 0;">
-    <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example2.gif?v=2" width="350" alt="example2" />
-    <figcaption>Frame capture animation in action</figcaption>
-  </figure>
+  <!-- Second row: 2 images side by side -->
+  <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+    <figure style="display: flex; flex-direction: column; align-items: center; margin: 0;">
+      <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example2.gif?v=2" width="350" alt="example2" />
+      <figcaption style="margin-top: 8px; text-align: center; font-style: italic;">Frame capture animation in action</figcaption>
+    </figure>
 
-  <figure style="display: flex; flex-direction: column; align-items: center; margin: 0;">
-    <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example3.gif?v=2" width="350" alt="example3" />
-    <figcaption>Document cropping and perspective correction</figcaption>
-  </figure>
+    <figure style="display: flex; flex-direction: column; align-items: center; margin: 0;">
+      <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example3.gif?v=2" width="350" alt="example3" />
+      <figcaption style="margin-top: 8px; text-align: center; font-style: italic;">Document cropping and perspective correction</figcaption>
+    </figure>
+  </div>
 </div>
-
 
 ## Features
 
