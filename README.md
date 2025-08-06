@@ -18,17 +18,17 @@ Here's a quick preview of `DocumentCameraFrame` in action:
     </td>
     <td style="text-align: center;">
       <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example1.gif?v=2" width="350" alt="example1" /><br/>
-      <em>Manual frame adjustment example</em>
+      <em>Driver license dual-side capture (320×200) with auto-capture and side indicators</em>
     </td>
   </tr>
   <tr>
     <td style="text-align: center;">
       <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example2.gif?v=2" width="350" alt="example2" /><br/>
-      <em>Frame capture animation in action</em>
+      <em>Passport scanning (300×450) with manual capture button, no side indicators, and custom instructions</em>
     </td>
     <td style="text-align: center;">
       <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example3.gif?v=2" width="350" alt="example3" /><br/>
-      <em>Document cropping and perspective correction</em>
+      <em>em>ID card dual-side capture (320×200) with auto-capture, hidden side indicators, and smooth transitions</em>
     </td>
   </tr>
 </table>
