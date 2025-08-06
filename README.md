@@ -11,10 +11,10 @@
 Here’s a quick preview of `DocumentCameraFrame` in action:
 
 <div style="display: flex; gap: 10px;">
+  <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example_auto_detect.gif" width="350" alt="Auto Detection Example" />
   <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example1.gif?v=2" width="350" alt="example1" />
   <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example2.gif?v=2" width="350" alt="example2" />
   <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example3.gif?v=2" width="350" alt="example3" />
-  <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example_auto_detect.gif" width="350" alt="Auto Detection Example" />
 </div>
 
 ## Features
