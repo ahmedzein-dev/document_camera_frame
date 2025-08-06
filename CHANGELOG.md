@@ -1,3 +1,6 @@
+# 2.0.1
+- Update metadata
+
 # 2.0.0
 added:
 - Modular styling system with dedicated style classes:
