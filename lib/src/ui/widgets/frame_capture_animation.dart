@@ -8,9 +8,9 @@ class FrameCaptureAnimation extends StatelessWidget {
     super.key,
     required this.frameWidth,
     required this.frameHeight,
-    this.animationDuration,
     this.animationColor,
-    this.curve,
+    this.animationDuration = const Duration(milliseconds: 600),
+    this.curve = Curves.easeInOut,
   });
 
   final double frameWidth;
@@ -18,6 +18,8 @@ class FrameCaptureAnimation extends StatelessWidget {
   final Duration? animationDuration;
   final Color? animationColor;
   final Curve? curve;
+
+  static final Color _defaultAnimationColor = Colors.black.withAlpha(127);
 
   @override
   Widget build(BuildContext context) {
@@ -27,19 +29,13 @@ class FrameCaptureAnimation extends StatelessWidget {
           Container(
                 width: frameWidth,
                 height: frameHeight + AppConstants.bottomFrameContainerHeight,
-                color: animationColor ?? Colors.black.withAlpha(127),
+                color: animationColor ?? _defaultAnimationColor,
               )
               .animate(
-                onPlay: (controller) => controller.repeat(
-                  period:
-                      animationDuration ?? const Duration(milliseconds: 1000),
-                ),
+                onPlay: (controller) =>
+                    controller.repeat(period: animationDuration),
               )
-              .fade(
-                duration:
-                    animationDuration ?? const Duration(milliseconds: 1000),
-                curve: curve,
-              ),
+              .fade(duration: animationDuration, curve: curve),
     );
   }
 }

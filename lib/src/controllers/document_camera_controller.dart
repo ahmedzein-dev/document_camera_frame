@@ -1,7 +1,4 @@
-import 'dart:developer';
-
 import 'package:camera/camera.dart';
-import 'package:flutter/material.dart';
 
 import '../services/camera_service.dart';
 import '../services/image_processing_service.dart';
@@ -18,11 +15,21 @@ class DocumentCameraController {
   CameraController? get cameraController => _cameraService.cameraController;
   List<CameraDescription> cameras = [];
 
-  Future<void> initialize(int cameraIndex) async {
+  ImageFormatGroup? _imageFormatGroup;
+
+  Future<void> initialize(
+    int cameraIndex, {
+    ImageFormatGroup? imageFormatGroup,
+  }) async {
+    _imageFormatGroup = imageFormatGroup;
+
     cameras = await availableCameras(); // Load cameras only once
     if (cameras.isNotEmpty) {
       _currentCameraIndex = cameraIndex;
-      await _cameraService.initialize(cameras[cameraIndex]);
+      await _cameraService.initialize(
+        cameras[cameraIndex],
+        imageFormatGroup: _imageFormatGroup,
+      );
     }
   }
 
@@ -37,7 +44,10 @@ class DocumentCameraController {
 
     // Smooth transition: Pause before switching
     await cameraController?.pausePreview();
-    await _cameraService.initialize(cameras[_currentCameraIndex]);
+    await _cameraService.initialize(
+      cameras[_currentCameraIndex],
+      imageFormatGroup: _imageFormatGroup,
+    );
     await cameraController?.resumePreview(); // Resume after switching
   }
 
@@ -46,20 +56,21 @@ class DocumentCameraController {
   Future<void> takeAndCropPicture(
     double frameWidth,
     double frameHeight,
-    BuildContext context,
+    int screenWidth,
+    int screenHeight,
   ) async {
     if (!_cameraService.isInitialized) return;
     try {
       final filePath = await _cameraService.captureImage();
-      if (!context.mounted) return;
+
       _imagePath = _imageProcessingService.cropImageToFrame(
         filePath,
         frameWidth,
         frameHeight,
-        context,
+        screenWidth,
+        screenHeight,
       );
     } catch (e) {
-      log('Error capturing or cropping image: $e');
       rethrow;
     }
   }

@@ -1,7 +1,4 @@
 import 'dart:io';
-
-import 'package:document_camera_frame/src/core/document_camera_context_extensions.dart';
-import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 
 class ImageProcessingService {
@@ -9,15 +6,13 @@ class ImageProcessingService {
     String filePath,
     double frameWidth,
     double frameHeight,
-    BuildContext context,
+    int screenWidth,
+    int screenHeight,
   ) {
     final File imageFile = File(filePath);
     final img.Image originalImage = img.decodeImage(
       imageFile.readAsBytesSync(),
     )!;
-
-    final int screenWidth = 1.sw(context).toInt();
-    final int screenHeight = 1.sh(context).toInt();
 
     final int cropWidth = originalImage.width * frameWidth ~/ screenWidth;
     final int cropHeight = originalImage.height * frameHeight ~/ screenHeight;

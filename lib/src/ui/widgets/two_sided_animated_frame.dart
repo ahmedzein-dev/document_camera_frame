@@ -7,12 +7,11 @@ class TwoSidedAnimatedFrame extends StatefulWidget {
   final double frameWidth;
   final double outerFrameBorderRadius;
   final double innerCornerBroderRadius;
-  final Duration animatedFrameDuration;
-  final Duration flipAnimationDuration;
-  final Curve flipAnimationCurve;
-  final Curve animatedFrameCurve;
+  final Duration frameFlipDuration;
+  final Curve frameFlipCurve;
   final BoxBorder? border;
   final ValueNotifier<DocumentSide>? currentSideNotifier;
+  final bool isDocumentAligned;
 
   const TwoSidedAnimatedFrame({
     super.key,
@@ -20,12 +19,11 @@ class TwoSidedAnimatedFrame extends StatefulWidget {
     required this.frameWidth,
     required this.outerFrameBorderRadius,
     required this.innerCornerBroderRadius,
-    required this.animatedFrameDuration,
-    required this.flipAnimationDuration,
-    required this.flipAnimationCurve,
-    required this.animatedFrameCurve,
+    required this.frameFlipDuration,
+    required this.frameFlipCurve,
     this.border,
     this.currentSideNotifier,
+    required this.isDocumentAligned,
   });
 
   @override
@@ -48,14 +46,14 @@ class _TwoSidedAnimatedFrameState extends State<TwoSidedAnimatedFrame>
     super.initState();
 
     _flipAnimationController = AnimationController(
-      duration: widget.flipAnimationDuration,
+      duration: widget.frameFlipDuration,
       vsync: this,
     );
 
     _flipAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _flipAnimationController,
-        curve: widget.flipAnimationCurve,
+        curve: widget.frameFlipCurve,
       ),
     );
 
@@ -128,6 +126,10 @@ class _TwoSidedAnimatedFrameState extends State<TwoSidedAnimatedFrame>
     }
   }
 
+  Duration get animatedFrameDuration => Duration(
+    milliseconds: (widget.frameFlipDuration.inMilliseconds / 2).round(),
+  );
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -165,14 +167,21 @@ class _TwoSidedAnimatedFrameState extends State<TwoSidedAnimatedFrame>
               child: AnimatedContainer(
                 width: widget.frameWidth,
                 height: animatedFrameHeight,
-                duration: _isFlipping
-                    ? Duration.zero
-                    : widget.animatedFrameDuration,
-                curve: widget.animatedFrameCurve,
+                duration: _isFlipping ? Duration.zero : animatedFrameDuration,
+                curve: widget.frameFlipCurve,
                 decoration: BoxDecoration(
-                  border:
-                      widget.border ??
-                      Border.all(color: Colors.white, width: 3),
+                  border: Border.all(
+                    color: _isFlipping
+                        ? Colors.white
+                        : widget.isDocumentAligned
+                        ? Colors.green.shade400
+                        : (widget.border is Border
+                              ? (widget.border as Border).top.color
+                              : Colors.white),
+                    width: widget.border is Border
+                        ? (widget.border as Border).top.width
+                        : 3,
+                  ),
                   borderRadius: BorderRadius.circular(
                     widget.innerCornerBroderRadius,
                   ),
@@ -191,22 +200,19 @@ class _TwoSidedAnimatedFrameState extends State<TwoSidedAnimatedFrame>
                   width:
                       widget.frameWidth -
                       AppConstants.kCornerBorderBoxHorizontalPadding,
-                  duration: _isFlipping
-                      ? Duration.zero
-                      : widget.animatedFrameDuration,
-                  curve: widget.animatedFrameCurve,
+                  duration: _isFlipping ? Duration.zero : animatedFrameDuration,
+                  curve: widget.frameFlipCurve,
                   child: animatedCornerHeight > 0
                       ? Stack(
                           children: [
                             // Top-left corner
                             Positioned(
-                              // bottom: widget.frameHeight +
-                              //     AppConstants.bottomFrameContainerHeight / 2 -
-                              //     34 -
-                              //     18,
                               bottom:
-                                  widget.frameHeight -
-                                  (AppConstants.bottomFrameContainerHeight / 2),
+                                  widget.frameHeight +
+                                  AppConstants.bottomFrameContainerHeight / 2 -
+                                  34 -
+                                  18,
+                              // bottom: widget.frameHeight - (AppConstants.bottomFrameContainerHeight / 2),
                               left: 0,
                               child: _cornerBox(topLeft: true),
                             ),
@@ -256,22 +262,25 @@ class _TwoSidedAnimatedFrameState extends State<TwoSidedAnimatedFrame>
     bool bottomLeft = false,
     bool bottomRight = false,
   }) {
+    final Color borderColor = _isFlipping
+        ? Colors.white
+        : (widget.isDocumentAligned ? Colors.green.shade400 : Colors.white);
     return Container(
       width: 16,
       height: 16,
       decoration: BoxDecoration(
         border: Border(
           top: topLeft || topRight
-              ? const BorderSide(color: Colors.white, width: 2)
+              ? BorderSide(color: borderColor, width: 2)
               : BorderSide.none,
           left: topLeft || bottomLeft
-              ? const BorderSide(color: Colors.white, width: 2)
+              ? BorderSide(color: borderColor, width: 2)
               : BorderSide.none,
           right: topRight || bottomRight
-              ? const BorderSide(color: Colors.white, width: 2)
+              ? BorderSide(color: borderColor, width: 2)
               : BorderSide.none,
           bottom: bottomLeft || bottomRight
-              ? const BorderSide(color: Colors.white, width: 2)
+              ? BorderSide(color: borderColor, width: 2)
               : BorderSide.none,
         ),
         borderRadius: BorderRadius.only(

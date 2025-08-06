@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:document_camera_frame/document_camera_frame.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/app_constants.dart';
+import '../../services/document_detection_service.dart';
 
 /// A customizable camera view for capturing both sides of document images.
 ///
@@ -15,35 +17,26 @@ class DocumentCameraFrame extends StatefulWidget {
   /// Height of the document capture frame.
   final double frameHeight;
 
-  /// Widget to display as the screen's title (optional).
-  final Widget? title;
+  /// Animation styling configuration
+  final DocumentCameraAnimationStyle animationStyle;
 
-  /// Custom title for front side capture
-  final Widget? frontSideTitle;
+  /// Frame styling configuration
+  final DocumentCameraFrameStyle frameStyle;
 
-  /// Custom title for back side capture
-  final Widget? backSideTitle;
+  /// Button styling configuration
+  final DocumentCameraButtonStyle buttonStyle;
 
-  /// Alignment of the screen title (optional).
-  final Alignment? screenTitleAlignment;
+  /// Title styling configuration
+  final DocumentCameraTitleStyle titleStyle;
 
-  /// Padding for the screen title (optional).
-  final EdgeInsets? screenTitlePadding;
+  /// Side indicator styling configuration
+  final DocumentCameraSideIndicatorStyle sideIndicatorStyle;
 
-  /// Radius of the outer circle of the capture button (optional).
-  final double? captureOuterCircleRadius;
+  /// Progress indicator styling configuration
+  final DocumentCameraProgressStyle progressStyle;
 
-  /// Radius of the inner circle of the capture button (optional).
-  final double? captureInnerCircleRadius;
-
-  /// Text for the "Capture" button.
-  final String? captureButtonText;
-
-  /// Text for capture button when capturing front side
-  final String? captureFrontButtonText;
-
-  /// Text for capture button when capturing back side
-  final String? captureBackButtonText;
+  /// Instruction text styling configuration
+  final DocumentCameraInstructionStyle instructionStyle;
 
   /// Callback triggered when front side is captured.
   final Function(String imgPath)? onFrontCaptured;
@@ -54,74 +47,8 @@ class DocumentCameraFrame extends StatefulWidget {
   /// Callback triggered when both sides are captured and saved.
   final Function(DocumentCaptureData documentData) onBothSidesSaved;
 
-  /// Style for the "Capture" button (optional).
-  final ButtonStyle? captureButtonStyle;
-
-  /// Alignment of the "Capture" button (optional).
-  final Alignment? captureButtonAlignment;
-
-  /// Padding for the "Capture" button (optional).
-  final EdgeInsets? captureButtonPadding;
-
-  /// Width for the "Capture" button (optional).
-  final double? captureButtonWidth;
-
-  /// Height for the "Capture" button (optional).
-  final double? captureButtonHeight;
-
-  /// Text for the "Save" button.
-  final String? saveButtonText;
-
-  /// Text for "Next" button (when moving from front to back)
-  final String? nextButtonText;
-
-  /// Text for "Previous" button (when going back to front from back)
-  final String? previousButtonText;
-
-  /// Style for action buttons (optional).
-  final ButtonStyle? actionButtonStyle;
-
-  /// Alignment of action buttons (optional).
-  final Alignment? actionButtonAlignment;
-
-  /// Padding for action buttons (optional).
-  final EdgeInsets? actionButtonPadding;
-
-  /// Width for action buttons (optional).
-  final double? actionButtonWidth;
-
-  /// Height for action buttons (optional).
-  final double? actionButtonHeight;
-
-  /// Text for the "Retake" button.
-  final String? retakeButtonText;
-
   /// Callback triggered when the "Retake" button is pressed.
   final VoidCallback? onRetake;
-
-  /// Style for the "Retake" button (optional).
-  final ButtonStyle? retakeButtonStyle;
-
-  /// Text styles for buttons
-  final TextStyle? captureButtonTextStyle;
-  final TextStyle? actionButtonTextStyle;
-  final TextStyle? retakeButtonTextStyle;
-
-  /// Border for the displayed Frame (optional).
-  final BoxBorder? frameBorder;
-
-  /// Animation properties
-  final Duration? capturingAnimationDuration;
-  final Color? capturingAnimationColor;
-  final Curve? capturingAnimationCurve;
-  final Duration animatedFrameDuration;
-  final Duration flipAnimationDuration;
-  final Curve flipAnimationCurve;
-  final Curve animatedFrameCurve;
-
-  /// Frame styling
-  final double outerFrameBorderRadius;
-  final double innerCornerBroderRadius;
 
   /// Bottom container customization
   final Widget? bottomFrameContainerChild;
@@ -135,97 +62,42 @@ class DocumentCameraFrame extends StatefulWidget {
   /// Whether to require both sides (if false, can save with just front side)
   final bool requireBothSides;
 
-  /// Progress indicator properties
-  final Color? progressIndicatorColor;
-  final double progressIndicatorHeight;
-
-  /// Instruction text for each side
-  final String? frontSideInstruction;
-  final String? backSideInstruction;
-  final TextStyle? instructionTextStyle;
-
   /// Optional bottom hint text shown in the bottom container.
   final String? bottomHintText;
 
   /// Optional widget shown on the right (e.g. a check icon).
   final Widget? sideInfoOverlay;
 
-  /// Show the side indicator (optional)
-  final bool showSideIndicator;
+  /// Enables automatic capture when a document is aligned in the frame.
+  final bool enableAutoCapture;
 
-  /// Customize side indicator colors and style
-  final Color? sideIndicatorBackgroundColor;
-  final Color? sideIndicatorBorderColor;
-  final Color? sideIndicatorActiveColor;
-  final Color? sideIndicatorInactiveColor;
-  final Color? sideIndicatorCompletedColor;
-  final TextStyle? sideIndicatorTextStyle;
+  /// Callback triggered when a camera-related error occurs (e.g., initialization, streaming, or capture failure).
+  final void Function(Object error)? onCameraError;
 
   /// Constructor for the [DocumentCameraFrame].
   const DocumentCameraFrame({
     super.key,
     required this.frameWidth,
     required this.frameHeight,
-    this.title,
-    this.frontSideTitle,
-    this.backSideTitle,
-    this.screenTitleAlignment,
-    this.screenTitlePadding,
-    this.captureOuterCircleRadius,
-    this.captureInnerCircleRadius,
-    this.captureButtonText,
-    this.captureFrontButtonText,
-    this.captureBackButtonText,
+    this.animationStyle = const DocumentCameraAnimationStyle(),
+    this.frameStyle = const DocumentCameraFrameStyle(),
+    this.buttonStyle = const DocumentCameraButtonStyle(),
+    this.titleStyle = const DocumentCameraTitleStyle(),
+    this.sideIndicatorStyle = const DocumentCameraSideIndicatorStyle(),
+    this.progressStyle = const DocumentCameraProgressStyle(),
+    this.instructionStyle = const DocumentCameraInstructionStyle(),
     this.onFrontCaptured,
     this.onBackCaptured,
     required this.onBothSidesSaved,
-    this.captureButtonStyle,
-    this.captureButtonAlignment,
-    this.captureButtonPadding,
-    this.captureButtonWidth,
-    this.captureButtonHeight,
-    this.saveButtonText,
-    this.nextButtonText,
-    this.previousButtonText,
-    this.actionButtonStyle,
-    this.actionButtonAlignment,
-    this.actionButtonPadding,
-    this.actionButtonWidth,
-    this.actionButtonHeight,
-    this.retakeButtonText,
     this.onRetake,
-    this.retakeButtonStyle,
-    this.captureButtonTextStyle,
-    this.actionButtonTextStyle,
-    this.retakeButtonTextStyle,
-    this.frameBorder,
-    this.capturingAnimationDuration,
-    this.capturingAnimationColor,
-    this.capturingAnimationCurve,
-    this.animatedFrameDuration = const Duration(milliseconds: 600),
-    this.flipAnimationDuration = const Duration(milliseconds: 1200),
-    this.flipAnimationCurve = Curves.easeInOut,
-    this.animatedFrameCurve = Curves.easeInOut,
-    this.outerFrameBorderRadius = 12,
-    this.innerCornerBroderRadius = 8,
     this.bottomFrameContainerChild,
     this.showCloseButton = false,
     this.cameraIndex,
     this.requireBothSides = true,
-    this.progressIndicatorColor,
-    this.progressIndicatorHeight = 4.0,
-    this.frontSideInstruction,
-    this.backSideInstruction,
-    this.instructionTextStyle,
     this.bottomHintText,
     this.sideInfoOverlay,
-    this.showSideIndicator = true,
-    this.sideIndicatorBackgroundColor,
-    this.sideIndicatorBorderColor,
-    this.sideIndicatorActiveColor,
-    this.sideIndicatorInactiveColor,
-    this.sideIndicatorCompletedColor,
-    this.sideIndicatorTextStyle,
+    this.enableAutoCapture = false,
+    this.onCameraError,
   });
 
   @override
@@ -234,37 +106,90 @@ class DocumentCameraFrame extends StatefulWidget {
 
 class _DocumentCameraFrameState extends State<DocumentCameraFrame>
     with TickerProviderStateMixin {
-  late DocumentCameraController _controller;
-  final ValueNotifier<bool> isInitializedNotifier = ValueNotifier(false);
-  final ValueNotifier<bool> isLoadingNotifier = ValueNotifier(false);
-  final ValueNotifier<String> capturedImageNotifier = ValueNotifier("");
+  Timer? _debounceTimer;
+  bool _isDebouncing = false;
 
-  // Two-sided document specific state
-  final ValueNotifier<DocumentSide> currentSideNotifier = ValueNotifier(
+  late DocumentCameraController _controller;
+
+  // State notifiers
+  final ValueNotifier<bool> _isInitializedNotifier = ValueNotifier(false);
+  final ValueNotifier<bool> _isLoadingNotifier = ValueNotifier(false);
+  final ValueNotifier<String> _capturedImageNotifier = ValueNotifier("");
+  final ValueNotifier<DocumentSide> _currentSideNotifier = ValueNotifier(
     DocumentSide.front,
   );
-  final ValueNotifier<DocumentCaptureData> documentDataNotifier = ValueNotifier(
-    DocumentCaptureData(),
-  );
+  final ValueNotifier<DocumentCaptureData> _documentDataNotifier =
+      ValueNotifier(DocumentCaptureData());
+  final ValueNotifier<bool> _isDocumentAlignedNotifier = ValueNotifier(false);
 
-  late AnimationController _progressAnimationController;
-  late Animation<double> _progressAnimation;
+  // Animation controllers
+  AnimationController? _progressAnimationController;
+  Animation<double>? _progressAnimation;
+
+  // Document detection
+  DocumentDetectionService? _documentDetectionService;
+  bool _isDetectorBusy = false;
+  bool _isImageStreamActive = false;
+
+  // Frame dimensions
+  late double _updatedFrameWidth;
+  late double _updatedFrameHeight;
 
   @override
   void initState() {
     super.initState();
-    _initializeCamera();
-    _initializeAnimations();
+    _initializeComponents();
   }
 
-  void _initializeAnimations() {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_hasInitializedFrameDimensions) {
+      _calculateFrameDimensions();
+      _hasInitializedFrameDimensions = true;
+    }
+  }
+
+  void _calculateFrameDimensions() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    final maxWidth = screenWidth;
+    final maxHeight = 0.45 * screenHeight;
+
+    _updatedFrameWidth = widget.frameWidth > maxWidth
+        ? maxWidth
+        : widget.frameWidth;
+    _updatedFrameHeight = widget.frameHeight > maxHeight
+        ? maxHeight
+        : widget.frameHeight;
+  }
+
+  bool _hasInitializedFrameDimensions = false;
+
+  Future<void> _initializeComponents() async {
+    if (widget.sideIndicatorStyle.showSideIndicator) {
+      _initializeProgressAnimation();
+    }
+
+    if (widget.enableAutoCapture) {
+      _documentDetectionService = DocumentDetectionService(
+        onError: widget.onCameraError,
+      );
+      _documentDetectionService!.initialize();
+    }
+
+    await _initializeCamera();
+  }
+
+  void _initializeProgressAnimation() {
     _progressAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
     _progressAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
-        parent: _progressAnimationController,
+        parent: _progressAnimationController!,
         curve: Curves.easeInOut,
       ),
     );
@@ -272,29 +197,174 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
 
   /// Initializes the camera and updates the state when ready.
   Future<void> _initializeCamera() async {
-    _controller = DocumentCameraController();
-    await _controller.initialize(widget.cameraIndex ?? 0);
-    isInitializedNotifier.value = true;
+    try {
+      _controller = DocumentCameraController();
+      await _controller.initialize(
+        widget.cameraIndex ?? 0,
+        imageFormatGroup: ImageFormatGroup.nv21,
+      );
+
+      if (!mounted) return;
+
+      _isInitializedNotifier.value = true;
+
+      if (widget.enableAutoCapture) {
+        await _startImageStream();
+      }
+    } catch (e) {
+      debugPrint('Camera initialization failed: $e');
+      widget.onCameraError?.call(e);
+    }
+  }
+
+  // Safe image stream management methods
+  Future<void> _startImageStream() async {
+    if (_isImageStreamActive ||
+        _controller.cameraController == null ||
+        !_controller.cameraController!.value.isInitialized) {
+      return;
+    }
+
+    try {
+      await _controller.cameraController!.startImageStream(_processCameraImage);
+      _isImageStreamActive = true;
+    } catch (e) {
+      debugPrint('Failed to start image stream: $e');
+      _isImageStreamActive = false;
+      widget.onCameraError?.call(e);
+    }
+  }
+
+  Future<void> _stopImageStream() async {
+    final controller = _controller.cameraController;
+    if (!_isImageStreamActive ||
+        controller == null ||
+        !controller.value.isStreamingImages) {
+      return;
+    }
+
+    try {
+      await controller.stopImageStream();
+    } catch (e) {
+      debugPrint('Failed to stop image stream: $e');
+      widget.onCameraError?.call(e);
+    } finally {
+      _isImageStreamActive = false;
+    }
+  }
+
+  Future<void> _processCameraImage(CameraImage image) async {
+    if (_isDetectorBusy || !mounted || _documentDetectionService == null) {
+      return;
+    }
+
+    if (_capturedImageNotifier.value.isNotEmpty) {
+      if (_isDocumentAlignedNotifier.value) {
+        _isDocumentAlignedNotifier.value = false;
+      }
+      return;
+    }
+
+    _isDetectorBusy = true;
+
+    try {
+      final bool isAligned = await _documentDetectionService!.processImage(
+        image: image,
+        cameraController: _controller.cameraController!,
+        context: context,
+        frameWidth: _updatedFrameWidth,
+        frameHeight: _updatedFrameHeight,
+        screenWidth: MediaQuery.of(context).size.width.toInt(),
+        screenHeight: MediaQuery.of(context).size.height.toInt(),
+      );
+
+      if (!mounted) return;
+
+      _isDocumentAlignedNotifier.value = isAligned;
+
+      if (isAligned) {
+        if (!_isDebouncing) {
+          _isDebouncing = true;
+
+          _debounceTimer = Timer(const Duration(seconds: 1), () async {
+            if (_isDocumentAlignedNotifier.value && mounted) {
+              await _captureAndHandleImageUnified(
+                context,
+                _updatedFrameWidth,
+                _updatedFrameHeight + AppConstants.bottomFrameContainerHeight,
+                1.sw(context).toInt(),
+                1.sh(context).toInt(),
+              );
+            }
+            _isDebouncing = false;
+            _debounceTimer = null;
+          });
+        }
+      } else {
+        if (_isDebouncing) {
+          _debounceTimer?.cancel();
+          _debounceTimer = null;
+          _isDebouncing = false;
+        }
+      }
+    } catch (e) {
+      debugPrint('Image processing error: $e');
+      widget.onCameraError?.call(e);
+    } finally {
+      _isDetectorBusy = false;
+    }
+  }
+
+  Future<void> _captureAndHandleImageUnified(
+    BuildContext context,
+    double frameWidth,
+    double frameHeight,
+    int screenWidth,
+    int screenHeight,
+  ) async {
+    if (_isLoadingNotifier.value) {
+      return; // Prevent multiple simultaneous captures
+    }
+
+    _isLoadingNotifier.value = true;
+
+    try {
+      // Stop image stream before capture to prevent conflicts
+      if (widget.enableAutoCapture && _isImageStreamActive) {
+        await _stopImageStream();
+      }
+
+      await _controller.takeAndCropPicture(
+        frameWidth,
+        frameHeight,
+        screenWidth,
+        screenHeight,
+      );
+
+      _capturedImageNotifier.value = _controller.imagePath;
+      _handleCapture(_controller.imagePath);
+    } catch (e) {
+      debugPrint('Capture failed: $e');
+      widget.onCameraError?.call(e);
+    } finally {
+      if (mounted) {
+        _isLoadingNotifier.value = false;
+      }
+    }
   }
 
   /// Handle image capture based on current side
   void _handleCapture(String imagePath) {
-    final currentSide = currentSideNotifier.value;
-    final currentData = documentDataNotifier.value;
+    final currentSide = _currentSideNotifier.value;
+    final currentData = _documentDataNotifier.value;
 
     if (currentSide == DocumentSide.front) {
-      documentDataNotifier.value = currentData.copyWith(
+      _documentDataNotifier.value = currentData.copyWith(
         frontImagePath: imagePath,
       );
       widget.onFrontCaptured?.call(imagePath);
-
-      // Auto-progress to back side if both sides are required
-      if (widget.requireBothSides) {
-        // Don't auto-switch immediately, let user see the captured image first
-        // They can click "Next Side" button to proceed
-      }
     } else {
-      documentDataNotifier.value = currentData.copyWith(
+      _documentDataNotifier.value = currentData.copyWith(
         backImagePath: imagePath,
       );
       widget.onBackCaptured?.call(imagePath);
@@ -303,70 +373,113 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
 
   /// Switch to back side capture
   void _switchToBackSide() {
-    currentSideNotifier.value = DocumentSide.back;
-    // Reset the controller for new capture
-    _controller.retakeImage();
-    capturedImageNotifier.value = _controller.imagePath;
-    _progressAnimationController.animateTo(1.0);
+    _currentSideNotifier.value = DocumentSide.back;
+    _controller.resetImage();
+    _capturedImageNotifier.value = _controller.imagePath;
+
+    _progressAnimationController?.animateTo(1.0);
+
+    // Restart stream for auto-capture
+    if (widget.enableAutoCapture) {
+      _restartImageStreamSafely();
+    }
   }
 
   /// Switch to front side capture
   void _switchToFrontSide() {
-    currentSideNotifier.value = DocumentSide.front;
-    // Show the previously captured front image if it exists
-    final frontImagePath = documentDataNotifier.value.frontImagePath;
+    _currentSideNotifier.value = DocumentSide.front;
+    final frontImagePath = _documentDataNotifier.value.frontImagePath;
+
     if (frontImagePath != null && frontImagePath.isNotEmpty) {
-      capturedImageNotifier.value = frontImagePath;
-      // Note: We can't set the controller's imagePath directly as it's read-only
-      // The controller will be reset when user takes a new picture
+      _capturedImageNotifier.value = frontImagePath;
     } else {
-      _controller.retakeImage();
-      capturedImageNotifier.value = _controller.imagePath;
+      _controller.resetImage();
+      _capturedImageNotifier.value = _controller.imagePath;
     }
-    _progressAnimationController.animateTo(0.0);
+
+    _progressAnimationController?.animateTo(0.0);
+
+    // Restart stream for auto-capture if no front image exists
+    if (widget.enableAutoCapture &&
+        (frontImagePath == null || frontImagePath.isEmpty)) {
+      _restartImageStreamSafely();
+    }
   }
 
   /// Handle save action
   void _handleSave() {
-    final data = documentDataNotifier.value;
+    final data = _documentDataNotifier.value;
     if (!widget.requireBothSides ||
         data.isCompleteFor(requireBothSides: widget.requireBothSides)) {
       widget.onBothSidesSaved(data);
-      // Reset the controller after saving
-      _controller.resetImage();
-      capturedImageNotifier.value = _controller.imagePath;
+      _resetCapture();
     }
   }
 
   /// Handle retake current side
   void _handleRetake() {
-    final currentSide = currentSideNotifier.value;
-    final currentData = documentDataNotifier.value;
+    final currentSide = _currentSideNotifier.value;
+    final currentData = _documentDataNotifier.value;
 
     if (currentSide == DocumentSide.front) {
-      documentDataNotifier.value = currentData.copyWith(frontImagePath: "");
+      _documentDataNotifier.value = currentData.copyWith(frontImagePath: "");
     } else {
-      documentDataNotifier.value = currentData.copyWith(backImagePath: "");
+      _documentDataNotifier.value = currentData.copyWith(backImagePath: "");
     }
 
-    // Use the controller's retake method
     _controller.retakeImage();
-    capturedImageNotifier.value = _controller.imagePath;
+    _capturedImageNotifier.value = _controller.imagePath;
+
+    // Restart image stream for auto-capture if enabled
+    if (widget.enableAutoCapture) {
+      _restartImageStreamSafely();
+    }
+
     widget.onRetake?.call();
   }
 
+  // Helper method to safely restart image stream
+  Future<void> _restartImageStreamSafely() async {
+    try {
+      // Ensure stream is stopped first
+      if (_isImageStreamActive) {
+        await _stopImageStream();
+      }
+
+      // Small delay to ensure camera is ready
+      await Future.delayed(widget.animationStyle.frameFlipDuration);
+
+      // Start the stream again
+      await _startImageStream();
+    } catch (e) {
+      debugPrint('Failed to restart image stream: $e');
+      widget.onCameraError?.call(e);
+    }
+  }
+
+  void _resetCapture() {
+    _controller.resetImage();
+    _capturedImageNotifier.value = _controller.imagePath;
+    // _currentSideNotifier.value = DocumentSide.front;
+    // _documentDataNotifier.value = DocumentCaptureData();
+    // _progressAnimationController?.reset();
+  }
+
   Widget _buildProgressIndicator() {
+    if (_progressAnimation == null) return const SizedBox.shrink();
+
     return Container(
-      height: widget.progressIndicatorHeight,
+      height: widget.progressStyle.progressIndicatorHeight,
       margin: const EdgeInsets.symmetric(horizontal: 20),
       child: AnimatedBuilder(
-        animation: _progressAnimation,
+        animation: _progressAnimation!,
         builder: (context, child) {
           return LinearProgressIndicator(
-            value: _progressAnimation.value,
+            value: _progressAnimation!.value,
             backgroundColor: Colors.white.withAlpha((0.3 * 255).toInt()),
             valueColor: AlwaysStoppedAnimation<Color>(
-              widget.progressIndicatorColor ?? Theme.of(context).primaryColor,
+              widget.progressStyle.progressIndicatorColor ??
+                  Theme.of(context).primaryColor,
             ),
           );
         },
@@ -376,12 +489,12 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
 
   Widget _buildInstructionText() {
     return ValueListenableBuilder<DocumentSide>(
-      valueListenable: currentSideNotifier,
+      valueListenable: _currentSideNotifier,
       builder: (context, currentSide, child) {
         final instruction = currentSide == DocumentSide.front
-            ? (widget.frontSideInstruction ??
+            ? (widget.instructionStyle.frontSideInstruction ??
                   "Position the front side of your document within the frame")
-            : (widget.backSideInstruction ??
+            : (widget.instructionStyle.backSideInstruction ??
                   "Now position the back side of your document within the frame");
 
         return Container(
@@ -394,7 +507,7 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
           child: Text(
             instruction,
             style:
-                widget.instructionTextStyle ??
+                widget.instructionStyle.instructionTextStyle ??
                 const TextStyle(
                   color: Colors.white,
                   fontSize: 14,
@@ -409,18 +522,18 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
 
   Widget _buildCurrentTitle() {
     return ValueListenableBuilder<DocumentSide>(
-      valueListenable: currentSideNotifier,
+      valueListenable: _currentSideNotifier,
       builder: (context, currentSide, child) {
         Widget? currentTitle;
 
         if (currentSide == DocumentSide.front &&
-            widget.frontSideTitle != null) {
-          currentTitle = widget.frontSideTitle;
+            widget.titleStyle.frontSideTitle != null) {
+          currentTitle = widget.titleStyle.frontSideTitle;
         } else if (currentSide == DocumentSide.back &&
-            widget.backSideTitle != null) {
-          currentTitle = widget.backSideTitle;
-        } else if (widget.title != null) {
-          currentTitle = widget.title;
+            widget.titleStyle.backSideTitle != null) {
+          currentTitle = widget.titleStyle.backSideTitle;
+        } else if (widget.titleStyle.title != null) {
+          currentTitle = widget.titleStyle.title;
         }
 
         return currentTitle ?? const SizedBox.shrink();
@@ -430,85 +543,77 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
 
   @override
   Widget build(BuildContext context) {
-    // Calculate updated frame size clamped to screen size with margins
-    final screenWidth = 1.sw(context);
-    final screenHeight = 1.sh(context);
-
-    final maxWidth = screenWidth;
-    final maxHeight = .45 * screenHeight;
-
-    final updatedFrameWidth = widget.frameWidth > maxWidth
-        ? maxWidth
-        : widget.frameWidth; // clamp to maxWidth
-
-    final updatedFrameHeight = widget.frameHeight > maxHeight
-        ? maxHeight
-        : widget.frameHeight; // clamp to maxHeight
-
     return Scaffold(
       backgroundColor: Colors.black,
       body: ValueListenableBuilder<bool>(
-        valueListenable: isInitializedNotifier,
+        valueListenable: _isInitializedNotifier,
         builder: (context, isInitialized, child) => Stack(
           fit: StackFit.expand,
           children: [
-            // Display the camera preview
-            if (isInitialized) CameraPreview(_controller.cameraController!),
+            // Camera preview
+            if (isInitialized && _controller.cameraController != null)
+              CameraPreview(_controller.cameraController!),
 
-            /// Display captured image
+            // Captured image preview
             if (isInitialized)
               CapturedImagePreview(
-                capturedImageNotifier: capturedImageNotifier,
-                frameWidth: updatedFrameWidth,
-                frameHeight: updatedFrameHeight,
-                borderRadius: widget.outerFrameBorderRadius,
+                capturedImageNotifier: _capturedImageNotifier,
+                frameWidth: _updatedFrameWidth,
+                frameHeight: _updatedFrameHeight,
+                borderRadius: widget.frameStyle.outerFrameBorderRadius,
               ),
 
-            /// Frame capture animation when loading
+            // Frame capture animation
             if (isInitialized)
               ValueListenableBuilder<bool>(
-                valueListenable: isLoadingNotifier,
+                valueListenable: _isLoadingNotifier,
+                child: FrameCaptureAnimation(
+                  frameWidth: _updatedFrameWidth,
+                  frameHeight: _updatedFrameHeight,
+                  animationDuration:
+                      widget.animationStyle.capturingAnimationDuration,
+                  animationColor: widget.animationStyle.capturingAnimationColor,
+                  curve: widget.animationStyle.capturingAnimationCurve,
+                ),
                 builder: (context, isLoading, child) {
-                  if (isLoading) {
-                    return FrameCaptureAnimation(
-                      frameWidth: updatedFrameWidth,
-                      frameHeight: updatedFrameHeight,
-                      animationDuration: widget.capturingAnimationDuration,
-                      animationColor: widget.capturingAnimationColor,
-                      curve: widget.capturingAnimationCurve,
-                    );
-                  }
-                  return const SizedBox.shrink();
+                  return isLoading ? child! : const SizedBox.shrink();
                 },
               ),
 
-            ///  Draw the document frame
-            TwoSidedAnimatedFrame(
-              frameHeight: updatedFrameHeight,
-              frameWidth: updatedFrameWidth,
-              outerFrameBorderRadius: widget.outerFrameBorderRadius,
-              innerCornerBroderRadius: widget.innerCornerBroderRadius,
-              animatedFrameDuration: widget.animatedFrameDuration,
-              flipAnimationDuration: widget.flipAnimationDuration,
-              flipAnimationCurve: widget.flipAnimationCurve,
-              animatedFrameCurve: widget.animatedFrameCurve,
-              border: widget.frameBorder,
-              currentSideNotifier: currentSideNotifier,
+            // Document frame
+            ValueListenableBuilder<bool>(
+              valueListenable: _isDocumentAlignedNotifier,
+              builder: (context, isAligned, child) {
+                return TwoSidedAnimatedFrame(
+                  frameHeight: _updatedFrameHeight,
+                  frameWidth: _updatedFrameWidth,
+                  outerFrameBorderRadius:
+                      widget.frameStyle.outerFrameBorderRadius,
+                  innerCornerBroderRadius:
+                      widget.frameStyle.innerCornerBroderRadius,
+                  frameFlipDuration: widget.animationStyle.frameFlipDuration,
+                  frameFlipCurve: widget.animationStyle.frameFlipCurve,
+                  border: widget.frameStyle.frameBorder,
+                  currentSideNotifier: _currentSideNotifier,
+                  isDocumentAligned: isAligned,
+                );
+              },
             ),
 
-            /// Frame Bottom Container
+            // Bottom frame container
             TwoSidedBottomFrameContainer(
-              width: updatedFrameWidth,
-              height: updatedFrameHeight,
-              borderRadius: widget.outerFrameBorderRadius,
-              currentSideNotifier: currentSideNotifier,
-              documentDataNotifier: documentDataNotifier,
+              width: _updatedFrameWidth,
+              height: _updatedFrameHeight,
+              borderRadius: widget.frameStyle.outerFrameBorderRadius,
+              currentSideNotifier: _currentSideNotifier,
+              documentDataNotifier: _documentDataNotifier,
               bottomHintText: widget.bottomHintText,
               sideInfoOverlay: widget.sideInfoOverlay,
             ),
 
-            /// Progress Indicator
-            if (widget.requireBothSides && widget.showSideIndicator)
+            // Progress indicator
+            if (widget.requireBothSides &&
+                widget.sideIndicatorStyle.showSideIndicator)
               Positioned(
                 top: MediaQuery.of(context).padding.top + 60,
                 left: 0,
@@ -516,9 +621,11 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
                 child: _buildProgressIndicator(),
               ),
 
-            /// Instruction Text
+            // Instruction text
             Positioned(
-              top: widget.requireBothSides && widget.showSideIndicator
+              top:
+                  widget.requireBothSides &&
+                      widget.sideIndicatorStyle.showSideIndicator
                   ? MediaQuery.of(context).padding.top + 120
                   : MediaQuery.of(context).padding.top + 60,
               left: 0,
@@ -526,95 +633,94 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
               child: _buildInstructionText(),
             ),
 
-            /// Screen Title
-            if (widget.title != null ||
-                widget.frontSideTitle != null ||
-                widget.backSideTitle != null ||
+            // Screen title
+            if (widget.titleStyle.title != null ||
+                widget.titleStyle.frontSideTitle != null ||
+                widget.titleStyle.backSideTitle != null ||
                 widget.showCloseButton)
               ScreenTitle(
                 title: _buildCurrentTitle(),
                 showCloseButton: widget.showCloseButton,
-                screenTitleAlignment: widget.screenTitleAlignment,
-                screenTitlePadding: widget.screenTitlePadding,
+                screenTitleAlignment: widget.titleStyle.screenTitleAlignment,
+                screenTitlePadding: widget.titleStyle.screenTitlePadding,
               ),
 
-            /// Side Indicator - Shows Front/Back progress
-            if (widget.requireBothSides && widget.showSideIndicator)
+            // Side indicator
+            if (widget.requireBothSides &&
+                widget.sideIndicatorStyle.showSideIndicator)
               SideIndicator(
-                currentSideNotifier: currentSideNotifier,
-                documentDataNotifier: documentDataNotifier,
+                currentSideNotifier: _currentSideNotifier,
+                documentDataNotifier: _documentDataNotifier,
                 rightPosition: 20,
                 backgroundColor:
-                    widget.sideIndicatorBackgroundColor ??
+                    widget.sideIndicatorStyle.sideIndicatorBackgroundColor ??
                     Colors.black.withAlpha((0.8 * 255).toInt()),
-                borderColor: widget.sideIndicatorBorderColor,
-                activeColor: widget.sideIndicatorActiveColor ?? Colors.blue,
-                inactiveColor: widget.sideIndicatorInactiveColor ?? Colors.grey,
+                borderColor: widget.sideIndicatorStyle.sideIndicatorBorderColor,
+                activeColor:
+                    widget.sideIndicatorStyle.sideIndicatorActiveColor ??
+                    Colors.blue,
+                inactiveColor:
+                    widget.sideIndicatorStyle.sideIndicatorInactiveColor ??
+                    Colors.grey,
                 completedColor:
-                    widget.sideIndicatorCompletedColor ?? Colors.green,
-                textStyle: widget.sideIndicatorTextStyle,
+                    widget.sideIndicatorStyle.sideIndicatorCompletedColor ??
+                    Colors.green,
+                textStyle: widget.sideIndicatorStyle.sideIndicatorTextStyle,
               ),
 
-            /// Display action buttons with two-sided support
+            // Action buttons
             TwoSidedActionButtons(
-              // Camera control properties
-              captureOuterCircleRadius: widget.captureOuterCircleRadius,
-              captureInnerCircleRadius: widget.captureInnerCircleRadius,
-              captureButtonAlignment: widget.captureButtonAlignment,
-              captureButtonPadding: widget.captureButtonPadding,
-
-              // Button text properties
-              captureButtonText: widget.captureButtonText,
-              captureFrontButtonText: widget.captureFrontButtonText,
-              captureBackButtonText: widget.captureBackButtonText,
-              saveButtonText: widget.saveButtonText,
-              nextButtonText: widget.nextButtonText,
-              previousButtonText: widget.previousButtonText,
-              retakeButtonText: widget.retakeButtonText,
-
-              // Button styling
-              captureButtonTextStyle: widget.captureButtonTextStyle,
-              actionButtonTextStyle: widget.actionButtonTextStyle,
-              retakeButtonTextStyle: widget.retakeButtonTextStyle,
-              captureButtonStyle: widget.captureButtonStyle,
-              actionButtonStyle: widget.actionButtonStyle,
-              retakeButtonStyle: widget.retakeButtonStyle,
-
-              // Button dimensions and positioning
-              actionButtonPadding: widget.actionButtonPadding,
-              actionButtonWidth: widget.actionButtonWidth,
-              actionButtonHeight: widget.actionButtonHeight,
-              captureButtonWidth: widget.captureButtonWidth,
-              captureButtonHeight: widget.captureButtonHeight,
-
-              // State notifiers
-              capturedImageNotifier: capturedImageNotifier,
-              isLoadingNotifier: isLoadingNotifier,
-              currentSideNotifier: currentSideNotifier,
-              documentDataNotifier: documentDataNotifier,
-
-              // Frame properties
-              frameWidth: updatedFrameWidth,
-              frameHeight: updatedFrameHeight,
+              captureOuterCircleRadius:
+                  widget.buttonStyle.captureOuterCircleRadius,
+              captureInnerCircleRadius:
+                  widget.buttonStyle.captureInnerCircleRadius,
+              captureButtonAlignment: widget.buttonStyle.captureButtonAlignment,
+              captureButtonPadding: widget.buttonStyle.captureButtonPadding,
+              captureButtonText: widget.buttonStyle.captureButtonText,
+              captureFrontButtonText: widget.buttonStyle.captureFrontButtonText,
+              captureBackButtonText: widget.buttonStyle.captureBackButtonText,
+              saveButtonText: widget.buttonStyle.saveButtonText,
+              nextButtonText: widget.buttonStyle.nextButtonText,
+              previousButtonText: widget.buttonStyle.previousButtonText,
+              retakeButtonText: widget.buttonStyle.retakeButtonText,
+              captureButtonTextStyle: widget.buttonStyle.captureButtonTextStyle,
+              actionButtonTextStyle: widget.buttonStyle.actionButtonTextStyle,
+              retakeButtonTextStyle: widget.buttonStyle.retakeButtonTextStyle,
+              captureButtonStyle: widget.buttonStyle.captureButtonStyle,
+              actionButtonStyle: widget.buttonStyle.actionButtonStyle,
+              retakeButtonStyle: widget.buttonStyle.retakeButtonStyle,
+              actionButtonPadding: widget.buttonStyle.actionButtonPadding,
+              actionButtonWidth: widget.buttonStyle.actionButtonWidth,
+              actionButtonHeight: widget.buttonStyle.actionButtonHeight,
+              captureButtonWidth: widget.buttonStyle.captureButtonWidth,
+              captureButtonHeight: widget.buttonStyle.captureButtonHeight,
+              capturedImageNotifier: _capturedImageNotifier,
+              isLoadingNotifier: _isLoadingNotifier,
+              currentSideNotifier: _currentSideNotifier,
+              documentDataNotifier: _documentDataNotifier,
+              frameWidth: _updatedFrameWidth,
+              frameHeight: _updatedFrameHeight,
               bottomFrameContainerHeight:
                   AppConstants.bottomFrameContainerHeight,
-
-              // Controller
               controller: _controller,
-
-              // Callbacks
-              onCapture: _handleCapture,
+              onManualCapture: _captureAndHandleImageUnified,
               onSave: _handleSave,
               onRetake: _handleRetake,
               onNext: _switchToBackSide,
               onPrevious: _switchToFrontSide,
               onCameraSwitched: () async {
-                isInitializedNotifier.value = false;
-                await _controller.switchCamera();
-                isInitializedNotifier.value = true;
-              },
+                _isInitializedNotifier.value = false;
+                if (widget.enableAutoCapture) {
+                  await _stopImageStream();
+                }
 
-              // Configuration
+                await _controller.switchCamera();
+                _isInitializedNotifier.value = true;
+
+                if (widget.enableAutoCapture) {
+                  await _startImageStream();
+                }
+              },
               requireBothSides: widget.requireBothSides,
             ),
           ],
@@ -625,13 +731,30 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
 
   @override
   void dispose() {
+    // Start async disposal but don't await it here
+    _disposeAsync();
+
+    // Dispose sync stuff
     _controller.dispose();
-    isInitializedNotifier.dispose();
-    isLoadingNotifier.dispose();
-    capturedImageNotifier.dispose();
-    currentSideNotifier.dispose();
-    documentDataNotifier.dispose();
-    _progressAnimationController.dispose();
+    _documentDetectionService?.dispose();
+    _progressAnimationController?.dispose();
+
+    _isInitializedNotifier.dispose();
+    _isLoadingNotifier.dispose();
+    _capturedImageNotifier.dispose();
+    _currentSideNotifier.dispose();
+    _documentDataNotifier.dispose();
+    _isDocumentAlignedNotifier.dispose();
+
+    _debounceTimer?.cancel();
+    _debounceTimer = null;
+
     super.dispose();
+  }
+
+  Future<void> _disposeAsync() async {
+    if (widget.enableAutoCapture) {
+      await _stopImageStream();
+    }
   }
 }

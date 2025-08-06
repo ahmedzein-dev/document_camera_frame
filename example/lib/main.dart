@@ -95,11 +95,14 @@ class DocumentTypeSelectionScreen extends StatelessWidget {
         return DocumentCameraFrame(
           frameWidth: 320,
           frameHeight: 200,
-          frontSideTitle: const Text('Scan Front of License',
-              style: TextStyle(color: Colors.white)),
-          backSideTitle: const Text('Scan Back of License',
-              style: TextStyle(color: Colors.white)),
+          titleStyle: const DocumentCameraTitleStyle(
+            frontSideTitle: Text('Scan Front of License',
+                style: TextStyle(color: Colors.white)),
+            backSideTitle: Text('Scan Back of License',
+                style: TextStyle(color: Colors.white)),
+          ),
           requireBothSides: true,
+          enableAutoCapture: true,
           // Callbacks
           onFrontCaptured: (imagePath) {
             debugPrint('Front side captured: $imagePath');
@@ -127,13 +130,21 @@ class DocumentTypeSelectionScreen extends StatelessWidget {
         return DocumentCameraFrame(
           frameWidth: 300,
           frameHeight: 450,
-          actionButtonHeight: 40,
-          title: const Text('Scan Passport',
-              style: TextStyle(color: Colors.white)),
+          titleStyle: const DocumentCameraTitleStyle(
+            title: Text('Scan Passport', style: TextStyle(color: Colors.white)),
+          ),
+          buttonStyle: const DocumentCameraButtonStyle(
+            actionButtonHeight: 40,
+          ),
+          sideIndicatorStyle: const DocumentCameraSideIndicatorStyle(
+            showSideIndicator: false,
+          ),
+          instructionStyle: const DocumentCameraInstructionStyle(
+            frontSideInstruction:
+                "Position the main page of your passport within the frame",
+          ),
           requireBothSides: false,
-          showSideIndicator: false,
-          frontSideInstruction:
-              "Position the main page of your passport within the frame",
+          enableAutoCapture: false,
           onBothSidesSaved: (data) {
             debugPrint('Passport captured');
             Navigator.of(context).pop();
@@ -144,12 +155,17 @@ class DocumentTypeSelectionScreen extends StatelessWidget {
         return DocumentCameraFrame(
           frameWidth: 320,
           frameHeight: 200,
-          frontSideTitle: const Text('Scan Front of ID',
-              style: TextStyle(color: Colors.white)),
-          backSideTitle: const Text('Scan Back of ID',
-              style: TextStyle(color: Colors.white)),
+          titleStyle: const DocumentCameraTitleStyle(
+            frontSideTitle:
+                Text('Scan Front of ID', style: TextStyle(color: Colors.white)),
+            backSideTitle:
+                Text('Scan Back of ID', style: TextStyle(color: Colors.white)),
+          ),
+          sideIndicatorStyle: const DocumentCameraSideIndicatorStyle(
+            showSideIndicator: false,
+          ),
           requireBothSides: true,
-          showSideIndicator: false,
+          enableAutoCapture: true,
           onBothSidesSaved: (documentData) {
             // Handle the saved document
             _processDocument(context, documentData);

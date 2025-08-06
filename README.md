@@ -4,22 +4,24 @@
 [![Pub Points](https://img.shields.io/pub/points/document_camera_frame)](https://pub.dev/packages/document_camera_frame/score)
 [![Likes](https://img.shields.io/pub/likes/document_camera_frame)](https://pub.dev/packages/document_camera_frame/score)
 
-`DocumentCameraFrame` is a Flutter package for scanning documents using a live camera feed. It provides a customizable frame UI, dual-side capture support (e.g., front/back of ID cards), and easy integration for OCR or document processing workflows.
+`DocumentCameraFrame` is a Flutter package for scanning documents using a live camera feed. It provides a customizable frame UI, dual-side capture support (e.g., front/back of ID cards), automatic document detection, and easy integration for OCR or document processing workflows.
 
 ## Demo
 
 Here’s a quick preview of `DocumentCameraFrame` in action:
 
 <div style="display: flex; gap: 10px;">
-  <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example1.gif?v=2" width="250" alt="example1" />
-  <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example2.gif?v=2" width="250" alt="example2" />
-  <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example3.gif?v=2" width="250" alt="example3" />
+  <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example1.gif?v=2" width="350" alt="example1" />
+  <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example2.gif?v=2" width="350" alt="example2" />
+  <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example3.gif?v=2" width="350" alt="example3" />
+  <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example_auto_detect.gif" width="350" alt="Auto Detection Example" />
 </div>
 
 ## Features
 
 - 📸 **Live Camera Preview** with adjustable document frame
 - ✂️ **Custom Frame Dimensions** for precise cropping
+- 🔎 **Automatic Document Detection**
 - 🔄 **Dual-Side Capture Support** (e.g., ID front/back)
 - 🎛️ **Fully Customizable UI** — titles, padding, button styles
 - 🪝 **Easy Event Callbacks** — `onCaptured`, `onRetake`, `onSaved`
@@ -47,6 +49,7 @@ class QuickExample extends StatelessWidget {
       frameWidth: 320,
       frameHeight: 200,
       requireBothSides: false,
+      enableAutoCapture: true, // Enable automatic capture
       onBothSidesSaved: (documentData) {
         print('Document saved: ${documentData.frontImagePath}');
         Navigator.pop(context);
@@ -60,7 +63,13 @@ class QuickExample extends StatelessWidget {
 
 ### iOS Setup
 
-Add the following keys to your `ios/Runner/Info.plist` file to request camera and microphone
+1. Set the minimum iOS deployment target to 15.5 or higher in your `ios/Podfile`:
+
+```ruby
+platform :ios, '15.5'  # or newer version
+```
+
+2. Add the following keys to your `ios/Runner/Info.plist` file to request camera and microphone
 permissions:
 
 ```xml
@@ -139,6 +148,7 @@ DocumentCameraFrame(
   backSideTitle: Text('Scan Back of License',
     style: TextStyle(color: Colors.white)),
   requireBothSides: true,
+  enableAutoCapture: true, // Automatically capture when document is aligned
   onFrontCaptured: (imagePath) => print('Front: $imagePath'),
   onBackCaptured: (imagePath) => print('Back: $imagePath'),
   onBothSidesSaved: (data) => handleDocument(data),
@@ -154,6 +164,7 @@ DocumentCameraFrame(
   title: Text('Scan Passport', style: TextStyle(color: Colors.white)),
   requireBothSides: false,
   showSideIndicator: false,
+  enableAutoCapture: false, // Manual capture only
   frontSideInstruction: "Position passport within the frame",
   onBothSidesSaved: (data) => handlePassport(data),
 )
@@ -166,6 +177,7 @@ DocumentCameraFrame(
   frameWidth: 320,
   frameHeight: 200,
   requireBothSides: true,
+  enableAutoCapture: true,
   captureButtonText: "Take Photo",
   saveButtonText: "Done",
   retakeButtonText: "Try Again",
@@ -177,80 +189,126 @@ DocumentCameraFrame(
 
 ## Widget Parameters
 
-| Parameter                      | Type                            | Description                                                                      | Required    | Default Value                   |
-|--------------------------------|---------------------------------|----------------------------------------------------------------------------------|-------------|---------------------------------|
-| `frameWidth`                   | `double`                        | Width of the document capture frame.                                             | ✅           | —                               |
-| `frameHeight`                  | `double`                        | Height of the document capture frame.                                            | ✅           | —                               |
-| `title`                        | `Widget?`                       | Widget to display as the screen's title (optional).                              | ❌           | `null`                          |
-| `frontSideTitle`               | `Widget?`                       | Custom title for front side capture.                                             | ❌           | `null`                          |
-| `backSideTitle`                | `Widget?`                       | Custom title for back side capture.                                              | ❌           | `null`                          |
-| `screenTitleAlignment`         | `Alignment?`                    | Alignment of the screen title (optional).                                        | ❌           | `Alignment.topCenter`           |
-| `screenTitlePadding`           | `EdgeInsets?`                   | Padding for the screen title (optional).                                         | ❌           | `EdgeInsets.zero`               |
-| `captureButtonText`            | `String?`                       | Text for the "Capture" button.                                                   | ❌           | `"Capture"`                     |
-| `captureFrontButtonText`       | `String?`                       | Text for capture button when capturing front side.                               | ❌           | `null`                          |
-| `captureBackButtonText`        | `String?`                       | Text for capture button when capturing back side.                                | ❌           | `null`                          |
-| `captureButtonTextStyle`       | `TextStyle?`                    | Text style for the "Capture" button text (optional).                             | ❌           | `null`                          |
-| `captureInnerCircleRadius`     | `double?`                       | Radius of the inner circle of the capture button (optional).                     | ❌           | `59`                            |
-| `captureOuterCircleRadius`     | `double?`                       | Radius of the outer circle of the capture button (optional).                     | ❌           | `70`                            |
-| `captureButtonStyle`           | `ButtonStyle?`                  | Style for the "Capture" button (optional).                                       | ❌           | `null`                          |
-| `captureButtonAlignment`       | `Alignment?`                    | Alignment of the "Capture" button (optional).                                    | ❌           | `Alignment.bottomCenter`        |
-| `captureButtonPadding`         | `EdgeInsets?`                   | Padding for the "Capture" button (optional).                                     | ❌           | `null`                          |
-| `captureButtonWidth`           | `double?`                       | Width for the "Capture" button (optional).                                       | ❌           | `null`                          |
-| `captureButtonHeight`          | `double?`                       | Height for the "Capture" button (optional).                                      | ❌           | `null`                          |
-| `onFrontCaptured`              | `Function(String)`?             | Callback triggered when front side is captured.                                  | ❌           | `null`                          |
-| `onBackCaptured`               | `Function(String)`?             | Callback triggered when back side is captured.                                   | ❌           | `null`                          |
-| `onBothSidesSaved`             | `Function(DocumentCaptureData)` | Callback triggered when both sides are captured and saved.                       | ✅           | —                               |
-| `saveButtonText`               | `String?`                       | Text for the "Save" button.                                                      | ❌           | `"Save"`                        |
-| `nextButtonText`               | `String?`                       | Text for "Next" button (when moving from front to back).                         | ❌           | `null`                          |
-| `previousButtonText`           | `String?`                       | Text for "Previous" button (when going back to front from back).                 | ❌           | `null`                          |
-| `saveButtonTextStyle`          | `TextStyle?`                    | Text style for the "Save" button text (optional).                                | ❌           | `null`                          |
-| `saveButtonStyle`              | `ButtonStyle?`                  | Style for the "Save" button (optional).                                          | ❌           | `null`                          |
-| `saveButtonAlignment`          | `Alignment?`                    | Alignment of the "Save" button (optional).                                       | ❌           | `Alignment.bottomRight`         |
-| `saveButtonPadding`            | `EdgeInsets?`                   | Padding for the "Save" button (optional).                                        | ❌           | `null`                          |
-| `saveButtonWidth`              | `double?`                       | Width for the "Save" button (optional).                                          | ❌           | `null`                          |
-| `saveButtonHeight`             | `double?`                       | Height for the "Save" button (optional).                                         | ❌           | `null`                          |
-| `actionButtonStyle`            | `ButtonStyle?`                  | Style for action buttons (optional).                                             | ❌           | `null`                          |
-| `actionButtonAlignment`        | `Alignment?`                    | Alignment of action buttons (optional).                                          | ❌           | `null`                          |
-| `actionButtonPadding`          | `EdgeInsets?`                   | Padding for action buttons (optional).                                           | ❌           | `null`                          |
-| `actionButtonWidth`            | `double?`                       | Width for action buttons (optional).                                             | ❌           | `null`                          |
-| `actionButtonHeight`           | `double?`                       | Height for action buttons (optional).                                            | ❌           | `null`                          |
-| `actionButtonTextStyle`        | `TextStyle?`                    | Text style for action buttons (optional).                                        | ❌           | `null`                          |
-| `retakeButtonText`             | `String?`                       | Text for the "Retake" button.                                                    | ❌           | `"Retake"`                      |
-| `retakeButtonTextStyle`        | `TextStyle?`                    | Text style for the "Retake" button text (optional).                              | ❌           | `null`                          |
-| `retakeButtonStyle`            | `ButtonStyle?`                  | Style for the "Retake" button (optional).                                        | ❌           | `null`                          |
-| `retakeButtonAlignment`        | `Alignment?`                    | Alignment of the "Retake" button (optional).                                     | ❌           | `Alignment.bottomLeft`          |
-| `retakeButtonPadding`          | `EdgeInsets?`                   | Padding for the "Retake" button (optional).                                      | ❌           | `null`                          |
-| `retakeButtonWidth`            | `double?`                       | Width for the "Retake" button (optional).                                        | ❌           | `null`                          |
-| `retakeButtonHeight`           | `double?`                       | Height for the "Retake" button (optional).                                       | ❌           | `null`                          |
-| `onRetake`                     | `VoidCallback?`                 | Callback triggered when the "Retake" button is pressed.                          | ❌           | `null`                          |
-| `frameBorder`                  | `BoxBorder?`                    | Border for the displayed frame (optional).                                       | ❌           | `null`                          |
-| `capturingAnimationDuration`   | `Duration?`                     | Duration for the capturing animation (optional).                                 | ❌           | `Duration(milliseconds: 1000)`  |
-| `capturingAnimationColor`      | `Color?`                        | Color for the capturing animation (optional).                                    | ❌           | `Colors.black26`                |
-| `capturingAnimationCurve`      | `Curve?`                        | Curve for the capturing animation (optional).                                    | ❌           | `Curves.easeInOut`              |
-| `outerFrameBorderRadius`       | `double`                        | Radius of the outer border of the frame.                                         | ❌           | `12.0`                          |
-| `innerCornerBroderRadius`      | `double`                        | Radius of the inner corners of the frame.                                        | ❌           | `8.0`                           |
-| `animatedFrameDuration`        | `Duration`                      | Duration for the frame animation (optional).                                     | ❌           | `Duration(milliseconds: 600)`   |
-| `flipAnimationDuration`        | `Duration`                      | Duration for the flip animation between sides.                                   | ❌           | `Duration(milliseconds: 1200)`  |
-| `flipAnimationCurve`           | `Curve`                         | Curve for the flip animation between sides.                                      | ❌           | `Curves.easeInOut`              |
-| `animatedFrameCurve`           | `Curve`                         | Curve for the frame animation (optional).                                        | ❌           | `Curves.easeInOut`              |
-| `bottomFrameContainerChild`    | `Widget?`                       | Custom content for the bottom container (optional).                              | ❌           | `null`                          |
-| `showCloseButton`              | `bool`                          | Flag to control the visibility of the CloseButton (optional).                    | ❌           | `false`                         |
-| `cameraIndex`                  | `int?`                          | Index to specify which camera to use (e.g., 0 for back, 1 for front) (optional). | ❌           | `0` (back)                      |
-| `requireBothSides`             | `bool`                          | Whether to require both sides (if false, can save with just front side).         | ❌           | `true`                          |
-| `progressIndicatorColor`       | `Color?`                        | Color for the progress indicator (optional).                                     | ❌           | `Theme.primaryColor`            |
-| `progressIndicatorHeight`      | `double`                        | Height of the progress indicator.                                                | ❌           | `4.0`                           |
-| `frontSideInstruction`         | `String?`                       | Instruction text for front side capture.                                         | ❌           | Default instruction text        |
-| `backSideInstruction`          | `String?`                       | Instruction text for back side capture.                                          | ❌           | Default instruction text        |
-| `instructionTextStyle`         | `TextStyle?`                    | Text style for instruction text (optional).                                      | ❌           | Default style                   |
-| `bottomHintText`               | `String?`                       | Optional bottom hint text shown in the bottom container.                         | ❌           | `null`                          |
-| `sideInfoOverlay`              | `Widget?`                       | Optional widget shown on the right (e.g. a check icon).                          | ❌           | `null`                          |
-| `showSideIndicator`            | `bool`                          | Show the side indicator (optional).                                              | ❌           | `true`                          |
-| `sideIndicatorBackgroundColor` | `Color?`                        | Background color for side indicator.                                             | ❌           | `Colors.black.withOpacity(0.8)` |
-| `sideIndicatorBorderColor`     | `Color?`                        | Border color for side indicator.                                                 | ❌           | `null`                          |
-| `sideIndicatorActiveColor`     | `Color?`                        | Active color for side indicator.                                                 | ❌           | `Colors.blue`                   |
-| `sideIndicatorInactiveColor`   | `Color?`                        | Inactive color for side indicator.                                               | ❌           | `Colors.grey`                   |
-| `sideIndicatorCompletedColor`  | `Color?`                        | Completed color for side indicator.                                              | ❌           | `Colors.green`                  |
-| `sideIndicatorTextStyle`       | `TextStyle?`                    | Text style for side indicator text.                                              | ❌           | `null`                          |
+### Core Parameters
+
+| Parameter                   | Type      | Description                                                                      | Required | Default Value |
+|-----------------------------|-----------|----------------------------------------------------------------------------------|----------|---------------|
+| `frameWidth`                | `double`  | Width of the document capture frame.                                             | ✅        | —             |
+| `frameHeight`               | `double`  | Height of the document capture frame.                                            | ✅        | —             |
+| `enableAutoCapture`         | `bool`    | Enables automatic capture when a document is properly aligned in the frame.      | ❌        | `false`       |
+| `requireBothSides`          | `bool`    | Whether to require both sides (if false, can save with just front side).         | ❌        | `true`        |
+| `showCloseButton`           | `bool`    | Flag to control the visibility of the CloseButton (optional).                    | ❌        | `false`       |
+| `cameraIndex`               | `int?`    | Index to specify which camera to use (e.g., 0 for back, 1 for front) (optional). | ❌        | `0` (back)    |
+| `bottomFrameContainerChild` | `Widget?` | Custom content for the bottom container (optional).                              | ❌        | `null`        |
+| `bottomHintText`            | `String?` | Optional bottom hint text shown in the bottom container.                         | ❌        | `null`        |
+| `sideInfoOverlay`           | `Widget?` | Optional widget shown on the right (e.g. a check icon).                          | ❌        | `null`        |
+
+### Styling Classes
+
+| Parameter            | Type                               | Description                                             | Required | Default Value                        |
+|----------------------|------------------------------------|---------------------------------------------------------|----------|--------------------------------------|
+| `animationStyle`     | `DocumentCameraAnimationStyle`     | Animation styling configuration for the camera widget.  | ❌        | `DocumentCameraAnimationStyle()`     |
+| `frameStyle`         | `DocumentCameraFrameStyle`         | Frame styling configuration for borders and appearance. | ❌        | `DocumentCameraFrameStyle()`         |
+| `buttonStyle`        | `DocumentCameraButtonStyle`        | Button styling configuration for all buttons.           | ❌        | `DocumentCameraButtonStyle()`        |
+| `titleStyle`         | `DocumentCameraTitleStyle`         | Title styling configuration for screen titles.          | ❌        | `DocumentCameraTitleStyle()`         |
+| `sideIndicatorStyle` | `DocumentCameraSideIndicatorStyle` | Side indicator styling configuration.                   | ❌        | `DocumentCameraSideIndicatorStyle()` |
+| `progressStyle`      | `DocumentCameraProgressStyle`      | Progress indicator styling configuration.               | ❌        | `DocumentCameraProgressStyle()`      |
+| `instructionStyle`   | `DocumentCameraInstructionStyle`   | Instruction text styling configuration.                 | ❌        | `DocumentCameraInstructionStyle()`   |
+
+### Callbacks
+
+| Parameter          | Type                            | Description                                                                                                  | Required | Default Value |
+|--------------------|---------------------------------|--------------------------------------------------------------------------------------------------------------|----------|---------------|
+| `onFrontCaptured`  | `Function(String)?`             | Callback triggered when front side is captured.                                                              | ❌        | `null`        |
+| `onBackCaptured`   | `Function(String)?`             | Callback triggered when back side is captured.                                                               | ❌        | `null`        |
+| `onBothSidesSaved` | `Function(DocumentCaptureData)` | Callback triggered when both sides are captured and saved.                                                   | ✅        | —             |
+| `onRetake`         | `VoidCallback?`                 | Callback triggered when the "Retake" button is pressed.                                                      | ❌        | `null`        |
+| `onCameraError`    | `void Function(Object error)?`  | Callback triggered when a camera-related error occurs (e.g., initialization, streaming, or capture failure). | ❌        | `null`        |
+
+## Styling Classes Details
+
+### DocumentCameraAnimationStyle
+
+| Property                     | Type        | Description                                          | Default Value                     |
+|------------------------------|-------------|------------------------------------------------------|-----------------------------------|
+| `capturingAnimationDuration` | `Duration?` | Duration for the capturing animation (optional).     | `null`                            |
+| `capturingAnimationColor`    | `Color?`    | Color for the capturing animation (optional).        | `null`                            |
+| `capturingAnimationCurve`    | `Curve?`    | Curve for the capturing animation (optional).        | `null`                            |
+| `frameFlipDuration`          | `Duration`  | Duration for the flip animation between sides.       | `Duration(milliseconds: 1200)`    |
+| `frameFlipCurve`             | `Curve`     | Curve for the flip animation between sides.          | `Curves.easeInOut`                |
+
+### DocumentCameraFrameStyle
+
+| Property                       | Type         | Description                                           | Default Value                    |
+|--------------------------------|--------------|-------------------------------------------------------|----------------------------------|
+| `outerFrameBorderRadius`       | `double`     | Radius of the outer border of the frame.              | `12.0`                           |
+| `innerCornerBroderRadius`      | `double`     | Radius of the inner corners of the frame.             | `8.0`                            |
+| `frameBorder`                  | `BoxBorder?` | Border for the displayed frame (optional).            | `null`                           |
+
+### DocumentCameraButtonStyle
+
+| Property                   | Type           | Description                                              | Default Value |
+|----------------------------|----------------|----------------------------------------------------------|---------------|
+| `captureOuterCircleRadius` | `double?`      | Radius of the outer circle of the capture button.        | `null`        |
+| `captureInnerCircleRadius` | `double?`      | Radius of the inner circle of the capture button.        | `null`        |
+| `captureButtonText`        | `String?`      | Text for the "Capture" button.                           | `null`        |
+| `captureFrontButtonText`   | `String?`      | Text for capture button when capturing front side.       | `null`        |
+| `captureBackButtonText`    | `String?`      | Text for capture button when capturing back side.        | `null`        |
+| `saveButtonText`           | `String?`      | Text for the "Save" button.                              | `null`        |
+| `nextButtonText`           | `String?`      | Text for "Next" button (when moving from front to back). | `null`        |
+| `previousButtonText`       | `String?`      | Text for "Previous" button (when going back to front).   | `null`        |
+| `retakeButtonText`         | `String?`      | Text for the "Retake" button.                            | `null`        |
+| `captureButtonStyle`       | `ButtonStyle?` | Style for the "Capture" button (optional).               | `null`        |
+| `actionButtonStyle`        | `ButtonStyle?` | Style for action buttons (optional).                     | `null`        |
+| `retakeButtonStyle`        | `ButtonStyle?` | Style for the "Retake" button (optional).                | `null`        |
+| `captureButtonAlignment`   | `Alignment?`   | Alignment of the "Capture" button (optional).            | `null`        |
+| `captureButtonPadding`     | `EdgeInsets?`  | Padding for the "Capture" button (optional).             | `null`        |
+| `captureButtonWidth`       | `double?`      | Width for the "Capture" button (optional).               | `null`        |
+| `captureButtonHeight`      | `double?`      | Height for the "Capture" button (optional).              | `null`        |
+| `actionButtonAlignment`    | `Alignment?`   | Alignment of action buttons (optional).                  | `null`        |
+| `actionButtonPadding`      | `EdgeInsets?`  | Padding for action buttons (optional).                   | `null`        |
+| `actionButtonWidth`        | `double?`      | Width for action buttons (optional).                     | `null`        |
+| `actionButtonHeight`       | `double?`      | Height for action buttons (optional).                    | `null`        |
+| `captureButtonTextStyle`   | `TextStyle?`   | Text style for the "Capture" button text (optional).     | `null`        |
+| `actionButtonTextStyle`    | `TextStyle?`   | Text style for action buttons (optional).                | `null`        |
+| `retakeButtonTextStyle`    | `TextStyle?`   | Text style for the "Retake" button text (optional).      | `null`        |
+
+### DocumentCameraTitleStyle
+
+| Property                       | Type          | Description                                           | Default Value                    |
+|--------------------------------|---------------|-------------------------------------------------------|----------------------------------|
+| `title`                        | `Widget?`     | Widget to display as the screen's title (optional).   | `null`                           |
+| `frontSideTitle`               | `Widget?`     | Custom title for front side capture.                  | `null`                           |
+| `backSideTitle`                | `Widget?`     | Custom title for back side capture.                   | `null`                           |
+| `screenTitleAlignment`         | `Alignment?`  | Alignment of the screen title (optional).             | `null`                           |
+| `screenTitlePadding`           | `EdgeInsets?` | Padding for the screen title (optional).              | `null`                           |
+
+### DocumentCameraSideIndicatorStyle
+
+| Property                       | Type         | Description                                           | Default Value                    |
+|--------------------------------|--------------|-------------------------------------------------------|----------------------------------|
+| `showSideIndicator`            | `bool`       | Show the side indicator (optional).                   | `true`                           |
+| `sideIndicatorBackgroundColor` | `Color?`     | Background color for side indicator.                  | `null`                           |
+| `sideIndicatorBorderColor`     | `Color?`     | Border color for side indicator.                      | `null`                           |
+| `sideIndicatorActiveColor`     | `Color?`     | Active color for side indicator.                      | `null`                           |
+| `sideIndicatorInactiveColor`   | `Color?`     | Inactive color for side indicator.                    | `null`                           |
+| `sideIndicatorCompletedColor`  | `Color?`     | Completed color for side indicator.                   | `null`                           |
+| `sideIndicatorTextStyle`       | `TextStyle?` | Text style for side indicator text.                   | `null`                           |
+
+### DocumentCameraProgressStyle
+
+| Property                       | Type     | Description                                           | Default Value                    |
+|--------------------------------|----------|-------------------------------------------------------|----------------------------------|
+| `progressIndicatorColor`       | `Color?` | Color for the progress indicator (optional).          | `null`                           |
+| `progressIndicatorHeight`      | `double` | Height of the progress indicator.                     | `4.0`                            |
+
+### DocumentCameraInstructionStyle
+
+| Property                       | Type         | Description                                           | Default Value                    |
+|--------------------------------|--------------|-------------------------------------------------------|----------------------------------|
+| `frontSideInstruction`         | `String?`    | Instruction text for front side capture.              | `null`                           |
+| `backSideInstruction`          | `String?`    | Instruction text for back side capture.               | `null`                           |
+| `instructionTextStyle`         | `TextStyle?` | Text style for instruction text (optional).           | `null`                           |
 
 ---
 
@@ -266,6 +324,7 @@ DocumentCameraFrame(
 **Build errors:**
 - 💡 Run `flutter clean && flutter pub get`
 - 💡 Confirm all platform-specific setup is complete
+- 💡 Ensure minimum iOS deployment target is 15.5 or higher in your ios/Podfile
 
 **Permission denied errors:**
 - ⚠️ Handle permission errors gracefully in your app UI

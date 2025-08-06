@@ -1,4 +1,4 @@
-import 'package:document_camera_frame/src/core/document_camera_context_extensions.dart';
+import 'package:document_camera_frame/src/core/context_extensions.dart';
 import 'package:flutter/material.dart';
 
 class ActionButton extends StatelessWidget {

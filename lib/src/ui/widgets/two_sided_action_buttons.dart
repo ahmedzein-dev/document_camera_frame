@@ -48,7 +48,14 @@ class TwoSidedActionButtons extends StatelessWidget {
   final DocumentCameraController controller;
 
   // Callbacks
-  final Function(String imgPath) onCapture;
+  final Future<void> Function(
+    BuildContext context,
+    double frameWidth,
+    double frameHeight,
+    int screenWidth,
+    int screenHeight,
+  )
+  onManualCapture;
   final Function() onSave;
   final VoidCallback? onRetake;
   final Function() onNext;
@@ -90,7 +97,7 @@ class TwoSidedActionButtons extends StatelessWidget {
     required this.frameHeight,
     required this.bottomFrameContainerHeight,
     required this.controller,
-    required this.onCapture,
+    required this.onManualCapture,
     required this.onSave,
     this.onRetake,
     required this.onNext,
@@ -99,32 +106,11 @@ class TwoSidedActionButtons extends StatelessWidget {
     this.requireBothSides = true,
   });
 
-  Future<void> _captureImage(BuildContext context) async {
-    isLoadingNotifier.value = true;
-    await controller.takeAndCropPicture(
-      frameWidth,
-      frameHeight + bottomFrameContainerHeight,
-      context,
-    );
-
-    capturedImageNotifier.value = controller.imagePath;
-    onCapture(controller.imagePath);
-    isLoadingNotifier.value = false;
-  }
-
   void _retakeImage() {
     onRetake?.call();
     controller.retakeImage();
     capturedImageNotifier.value = controller.imagePath;
   }
-  //
-  // String _getCaptureButtonText() {
-  //   if (currentSideNotifier.value == DocumentSide.front) {
-  //     return captureFrontButtonText ?? captureButtonText ?? 'Capture Front';
-  //   } else {
-  //     return captureBackButtonText ?? captureButtonText ?? 'Capture Back';
-  //   }
-  // }
 
   bool _canSave() {
     final data = documentDataNotifier.value;
@@ -213,7 +199,14 @@ class TwoSidedActionButtons extends StatelessWidget {
                                     return CaptureButton(
                                       onPressed: () async {
                                         if (isLoading) return;
-                                        await _captureImage(context);
+                                        await onManualCapture(
+                                          context,
+                                          frameWidth,
+                                          frameHeight +
+                                              bottomFrameContainerHeight,
+                                          1.sw(context).toInt(),
+                                          1.sh(context).toInt(),
+                                        );
                                       },
                                       captureInnerCircleRadius:
                                           captureInnerCircleRadius,

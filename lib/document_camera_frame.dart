@@ -1,6 +1,6 @@
 // Core functionality
 export 'src/controllers/document_camera_controller.dart';
-export 'src/core/document_camera_context_extensions.dart';
+export 'src/core/context_extensions.dart';
 export 'src/core/enums.dart';
 
 // Services
@@ -12,6 +12,7 @@ export 'src/models/document_capture_data.dart';
 
 // Main widget
 export 'src/ui/page/document_camera_frame.dart';
+export 'src/core/document_camera_style.dart';
 
 // UI widgets
 export 'src/ui/widgets/action_button.dart';
