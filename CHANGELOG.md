@@ -1,4 +1,5 @@
-# 2.0.1
+# 2.0.1 - 2.0.2
+- Update Readme.md
 - Update metadata
 
 # 2.0.0
