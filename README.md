@@ -28,7 +28,7 @@ Here's a quick preview of `DocumentCameraFrame` in action:
     </td>
     <td style="text-align: center;">
       <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example3.gif?v=2" width="350" alt="example3" /><br/>
-      <em>em>ID card dual-side capture (320×200) with auto-capture, hidden side indicators, and smooth transitions</em>
+      <em>ID card dual-side capture (320×200) with auto-capture, hidden side indicators, and smooth transitions</em>
     </td>
   </tr>
 </table>
