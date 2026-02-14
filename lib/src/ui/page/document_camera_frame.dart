@@ -44,8 +44,18 @@ class DocumentCameraFrame extends StatefulWidget {
   /// Callback triggered when back side is captured.
   final Function(String imgPath)? onBackCaptured;
 
-  /// Callback triggered when both sides are captured and saved.
-  final Function(DocumentCaptureData documentData) onBothSidesSaved;
+  /// Callback triggered when document capture is saved (one side e.g. passport, or both sides).
+  final Function(DocumentCaptureData documentData)? onDocumentSaved;
+
+  /// Deprecated. Use [onDocumentSaved] instead.
+  @Deprecated(
+    'Use onDocumentSaved instead (works for one-sided and two-sided documents)',
+  )
+  final Function(DocumentCaptureData documentData)? onBothSidesSaved;
+
+  /// When true, runs on-device OCR and includes [DocumentCaptureData.frontOcrText] and
+  /// [DocumentCaptureData.backOcrText] in the callback result.
+  final bool enableExtractText;
 
   /// Callback triggered when the "Retake" button is pressed.
   final VoidCallback? onRetake;
@@ -88,7 +98,9 @@ class DocumentCameraFrame extends StatefulWidget {
     this.instructionStyle = const DocumentCameraInstructionStyle(),
     this.onFrontCaptured,
     this.onBackCaptured,
-    required this.onBothSidesSaved,
+    this.onDocumentSaved,
+    this.onBothSidesSaved,
+    this.enableExtractText = false,
     this.onRetake,
     this.bottomFrameContainerChild,
     this.showCloseButton = false,
@@ -98,7 +110,10 @@ class DocumentCameraFrame extends StatefulWidget {
     this.sideInfoOverlay,
     this.enableAutoCapture = false,
     this.onCameraError,
-  });
+  }) : assert(
+         onDocumentSaved != null || onBothSidesSaved != null,
+         'Either onDocumentSaved or onBothSidesSaved must be provided',
+       );
 
   @override
   State<DocumentCameraFrame> createState() => _DocumentCameraFrameState();
@@ -407,11 +422,41 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
   }
 
   /// Handle save action
-  void _handleSave() {
+  Future<void> _handleSave() async {
     final data = _documentDataNotifier.value;
     if (!widget.requireBothSides ||
         data.isCompleteFor(requireBothSides: widget.requireBothSides)) {
-      widget.onBothSidesSaved(data);
+      DocumentCaptureData resultData = data;
+      if (widget.enableExtractText) {
+        _isLoadingNotifier.value = true;
+        try {
+          final ocrService = OcrService();
+          final frontPath = data.frontImagePath;
+          final backPath = data.backImagePath;
+          final results = await Future.wait<String?>([
+            if (frontPath != null && frontPath.isNotEmpty)
+              ocrService.extractText(frontPath)
+            else
+              Future<String?>.value(null),
+            if (backPath != null && backPath.isNotEmpty)
+              ocrService.extractText(backPath)
+            else
+              Future<String?>.value(null),
+          ]);
+          resultData = data.copyWith(
+            frontOcrText: results[0],
+            backOcrText: results[1],
+          );
+        } catch (e) {
+          debugPrint('OCR extraction failed: $e');
+          // Still deliver data without OCR text
+        } finally {
+          if (mounted) _isLoadingNotifier.value = false;
+        }
+      }
+      if (!mounted) return;
+      // ignore: deprecated_member_use_from_same_package
+      (widget.onDocumentSaved ?? widget.onBothSidesSaved)!(resultData);
       _resetCapture();
     }
   }

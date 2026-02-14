@@ -6,6 +6,7 @@ export 'src/core/enums.dart';
 // Services
 export 'src/services/camera_service.dart';
 export 'src/services/image_processing_service.dart';
+export 'src/services/ocr_service.dart';
 
 // Models
 export 'src/models/document_capture_data.dart';

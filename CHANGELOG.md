@@ -1,3 +1,21 @@
+# 2.0.5
+
+added:
+- **On-device OCR (text extraction):** Optional text recognition via `enableExtractText`.
+- **`enableExtractText`** parameter: When `true`, runs OCR after capture and sets `DocumentCaptureData.frontOcrText` and `backOcrText` before calling the save callback (no API key or internet required).
+- **`OcrService`** class: Reusable on-device OCR using Google ML Kit (Latin script; English and other Latin-based languages). Exported from the package for custom use.
+- **`DocumentCaptureData.frontOcrText`** and **`DocumentCaptureData.backOcrText`**: Optional extracted text when `enableExtractText` is true.
+- Dependency: `google_mlkit_text_recognition` for OCR.
+
+changed:
+- **`onDocumentSaved`**: New preferred callback name (replaces `onBothSidesSaved`). Fits both one-sided documents (e.g. passport) and two-sided (e.g. ID). Callback receives `DocumentCaptureData` with image paths and, when `enableExtractText` is true, `frontOcrText` and `backOcrText`.
+- **`onBothSidesSaved`** is deprecated; use `onDocumentSaved`. The deprecated callback still works for backward compatibility.
+- **`DocumentCaptureData`** model: Now holds optional `frontOcrText` and `backOcrText`; doc comment updated for one-sided vs two-sided use.
+
+notes:
+- OCR supports **Latin script only** (English, etc.). Arabic is not supported by ML Kit's on-device model.
+- Android: `minSdk` 21+ required. iOS: platform 15.5+ and armv7 exclusion recommended for ML Kit.
+
 # 2.0.1 - 2.0.4
 - Update Readme.md
 - Update metadata

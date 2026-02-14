@@ -39,8 +39,9 @@ Here's a quick preview of `DocumentCameraFrame` in action:
 - ✂️ **Custom Frame Dimensions** for precise cropping
 - 🔎 **Automatic Document Detection**
 - 🔄 **Dual-Side Capture Support** (e.g., ID front/back)
+- 📝 **Optional on-device OCR** — set `enableExtractText: true` to get extracted text in the save callback (no API key, no internet). *OCR is Latin-only (no Arabic).*
 - 🎛️ **Fully Customizable UI** — titles, padding, button styles
-- 🪝 **Easy Event Callbacks** — `onCaptured`, `onRetake`, `onSaved`
+- 🪝 **Easy Event Callbacks** — `onDocumentSaved`, `onFrontCaptured`, `onBackCaptured`, `onRetake`
 
 ## Quick Start
 ## Installation
@@ -66,7 +67,7 @@ class QuickExample extends StatelessWidget {
       frameHeight: 200,
       requireBothSides: false,
       enableAutoCapture: true, // Enable automatic capture
-      onBothSidesSaved: (documentData) {
+      onDocumentSaved: (documentData) {
         print('Document saved: ${documentData.frontImagePath}');
         Navigator.pop(context);
       },
@@ -74,6 +75,31 @@ class QuickExample extends StatelessWidget {
   }
 }
 ```
+
+## OCR (Text extraction)
+
+> **Note:** OCR is Latin-only (no Arabic). The on-device ML Kit model supports English and other Latin-script languages only.
+
+Set **`enableExtractText: true`** to run on-device text recognition after capture. The **`onDocumentSaved`** callback then receives **`DocumentCaptureData`** with:
+
+- **`frontImagePath`** / **`backImagePath`** — image file paths (unchanged)
+- **`frontOcrText`** / **`backOcrText`** — extracted text (when `enableExtractText` is true)
+
+No API key or internet is required. OCR uses Google ML Kit and supports **Latin script** (English and other Latin-based languages). **Arabic is not supported** by the on-device model.
+
+```dart
+DocumentCameraFrame(
+  frameWidth: 320,
+  frameHeight: 200,
+  enableExtractText: true,
+  onDocumentSaved: (data) {
+    print('Front text: ${data.frontOcrText}');
+    print('Back text: ${data.backOcrText}');
+  },
+)
+```
+
+For custom OCR (e.g. from file paths elsewhere), use the exported **`OcrService`** class and its **`extractText(String imagePath)`** method.
 
 ## Setup Requirements
 
@@ -167,7 +193,7 @@ DocumentCameraFrame(
   enableAutoCapture: true, // Automatically capture when document is aligned
   onFrontCaptured: (imagePath) => print('Front: $imagePath'),
   onBackCaptured: (imagePath) => print('Back: $imagePath'),
-  onBothSidesSaved: (data) => handleDocument(data),
+  onDocumentSaved: (data) => handleDocument(data),
 )
 ```
 
@@ -182,7 +208,7 @@ DocumentCameraFrame(
   showSideIndicator: false,
   enableAutoCapture: false, // Manual capture only
   frontSideInstruction: "Position passport within the frame",
-  onBothSidesSaved: (data) => handlePassport(data),
+  onDocumentSaved: (data) => handlePassport(data),
 )
 ```
 
@@ -199,7 +225,7 @@ DocumentCameraFrame(
   retakeButtonText: "Try Again",
   progressIndicatorColor: Colors.blue,
   outerFrameBorderRadius: 16.0,
-  onBothSidesSaved: (data) => processIdCard(data),
+  onDocumentSaved: (data) => processIdCard(data),
 )
 ```
 
@@ -237,9 +263,13 @@ DocumentCameraFrame(
 |--------------------|---------------------------------|--------------------------------------------------------------------------------------------------------------|----------|---------------|
 | `onFrontCaptured`  | `Function(String)?`             | Callback triggered when front side is captured.                                                              | ❌        | `null`        |
 | `onBackCaptured`   | `Function(String)?`             | Callback triggered when back side is captured.                                                               | ❌        | `null`        |
-| `onBothSidesSaved` | `Function(DocumentCaptureData)` | Callback triggered when both sides are captured and saved.                                                   | ✅        | —             |
+| `onDocumentSaved` | `Function(DocumentCaptureData)?` | Callback when document is saved (one-sided e.g. passport, or both sides). One of `onDocumentSaved` or `onBothSidesSaved` required. | ✅*       | —             |
+| `onBothSidesSaved` | `Function(DocumentCaptureData)?` | **Deprecated.** Use `onDocumentSaved` instead. Still supported for backward compatibility.                                  | ✅*       | —             |
+| `enableExtractText` | `bool` | When true, runs on-device OCR and sets `documentData.frontOcrText` / `backOcrText` before the callback.   | ❌        | `false`       |
 | `onRetake`         | `VoidCallback?`                 | Callback triggered when the "Retake" button is pressed.                                                      | ❌        | `null`        |
 | `onCameraError`    | `void Function(Object error)?`  | Callback triggered when a camera-related error occurs (e.g., initialization, streaming, or capture failure). | ❌        | `null`        |
+
+*At least one of `onDocumentSaved` or `onBothSidesSaved` must be provided. Prefer `onDocumentSaved`.
 
 ## Styling Classes Details
 

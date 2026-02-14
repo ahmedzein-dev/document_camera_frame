@@ -1,5 +1,5 @@
 name: document_camera
-description: "A new Flutter project."
+description: "Example app for document_camera_frame package (document scan + optional OCR)."
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -12,6 +12,7 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
+  # Local package (use path). For published version: document_camera_frame: ^2.0.5
   document_camera_frame:
     path: ..
 

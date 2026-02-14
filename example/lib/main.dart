@@ -103,26 +103,23 @@ class DocumentTypeSelectionScreen extends StatelessWidget {
           ),
           requireBothSides: true,
           enableAutoCapture: true,
-          // Callbacks
+          enableExtractText: true,
           onFrontCaptured: (imagePath) {
             debugPrint('Front side captured: $imagePath');
-            // You can perform additional actions here
-            // such as uploading to server, saving locally, etc.
           },
-
           onBackCaptured: (imagePath) {
             debugPrint('Back side captured: $imagePath');
-            // You can perform additional actions here
           },
-
-          onBothSidesSaved: (documentData) {
+          onDocumentSaved: (documentData) {
             debugPrint('Document capture completed!');
-            debugPrint('Front: ${documentData.frontImagePath}');
-            debugPrint('Back: ${documentData.backImagePath}');
-            debugPrint('Is complete: ${documentData.isComplete}');
-
-            // Navigate to next screen or process the captured document
-            _handleDocumentSaved(context, documentData);
+            Navigator.of(context).pop();
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (context) => DocumentResultScreen(
+                  documentData: documentData,
+                ),
+              ),
+            );
           },
         );
 
@@ -145,9 +142,17 @@ class DocumentTypeSelectionScreen extends StatelessWidget {
           ),
           requireBothSides: false,
           enableAutoCapture: false,
-          onBothSidesSaved: (data) {
+          enableExtractText: true,
+          onDocumentSaved: (documentData) {
             debugPrint('Passport captured');
             Navigator.of(context).pop();
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (context) => DocumentResultScreen(
+                  documentData: documentData,
+                ),
+              ),
+            );
           },
         );
 
@@ -166,67 +171,102 @@ class DocumentTypeSelectionScreen extends StatelessWidget {
           ),
           requireBothSides: true,
           enableAutoCapture: true,
-          onBothSidesSaved: (documentData) {
-            // Handle the saved document
-            _processDocument(context, documentData);
+          enableExtractText: true,
+          onDocumentSaved: (documentData) {
             Navigator.of(context).pop();
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (context) => DocumentResultScreen(
+                  documentData: documentData,
+                ),
+              ),
+            );
           },
         );
     }
   }
+}
 
-  void _handleDocumentSaved(
-      BuildContext context, DocumentCaptureData documentData) {
-    // Show success dialog
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Document Captured Successfully'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Your document has been captured successfully.'),
-            const SizedBox(height: 10),
-            Text(
-                'Front side: ${documentData.frontImagePath != null ? "✓" : "✗"}'),
-            Text(
-                'Back side: ${documentData.backImagePath != null ? "✓" : "✗"}'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close dialog
-              Navigator.of(context).pop(); // Go back to previous screen
-            },
-            child: const Text('OK'),
+/// Screen that displays extracted text from [DocumentCaptureData]
+/// when [enableExtractText] was true on [DocumentCameraFrame].
+class DocumentResultScreen extends StatelessWidget {
+  const DocumentResultScreen({super.key, required this.documentData});
+
+  final DocumentCaptureData documentData;
+
+  @override
+  Widget build(BuildContext context) {
+    final frontOcrText = documentData.frontOcrText;
+    final backOcrText = documentData.backOcrText;
+    final hasFront = documentData.hasFrontSide;
+    final hasBack = documentData.hasBackSide;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Extracted Text'),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (hasFront) ...[
+                const Text(
+                  'Front side',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _buildTextBlock(
+                  context,
+                  frontOcrText?.isEmpty ?? true
+                      ? '(No text detected)'
+                      : (frontOcrText ?? '(Text extraction not requested)'),
+                ),
+                const SizedBox(height: 24),
+              ],
+              if (hasBack) ...[
+                const Text(
+                  'Back side',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _buildTextBlock(
+                  context,
+                  backOcrText?.isEmpty ?? true
+                      ? '(No text detected)'
+                      : (backOcrText ?? '(Text extraction not requested)'),
+                ),
+              ],
+            ],
           ),
-        ],
-      ),
-    );
-  }
-
-  static void _processDocument(
-      BuildContext context, DocumentCaptureData documentData) {
-    // Process the captured document data
-    final hasBackSide = documentData.backImagePath != null;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          hasBackSide
-              ? 'Document captured with both sides!'
-              : 'Document captured (front side only)',
         ),
-        backgroundColor: Colors.green,
+      ),
+    );
+  }
+
+  Widget _buildTextBlock(BuildContext context, String text) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: SelectableText(
+        text,
+        style: Theme.of(context).textTheme.bodyMedium,
       ),
     );
   }
 }
 
-enum DocumentType {
-  driverLicense,
-  passport,
-  idCard,
-}
+enum DocumentType { driverLicense, passport, idCard }

@@ -2,25 +2,32 @@ PODS:
   - camera_avfoundation (0.0.1):
     - Flutter
   - Flutter (1.0.0)
-  - google_mlkit_commons (0.11.0):
+  - google_mlkit_commons (0.11.1):
     - Flutter
-    - MLKitVision
-  - google_mlkit_object_detection (0.15.0):
+    - MLKitVision (~> 10.0.0)
+  - google_mlkit_object_detection (0.15.1):
     - Flutter
     - google_mlkit_commons
-    - GoogleMLKit/ObjectDetection (~> 7.0.0)
-    - GoogleMLKit/ObjectDetectionCustom (~> 7.0.0)
+    - GoogleMLKit/ObjectDetection (~> 9.0.0)
+    - GoogleMLKit/ObjectDetectionCustom (~> 9.0.0)
+  - google_mlkit_text_recognition (0.15.1):
+    - Flutter
+    - google_mlkit_commons
+    - GoogleMLKit/TextRecognition (~> 9.0.0)
   - GoogleDataTransport (10.1.0):
     - nanopb (~> 3.30910.0)
     - PromisesObjC (~> 2.4)
-  - GoogleMLKit/MLKitCore (7.0.0):
-    - MLKitCommon (~> 12.0.0)
-  - GoogleMLKit/ObjectDetection (7.0.0):
+  - GoogleMLKit/MLKitCore (9.0.0):
+    - MLKitCommon (~> 14.0.0)
+  - GoogleMLKit/ObjectDetection (9.0.0):
     - GoogleMLKit/MLKitCore
-    - MLKitObjectDetection (~> 6.0.0)
-  - GoogleMLKit/ObjectDetectionCustom (7.0.0):
+    - MLKitObjectDetection (~> 8.0.0)
+  - GoogleMLKit/ObjectDetectionCustom (9.0.0):
     - GoogleMLKit/MLKitCore
-    - MLKitObjectDetectionCustom (~> 6.0.0)
+    - MLKitObjectDetectionCustom (~> 8.0.0)
+  - GoogleMLKit/TextRecognition (9.0.0):
+    - GoogleMLKit/MLKitCore
+    - MLKitTextRecognition (~> 7.0.0)
   - GoogleToolboxForMac/Defines (4.2.1)
   - GoogleToolboxForMac/Logger (4.2.1):
     - GoogleToolboxForMac/Defines (= 4.2.1)
@@ -36,41 +43,48 @@ PODS:
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
   - GTMSessionFetcher/Core (3.5.0)
-  - MLImage (1.0.0-beta6)
-  - MLKitCommon (12.0.0):
+  - MLImage (1.0.0-beta8)
+  - MLKitCommon (14.0.0):
     - GoogleDataTransport (~> 10.0)
     - GoogleToolboxForMac/Logger (< 5.0, >= 4.2.1)
     - "GoogleToolboxForMac/NSData+zlib (< 5.0, >= 4.2.1)"
     - GoogleUtilities/Logger (~> 8.0)
     - GoogleUtilities/UserDefaults (~> 8.0)
     - GTMSessionFetcher/Core (< 4.0, >= 3.3.2)
-  - MLKitImageLabelingCommon (8.0.0):
-    - MLKitCommon (~> 12.0)
-    - MLKitVision (~> 8.0)
-  - MLKitObjectDetection (6.0.0):
-    - MLKitCommon (~> 12.0)
-    - MLKitObjectDetectionCommon (~> 8.0)
-    - MLKitVision (~> 8.0)
-    - MLKitVisionKit (~> 9.0)
-  - MLKitObjectDetectionCommon (8.0.0):
-    - MLKitCommon (~> 12.0)
-    - MLKitVision (~> 8.0)
-  - MLKitObjectDetectionCustom (6.0.0):
-    - MLKitCommon (~> 12.0)
-    - MLKitObjectDetectionCommon (~> 8.0)
-    - MLKitVision (~> 8.0)
-    - MLKitVisionKit (~> 9.0)
-  - MLKitVision (8.0.0):
+  - MLKitImageLabelingCommon (10.0.0):
+    - MLKitCommon (~> 14.0)
+    - MLKitVision (~> 10.0)
+  - MLKitObjectDetection (8.0.0):
+    - MLKitCommon (~> 14.0)
+    - MLKitObjectDetectionCommon (~> 10.0)
+    - MLKitVision (~> 10.0)
+    - MLKitVisionKit (~> 11.0)
+  - MLKitObjectDetectionCommon (10.0.0):
+    - MLKitCommon (~> 14.0)
+    - MLKitVision (~> 10.0)
+  - MLKitObjectDetectionCustom (8.0.0):
+    - MLKitCommon (~> 14.0)
+    - MLKitObjectDetectionCommon (~> 10.0)
+    - MLKitVision (~> 10.0)
+    - MLKitVisionKit (~> 11.0)
+  - MLKitTextRecognition (7.0.0):
+    - MLKitCommon (~> 14.0)
+    - MLKitTextRecognitionCommon (= 6.0.0)
+    - MLKitVision (~> 10.0)
+  - MLKitTextRecognitionCommon (6.0.0):
+    - MLKitCommon (~> 14.0)
+    - MLKitVision (~> 10.0)
+  - MLKitVision (10.0.0):
     - GoogleToolboxForMac/Logger (< 5.0, >= 4.2.1)
     - "GoogleToolboxForMac/NSData+zlib (< 5.0, >= 4.2.1)"
     - GTMSessionFetcher/Core (< 4.0, >= 3.3.2)
-    - MLImage (= 1.0.0-beta6)
-    - MLKitCommon (~> 12.0)
-  - MLKitVisionKit (9.0.0):
-    - MLKitCommon (~> 12.0)
-    - MLKitImageLabelingCommon (~> 8.0)
-    - MLKitObjectDetectionCommon (~> 8.0)
-    - MLKitVision (~> 8.0)
+    - MLImage (= 1.0.0-beta8)
+    - MLKitCommon (~> 14.0)
+  - MLKitVisionKit (11.0.0):
+    - MLKitCommon (~> 14.0)
+    - MLKitImageLabelingCommon (~> 10.0)
+    - MLKitObjectDetectionCommon (~> 10.0)
+    - MLKitVision (~> 10.0)
   - nanopb (3.30910.0):
     - nanopb/decode (= 3.30910.0)
     - nanopb/encode (= 3.30910.0)
@@ -86,6 +100,7 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - google_mlkit_commons (from `.symlinks/plugins/google_mlkit_commons/ios`)
   - google_mlkit_object_detection (from `.symlinks/plugins/google_mlkit_object_detection/ios`)
+  - google_mlkit_text_recognition (from `.symlinks/plugins/google_mlkit_text_recognition/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
 
 SPEC REPOS:
@@ -101,6 +116,8 @@ SPEC REPOS:
     - MLKitObjectDetection
     - MLKitObjectDetectionCommon
     - MLKitObjectDetectionCustom
+    - MLKitTextRecognition
+    - MLKitTextRecognitionCommon
     - MLKitVision
     - MLKitVisionKit
     - nanopb
@@ -115,31 +132,36 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/google_mlkit_commons/ios"
   google_mlkit_object_detection:
     :path: ".symlinks/plugins/google_mlkit_object_detection/ios"
+  google_mlkit_text_recognition:
+    :path: ".symlinks/plugins/google_mlkit_text_recognition/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
 
 SPEC CHECKSUMS:
-  camera_avfoundation: dd002b0330f4981e1bbcb46ae9b62829237459a4
-  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  google_mlkit_commons: 2544377e5503bf78ee7412ccfce0394c2dcb8a6b
-  google_mlkit_object_detection: 7127aa6c97beda18b413a6d5c971a81ab200da00
+  camera_avfoundation: 281867ff09f1da66f031a184ecfbc6f2e625c9f5
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  google_mlkit_commons: 1e6ef6605d7281f35baf2b355e6049b9984fd624
+  google_mlkit_object_detection: e41786b13b2e82587cbaeca18758135fe1c6d813
+  google_mlkit_text_recognition: 309a3a493765ea17c7368cadb4a710391e73902c
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
-  GoogleMLKit: eff9e23ec1d90ea4157a1ee2e32a4f610c5b3318
+  GoogleMLKit: b1eee21a41c57704fe72483b15c85cb2c0cd7444
   GoogleToolboxForMac: d1a2cbf009c453f4d6ded37c105e2f67a32206d8
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
-  MLImage: 0ad1c5f50edd027672d8b26b0fee78a8b4a0fc56
-  MLKitCommon: 07c2c33ae5640e5380beaaa6e4b9c249a205542d
-  MLKitImageLabelingCommon: 23f0c9037c2c6433784db594bd1bb87173172fe9
-  MLKitObjectDetection: a5f066aa6e90f134fc1ac47940e95381b7eb5257
-  MLKitObjectDetectionCommon: 0198709a728984e3b6fac98a5fa53a8042880336
-  MLKitObjectDetectionCustom: b243512ccac75c98399c272e213b53413a255c07
-  MLKitVision: 45e79d68845a2de77e2dd4d7f07947f0ed157b0e
-  MLKitVisionKit: 8a7abd5f11aeb1add2942a694c2685eca422a849
+  MLImage: 0de5c6c2bf9e93b80ef752e2797f0836f03b58c0
+  MLKitCommon: 47d47b50a031d00db62f1b0efe5a1d8b09a3b2e6
+  MLKitImageLabelingCommon: 616b0c69b3e302720cfb65903da50dc2e697b915
+  MLKitObjectDetection: c6346f1e6fd945d9a1a993104184e886bda6e0f6
+  MLKitObjectDetectionCommon: 0639341c7cbb44327dac9a23c473d2484d3169dd
+  MLKitObjectDetectionCustom: a210309c7d2a0c08b0ce7b9ef3e8d36027c96978
+  MLKitTextRecognition: c0ad24510481dfc8893ad15dfcb8a5f05ed9e826
+  MLKitTextRecognitionCommon: 234ceb1cfdfb5fceb4fd664943046609a2961cc2
+  MLKitVision: 39a5a812db83c4a0794445088e567f3631c11961
+  MLKitVisionKit: 316cd349468797ef4e7fd785bf658ca838984de3
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
-  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
+  path_provider_foundation: 0b743cbb62d8e47eab856f09262bb8c1ddcfe6ba
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
 
-PODFILE CHECKSUM: f2095d9946016fd9e5adc1075579dbb37c2bbacc
+PODFILE CHECKSUM: fba9018169efa3a5fd3b035ceab7df54bcff94bc
 
 COCOAPODS: 1.16.2
