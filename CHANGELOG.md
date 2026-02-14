@@ -1,4 +1,4 @@
-# 2.0.5
+# 2.1.0
 
 added:
 - **On-device OCR (text extraction):** Optional text recognition via `enableExtractText`.
