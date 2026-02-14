@@ -4,7 +4,14 @@
 [![Pub Points](https://img.shields.io/pub/points/document_camera_frame)](https://pub.dev/packages/document_camera_frame/score)
 [![Likes](https://img.shields.io/pub/likes/document_camera_frame)](https://pub.dev/packages/document_camera_frame/score)
 
-`DocumentCameraFrame` is a Flutter package for scanning documents using a live camera feed. It provides a customizable frame UI, dual-side capture support (e.g., front/back of ID cards), automatic document detection, and easy integration for OCR or document processing workflows.
+`DocumentCameraFrame` is a powerful Flutter package for document scanning via a live camera feed. It offers a fully customizable UI and professional-grade capture workflows for IDs, passports, and general documents.
+
+Key Features:
+- Smart Capture: Choose between single-sided or dual-sided modes (Front/Back) with built-in side indicators and smooth transitions.
+- Edge Detection: Real-time automatic document detection and precise cropping.
+- On-Device OCR: Set enableExtractText: true for instant text extraction (frontOcrText / backOcrText). No API keys, no internet, and 100% privacy (supports Latin scripts).
+- Fully Customizable: Modern modular styling for frames, buttons, animations, and instructions.
+- Offline-First: All processing happens on-device for maximum speed and security.
 
 ## Demo
 
