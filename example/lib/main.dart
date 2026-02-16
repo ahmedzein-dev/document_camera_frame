@@ -101,6 +101,7 @@ class DocumentTypeSelectionScreen extends StatelessWidget {
             backSideTitle: Text('Scan Back of License',
                 style: TextStyle(color: Colors.white)),
           ),
+          showDetectionStatusText: true,
           requireBothSides: true,
           enableAutoCapture: true,
           enableExtractText: true,
@@ -137,9 +138,9 @@ class DocumentTypeSelectionScreen extends StatelessWidget {
             showSideIndicator: false,
           ),
           instructionStyle: const DocumentCameraInstructionStyle(
-            frontSideInstruction:
-                "Position the main page of your passport within the frame",
+            showInstructionText: false,
           ),
+          showDetectionStatusText: false,
           requireBothSides: false,
           enableAutoCapture: false,
           enableExtractText: true,

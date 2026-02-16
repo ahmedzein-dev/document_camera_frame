@@ -1,6 +1,7 @@
-# 2.2.1
+# 2.2.1 - 2.1.2
 - Update Readme.md
 - Update metadata
+- Update example
 
 # 2.2.0
 

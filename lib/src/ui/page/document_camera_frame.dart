@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../document_camera_frame.dart';
-import '../../core/document_camera_style.dart';
 import '../../logic/document_camera_logic.dart';
 import '../widgets/document_camera_preview_layer.dart';
 import '../widgets/document_camera_overlay_layer.dart';
