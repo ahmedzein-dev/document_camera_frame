@@ -251,6 +251,7 @@ DocumentCameraFrame(
 | `bottomFrameContainerChild` | `Widget?` | Custom content for the bottom container (optional).                              | ❌        | `null`        |
 | `bottomHintText`            | `String?` | Optional bottom hint text shown in the bottom container.                         | ❌        | `null`        |
 | `sideInfoOverlay`           | `Widget?` | Optional widget shown on the right (e.g. a check icon).                          | ❌        | `null`        |
+| `showDetectionStatusText`   | `bool`    | Show the (dynamic) live detection status text (e.g. "Move closer").              | ❌        | `true`        |
 
 ### Styling Classes
 
@@ -341,6 +342,8 @@ DocumentCameraFrame(
 | Property                       | Type         | Description                                           | Default Value                    |
 |--------------------------------|--------------|-------------------------------------------------------|----------------------------------|
 | `showSideIndicator`            | `bool`       | Show the side indicator (optional).                   | `true`                           |
+| `topPosition`                  | `double?`    | Side indicator position from the top (optional).      | `null`                           |
+| `rightPosition`                | `double?`    | Side indicator position from the right (optional).    | `null`                           |
 | `sideIndicatorBackgroundColor` | `Color?`     | Background color for side indicator.                  | `null`                           |
 | `sideIndicatorBorderColor`     | `Color?`     | Border color for side indicator.                      | `null`                           |
 | `sideIndicatorActiveColor`     | `Color?`     | Active color for side indicator.                      | `null`                           |
@@ -359,6 +362,7 @@ DocumentCameraFrame(
 
 | Property                       | Type         | Description                                           | Default Value                    |
 |--------------------------------|--------------|-------------------------------------------------------|----------------------------------|
+| `showInstructionText`          | `bool`       | Show the (static) top instruction text.               | `true`                           |
 | `frontSideInstruction`         | `String?`    | Instruction text for front side capture.              | `null`                           |
 | `backSideInstruction`          | `String?`    | Instruction text for back side capture.               | `null`                           |
 | `instructionTextStyle`         | `TextStyle?` | Text style for instruction text (optional).           | `null`                           |

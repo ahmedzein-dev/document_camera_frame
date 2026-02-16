@@ -173,6 +173,16 @@ class DocumentCameraSideIndicatorStyle {
   /// Show the side indicator.
   final bool showSideIndicator;
 
+  /// Side indicator position from the top (optional).
+  ///
+  /// If null, defaults to `MediaQuery.padding.top + 80` (see `SideIndicator`).
+  final double? topPosition;
+
+  /// Side indicator position from the right (optional).
+  ///
+  /// If null, defaults to `20` (see `SideIndicator`).
+  final double? rightPosition;
+
   /// Background color for the side indicator (optional).
   final Color? sideIndicatorBackgroundColor;
 
@@ -193,6 +203,8 @@ class DocumentCameraSideIndicatorStyle {
 
   const DocumentCameraSideIndicatorStyle({
     this.showSideIndicator = true,
+    this.topPosition,
+    this.rightPosition,
     this.sideIndicatorBackgroundColor,
     this.sideIndicatorBorderColor,
     this.sideIndicatorActiveColor,
@@ -218,6 +230,9 @@ class DocumentCameraProgressStyle {
 
 /// Instruction text styling configuration for DocumentCameraFrame
 class DocumentCameraInstructionStyle {
+  /// Show the (static) top instruction text.
+  final bool showInstructionText;
+
   /// Instruction text for front side capture (optional).
   final String? frontSideInstruction;
 
@@ -228,6 +243,7 @@ class DocumentCameraInstructionStyle {
   final TextStyle? instructionTextStyle;
 
   const DocumentCameraInstructionStyle({
+    this.showInstructionText = true,
     this.frontSideInstruction,
     this.backSideInstruction,
     this.instructionTextStyle,

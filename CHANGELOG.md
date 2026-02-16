@@ -1,3 +1,28 @@
+# 2.2.0
+
+added:
+- **Major internal refactoring:** Separated UI and business logic for better maintainability.
+- **Improved Architecture:**
+  - UI split into `DocumentCameraPreviewLayer` and `DocumentCameraOverlayLayer`.
+  - State management and business logic extracted into `DocumentCameraLogic`.
+- **New styling parameters:**
+  - `showDetectionStatusText` in `DocumentCameraFrame`: Toggle live detection guidance text.
+  - `showInstructionText` in `DocumentCameraInstructionStyle`: Toggle top instruction text.
+  - `topPosition` and `rightPosition` in `DocumentCameraSideIndicatorStyle`: Precise control over side indicator placement.
+- **Enhanced Internal Services:**
+  - **`DocumentDetectionService` Optimization**:
+    - Added **Letterbox Correction**: Accounts for camera sensor aspect ratio vs display area to ensure precise frame alignment.
+    - Added **Best-Candidate Selection**: Intelligently picks the best document candidate based on aspect ratio and area.
+    - Added **Live Guidance Engine**: Generates real-time user hints ("Move closer", "Move right", etc.) via `detectionStatusNotifier`.
+    - Added **Screen-Space Mapping**: Automatically maps detection coordinates to screen pixels for overlay rendering, including mirroring support for front cameras.
+  - **`ImageConverterService` Robustness**:
+    - Hardened conversion paths for `BGRA8888` (iOS) and `NV21/YUV420` (Android).
+    - Added **Stride (BytesPerRow) Handling** to prevent image skewing/distortion on various hardware.
+
+changed:
+- `DocumentCameraFrame` widget is now more efficient and easier to customize.
+- Refactored internal components for a cleaner codebase.
+
 # 2.1.0 - 2.1.1
 
 added:

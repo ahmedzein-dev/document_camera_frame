@@ -3,87 +3,112 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
 
-/// Converts a [CameraImage] to an [InputImage] for ML Kit processing.
+/// Converts a [CameraImage] (raw camera stream frame) to an [InputImage]
+/// that ML Kit can process for object detection, barcode scanning, etc.
+///
+/// Returns [null] if the image format is unsupported or the bytes are empty.
 InputImage? cameraImageToInputImage(
   CameraImage image,
   CameraController cameraController,
 ) {
-  final camera = cameraController.description;
-  final sensorOrientation = camera.sensorOrientation;
-  InputImageRotation? rotation;
+  // ---------------------------------------------------------------------------
+  // STEP 1: Determine Image Rotation
+  // ---------------------------------------------------------------------------
+  // ML Kit needs to know the orientation of the image to correctly process it.
+  // The sensor orientation is a fixed value from the camera hardware (0, 90, 180, 270),
+  // representing how many degrees the camera sensor is rotated relative to the device.
+  // We map it directly to ML Kit's InputImageRotation enum.
+  // Note: On Android, sensorOrientation is typically 90 or 270.
+  //       On iOS, it is typically 0 or 90.
+  // Adjust this logic if your device/setup requires different rotation handling.
+  final rotation = switch (cameraController.description.sensorOrientation) {
+    0 => InputImageRotation.rotation0deg,
+    90 => InputImageRotation.rotation90deg,
+    180 => InputImageRotation.rotation180deg,
+    270 => InputImageRotation.rotation270deg,
+    // Default to 0deg for any unexpected sensor orientation value.
+    _ => InputImageRotation.rotation0deg,
+  };
 
-  // Determine the rotation for ML Kit based on sensor orientation.
-  // This is a common way to map it. Adjust if your camera setup requires different logic.
-  switch (sensorOrientation) {
-    case 0:
-      rotation = InputImageRotation.rotation0deg;
-      break;
-    case 90:
-      rotation = InputImageRotation.rotation90deg;
-      break;
-    case 180:
-      rotation = InputImageRotation.rotation180deg;
-      break;
-    case 270:
-      rotation = InputImageRotation.rotation270deg;
-      break;
-    default:
-      rotation = InputImageRotation.rotation0deg; // Default to 0deg
-  }
-
+  // ---------------------------------------------------------------------------
+  // STEP 2: Determine Image Format & Prepare Bytes
+  // ---------------------------------------------------------------------------
+  // Different platforms produce different raw image formats from the camera:
+  //   - Android typically produces YUV420 or NV21.
+  //   - iOS typically produces BGRA8888.
+  // ML Kit requires both the correct format flag and the raw bytes
+  // laid out in a specific way depending on the format.
   final formatGroup = image.format.group;
-  InputImageFormat? inputImageFormat;
-  Uint8List bytes;
+  final InputImageFormat inputImageFormat;
+  final Uint8List bytes;
 
-  // Determine the correct InputImageFormat for ML Kit
-  // and prepare the bytes.
   if (formatGroup == ImageFormatGroup.yuv420 ||
       formatGroup == ImageFormatGroup.nv21) {
-    // For YUV formats (including NV21 and YUV420_888),
-    // ML Kit generally expects the bytes of all planes concatenated.
-    // The specific 'InputImageFormat' will tell ML Kit how to interpret them.
-    inputImageFormat = InputImageFormat
-        .nv21; // Or yuv420 if your ML Kit version prefers it, but NV21 is often safer for generic YUV
+    // YUV formats use multiple planes (Y, U, V) to store color information separately.
+    // ML Kit expects all plane bytes concatenated into a single byte array.
+    // We use NV21 as the format flag — it is the most broadly compatible
+    // option for generic YUV data in ML Kit. Use InputImageFormat.yuv420
+    // if your specific ML Kit version or model requires it instead.
+    inputImageFormat = InputImageFormat.nv21;
 
-    final allBytes = WriteBuffer();
+    // Concatenate all planes (Y, U, V) into one continuous byte buffer.
+    final buffer = WriteBuffer();
     for (final plane in image.planes) {
-      allBytes.putUint8List(plane.bytes);
+      buffer.putUint8List(plane.bytes);
     }
-    bytes = allBytes.done().buffer.asUint8List();
+    bytes = buffer.done().buffer.asUint8List();
   } else if (formatGroup == ImageFormatGroup.bgra8888) {
-    // For BGRA8888 (common on iOS), the bytes are typically in the first plane.
+    // BGRA8888 is an interleaved format common on iOS where all color channels
+    // (Blue, Green, Red, Alpha) are packed together in a single plane.
+    // No concatenation needed — we just read directly from the first (and only) plane.
     inputImageFormat = InputImageFormat.bgra8888;
     bytes = image.planes[0].bytes;
   } else {
-    debugPrint('Unsupported image format group: $formatGroup');
+    // Any other format (e.g., JPEG from some devices) is not currently supported.
+    // Return null to skip this frame silently rather than crashing.
+    debugPrint('[ImageConverter] Unsupported image format: $formatGroup');
     return null;
   }
 
-  // Ensure bytes is not null (shouldn't be with the above logic)
+  // Guard: If the byte array is somehow empty after the above processing,
+  // there is nothing meaningful to pass to ML Kit — skip this frame.
   if (bytes.isEmpty) {
-    debugPrint('Image bytes are empty for format group: $formatGroup');
+    debugPrint(
+      '[ImageConverter] Image bytes are empty for format: $formatGroup',
+    );
     return null;
   }
 
-  final imageSize = Size(image.width.toDouble(), image.height.toDouble());
+  // ---------------------------------------------------------------------------
+  // STEP 3: Determine bytesPerRow
+  // ---------------------------------------------------------------------------
+  // bytesPerRow (also called "stride") tells ML Kit how many bytes make up
+  // one row of pixels in the image buffer — this may be larger than the image
+  // width due to memory alignment padding added by the camera hardware.
+  //
+  // The camera plugin guarantees bytesPerRow is a non-null int (not int?),
+  // so no null check is needed. However, we still guard against an unexpectedly
+  // empty planes list as a defensive measure.
+  //
+  // Fallback: if planes is somehow empty, use image.width as the stride.
+  // For NV21/YUV420, the Y plane stride equals the image width in most cases.
+  final bytesPerRow = image.planes.isNotEmpty
+      ? image.planes[0].bytesPerRow
+      : image.width; // Fallback: stride equals width (no padding assumed)
 
-  // Create the metadata for ML Kit.
-  // InputImageMetadata no longer takes 'planeData'.
-  // 'bytesPerRow' is typically from the first plane for YUV formats.
-  final inputImageData = InputImageMetadata(
-    size: imageSize,
-    rotation: rotation,
-    format: inputImageFormat,
-    // Provide bytesPerRow. It should be an int, not nullable.
-    // Ensure image.planes[0].bytesPerRow is not null if it's coming from the camera plugin.
-    bytesPerRow: image
-        .planes[0]
-        .bytesPerRow, // This assumes planes[0] is always available for relevant formats.
-  );
-
-  // Create and return the InputImage
+  // ---------------------------------------------------------------------------
+  // STEP 4: Build and Return the InputImage
+  // ---------------------------------------------------------------------------
+  // Combine the raw bytes with metadata (size, rotation, format, stride)
+  // into an InputImage that ML Kit can consume directly.
   return InputImage.fromBytes(
     bytes: bytes,
-    metadata: inputImageData, // Use 'metadata' parameter name
+    metadata: InputImageMetadata(
+      size: Size(image.width.toDouble(), image.height.toDouble()),
+      rotation: rotation, // How the image is rotated relative to the screen
+      format: inputImageFormat, // How the bytes are laid out (NV21 or BGRA8888)
+      bytesPerRow:
+          bytesPerRow, // Row stride in bytes (includes any hardware padding)
+    ),
   );
 }
