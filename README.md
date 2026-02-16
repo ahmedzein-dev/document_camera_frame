@@ -4,14 +4,33 @@
 [![Pub Points](https://img.shields.io/pub/points/document_camera_frame)](https://pub.dev/packages/document_camera_frame/score)
 [![Likes](https://img.shields.io/pub/likes/document_camera_frame)](https://pub.dev/packages/document_camera_frame/score)
 
-`DocumentCameraFrame` is a powerful Flutter package for document scanning via a live camera feed. It offers a fully customizable UI and professional-grade capture workflows for IDs, passports, and general documents.
+`DocumentCameraFrame` is an enterprise-grade document scanner for Flutter. It bridges the gap between raw camera streams and structured data by combining real-time ML edge detection, perspective-corrected cropping, and secure on-device OCR.
 
-Key Features:
-- Smart Capture: Choose between single-sided or dual-sided modes (Front/Back) with built-in side indicators and smooth transitions.
-- Edge Detection: Real-time automatic document detection and precise cropping.
-- On-Device OCR: Set enableExtractText: true for instant text extraction (frontOcrText / backOcrText). No API keys, no internet, and 100% privacy (supports Latin scripts).
-- Fully Customizable: Modern modular styling for frames, buttons, animations, and instructions.
-- Offline-First: All processing happens on-device for maximum speed and security.
+## 💎 Premium Scanning Capabilities
+
+### ⚡ Smart Capture Engine
+- **Intelligent Shutter**: Real-time analysis of image stability and document alignment triggers auto-capture.
+- **Dual-Sided Workflow**: Native support for multi-step scanning (e.g., ID Front → ID Back) with animated transitions.
+- **Haptic Guidance**: Integrated vibration patterns to guide users without them needing to look at the screen.
+
+### 🎯 Precision Computer Vision
+- **ML Kit Edge Detection**: Sub-millisecond boundary detection for precise document isolation.
+- **Perspective Correction**: Automatically transforms skewed or angled captures into flat, top-down professional documents.
+- **Frame-to-Sensor Mapping**: Ensures high-resolution sensor output matches the UI overlay perfectly, preventing "cutoff" edges.
+
+### 🧠 On-Device Intelligence & OCR
+- **Privacy-First OCR**: Extract text from Latin-script documents 100% offline. No API keys, no latency, no data leaks.
+- **Context-Aware Hints**: Dynamic UI prompts (e.g., "Move Closer", "Too Dark", "Centering...") to maximize first-time capture success.
+- **Multi-Object Filtering**: Smart logic to ignore background clutter and focus solely on the primary document.
+
+### 🎨 Fully Decoupled UI
+- **Logic-Agnostic Design**: The detection engine is separated from the UI, allowing you to build completely custom overlays while keeping the "brains."
+- **Theming Engine**: Full control over frame colors, stroke thickness, button styles, and hint typography.
+
+### 🔐 Security & Compliance
+- **Offline-Only**: Designed for FinTech and HealthTech—zero external network calls.
+- **No Data Retention**: Images stay in the app's sandbox; you control the lifecycle.
+
 
 ## Demo
 
@@ -45,6 +64,7 @@ Here's a quick preview of `DocumentCameraFrame` in action:
 - 📸 **Live Camera Preview** with adjustable document frame
 - ✂️ **Custom Frame Dimensions** for precise cropping
 - 🔎 **Automatic Document Detection**
+- 📢 **Live Guidance Engine** — Real-time alignment feedback (e.g., "Move closer", "Move right")
 - 🔄 **Dual-Side Capture Support** (e.g., ID front/back)
 - 📝 **Optional on-device OCR** — set `enableExtractText: true` to get extracted text in the save callback (no API key, no internet). *OCR is Latin-only (no Arabic).*
 - 🎛️ **Fully Customizable UI** — titles, padding, button styles

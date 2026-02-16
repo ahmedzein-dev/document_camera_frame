@@ -1,3 +1,7 @@
+# 2.2.1
+- Update Readme.md
+- Update metadata
+
 # 2.2.0
 
 added:
