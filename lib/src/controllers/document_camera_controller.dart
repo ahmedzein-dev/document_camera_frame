@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 
+import '../core/enums.dart';
 import '../services/camera_service.dart';
 import '../services/image_processing_service.dart';
 
@@ -8,20 +9,27 @@ class DocumentCameraController {
   final ImageProcessingService _imageProcessingService =
       ImageProcessingService();
   String _imagePath = '';
+  String _previewPath = '';
 
   String get imagePath => _imagePath;
+  String get previewPath => _previewPath.isNotEmpty ? _previewPath : _imagePath;
   int _currentCameraIndex = 0; // Track the current camera
 
   CameraController? get cameraController => _cameraService.cameraController;
   List<CameraDescription> cameras = [];
 
   ImageFormatGroup? _imageFormatGroup;
+  DocumentOutputFormat _outputFormat = DocumentOutputFormat.jpg;
+  int _imageQuality = 90;
+  FlashMode _initialFlashMode = FlashMode.auto;
 
   Future<void> initialize(
     int cameraIndex, {
     ImageFormatGroup? imageFormatGroup,
+    FlashMode initialFlashMode = FlashMode.auto,
   }) async {
     _imageFormatGroup = imageFormatGroup;
+    _initialFlashMode = initialFlashMode;
 
     cameras = await availableCameras(); // Load cameras only once
     if (cameras.isNotEmpty) {
@@ -29,6 +37,7 @@ class DocumentCameraController {
       await _cameraService.initialize(
         cameras[cameraIndex],
         imageFormatGroup: _imageFormatGroup,
+        initialFlashMode: _initialFlashMode,
       );
     }
   }
@@ -47,6 +56,7 @@ class DocumentCameraController {
     await _cameraService.initialize(
       cameras[_currentCameraIndex],
       imageFormatGroup: _imageFormatGroup,
+      initialFlashMode: _initialFlashMode,
     );
     await cameraController?.resumePreview(); // Resume after switching
   }
@@ -57,19 +67,28 @@ class DocumentCameraController {
     double frameWidth,
     double frameHeight,
     int screenWidth,
-    int screenHeight,
-  ) async {
+    int screenHeight, {
+    DocumentOutputFormat outputFormat = DocumentOutputFormat.jpg,
+    int imageQuality = 90,
+  }) async {
     if (!_cameraService.isInitialized) return;
+    _outputFormat = outputFormat;
+    _imageQuality = imageQuality;
     try {
       final filePath = await _cameraService.captureImage();
 
-      _imagePath = _imageProcessingService.cropImageToFrame(
+      final result = _imageProcessingService.cropImageToFrame(
         filePath,
         frameWidth,
         frameHeight,
         screenWidth,
         screenHeight,
+        outputFormat: _outputFormat,
+        imageQuality: _imageQuality,
       );
+
+      _imagePath = result.filePath;
+      _previewPath = result.previewPath ?? '';
     } catch (e) {
       rethrow;
     }
@@ -77,9 +96,15 @@ class DocumentCameraController {
 
   String saveImage() => imagePath;
 
-  void retakeImage() => _imagePath = '';
+  void retakeImage() {
+    _imagePath = '';
+    _previewPath = '';
+  }
 
-  void resetImage() => _imagePath = '';
+  void resetImage() {
+    _imagePath = '';
+    _previewPath = '';
+  }
 
   void dispose() => _cameraService.dispose();
 }

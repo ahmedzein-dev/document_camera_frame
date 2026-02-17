@@ -88,6 +88,18 @@ class DocumentCameraFrame extends StatefulWidget {
   /// Callback triggered when a camera-related error occurs (e.g., initialization, streaming, or capture failure).
   final void Function(Object error)? onCameraError;
 
+  /// Output format for captured documents (default: JPG for backward compatibility)
+  final DocumentOutputFormat outputFormat;
+
+  /// PDF page size when outputFormat is PDF (default: A4)
+  final PdfPageSize pdfPageSize;
+
+  /// Image quality for lossy formats like JPG and WebP (1-100, default: 90)
+  final int imageQuality;
+
+  /// Initial flash mode for the camera (default: FlightMode.auto)
+  final FlashMode initialFlashMode;
+
   /// Constructor for the [DocumentCameraFrame].
   const DocumentCameraFrame({
     super.key,
@@ -115,6 +127,10 @@ class DocumentCameraFrame extends StatefulWidget {
     this.enableAutoCapture = false,
     this.showDetectionStatusText = true,
     this.onCameraError,
+    this.outputFormat = DocumentOutputFormat.jpg,
+    this.pdfPageSize = PdfPageSize.a4,
+    this.imageQuality = 90,
+    this.initialFlashMode = FlashMode.auto,
   }) : assert(
          onDocumentSaved != null || onBothSidesSaved != null,
          'Either onDocumentSaved or onBothSidesSaved must be provided',
@@ -147,6 +163,10 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
       enableAutoCapture: widget.enableAutoCapture,
       requireBothSides: widget.requireBothSides,
       frameFlipDuration: widget.animationStyle.frameFlipDuration,
+      outputFormat: widget.outputFormat,
+      pdfPageSize: widget.pdfPageSize,
+      imageQuality: widget.imageQuality,
+      initialFlashMode: widget.initialFlashMode,
     );
 
     if (widget.sideIndicatorStyle.showSideIndicator) {

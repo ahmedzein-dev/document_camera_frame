@@ -1,10 +1,39 @@
+# 2.3.0
+added:
+- **Export Format Support:** Choose output format for captured documents.
+  - **`outputFormat`** parameter: Select from `DocumentOutputFormat.jpg` (default), `png`, `pdf`, `webp`, or `tiff`.
+  - **`pdfPageSize`** parameter: Configure PDF page size (`PdfPageSize.a4` or `letter`) when using PDF format.
+  - **`imageQuality`** parameter: Control compression quality (1-100) for JPG and WebP formats.
+  - **PDF Generation:** Multi-page PDF support for two-sided documents with configurable page sizes.
+  - **`DocumentCaptureData.pdfPath`**: New field containing the path to generated PDF when using PDF format.
+  - **`PdfGenerationService`**: New exported service for custom PDF generation from images.
+- **TIFF Format Support:** Added automatic JPG preview generation for TIFF files to resolve "Invalid image data" errors in Flutter UI.
+- **TIFF OCR Fix:** OCR extraction now uses internal JPG previews to bypass ML Kit's lack of native TIFF support.
+- **`DocumentCaptureData` Enhancements:**
+  - Added **`frontPreviewPath`** and **`backPreviewPath`**: Access displayable (JPG) versions of documents even when the primary output is TIFF.
+  - Added **`hasFrontText`** and **`hasBackText`** getters: Simplified logic for checking if OCR extracted any content.
+- **`initialFlashMode` property:** Configure the starting flash mode for the camera (auto, off, on, torch).
+- **Library Export:** Re-exported `FlashMode` from the core library to simplify integration for consumers.
+
+changed:
+- **Alignment Reset:** The alignment guidance (green frame) now correctly resets when tapping "Retake".
+- **PDF Export Optimization:** Automatically deletes temporary JPG files after PDF generation to minimize local storage usage.
+- **Example App Enhancement:** Added direct file opening for generated PDFs using `open_file`.
+- **Image Processing:** Updated `ImageProcessingService` to support multiple output formats.
+- **Dependencies:** Added `pdf` package (^3.11.2) for PDF generation. Downgraded `image` package to ^4.5.4 for compatibility.
+
+notes:
+- All new parameters are optional with sensible defaults.
+- Existing code continues to work without modifications (JPG is default).
+- PDF generation only occurs when `outputFormat` is set to `DocumentOutputFormat.pdf`.
+- See `example/lib/export_format_example.dart` for usage examples of all formats.
+
 # 2.2.1 - 2.2.3
 - Update Readme.md
 - Update metadata
 - Update example
 
 # 2.2.0
-
 added:
 - **Major internal refactoring:** Separated UI and business logic for better maintainability.
 - **Improved Architecture:**
@@ -29,7 +58,6 @@ changed:
 - Refactored internal components for a cleaner codebase.
 
 # 2.1.0 - 2.1.1
-
 added:
 - **On-device OCR (text extraction):** Optional text recognition via `enableExtractText`.
 - **`enableExtractText`** parameter: When `true`, runs OCR after capture and sets `DocumentCaptureData.frontOcrText` and `backOcrText` before calling the save callback (no API key or internet required).

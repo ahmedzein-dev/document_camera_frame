@@ -6,32 +6,6 @@
 
 `DocumentCameraFrame` is an enterprise-grade document scanner for Flutter. It bridges the gap between raw camera streams and structured data by combining real-time ML edge detection, perspective-corrected cropping, and secure on-device OCR.
 
-## 💎 Premium Scanning Capabilities
-
-### ⚡ Smart Capture Engine
-- **Intelligent Shutter**: Real-time analysis of image stability and document alignment triggers auto-capture.
-- **Dual-Sided Workflow**: Native support for multi-step scanning (e.g., ID Front → ID Back) with animated transitions.
-- **Haptic Guidance**: Integrated vibration patterns to guide users without them needing to look at the screen.
-
-### 🎯 Precision Computer Vision
-- **ML Kit Edge Detection**: Sub-millisecond boundary detection for precise document isolation.
-- **Perspective Correction**: Automatically transforms skewed or angled captures into flat, top-down professional documents.
-- **Frame-to-Sensor Mapping**: Ensures high-resolution sensor output matches the UI overlay perfectly, preventing "cutoff" edges.
-
-### 🧠 On-Device Intelligence & OCR
-- **Privacy-First OCR**: Extract text from Latin-script documents 100% offline. No API keys, no latency, no data leaks.
-- **Context-Aware Hints**: Dynamic UI prompts (e.g., "Move Closer", "Too Dark", "Centering...") to maximize first-time capture success.
-- **Multi-Object Filtering**: Smart logic to ignore background clutter and focus solely on the primary document.
-
-### 🎨 Fully Decoupled UI
-- **Logic-Agnostic Design**: The detection engine is separated from the UI, allowing you to build completely custom overlays while keeping the "brains."
-- **Theming Engine**: Full control over frame colors, stroke thickness, button styles, and hint typography.
-
-### 🔐 Security & Compliance
-- **Offline-Only**: Designed for FinTech and HealthTech—zero external network calls.
-- **No Data Retention**: Images stay in the app's sandbox; you control the lifecycle.
-
-
 ## Demo
 
 Here's a quick preview of `DocumentCameraFrame` in action:
@@ -61,16 +35,40 @@ Here's a quick preview of `DocumentCameraFrame` in action:
 
 ## Features
 
+### ⚡ Smart Capture Engine
 - 📸 **Live Camera Preview** with adjustable document frame
 - ✂️ **Custom Frame Dimensions** for precise cropping
-- 🔎 **Automatic Document Detection**
-- 📢 **Live Guidance Engine** — Real-time alignment feedback (e.g., "Move closer", "Move right")
-- 🔄 **Dual-Side Capture Support** (e.g., ID front/back)
-- 📝 **Optional on-device OCR** — set `enableExtractText: true` to get extracted text in the save callback (no API key, no internet). *OCR is Latin-only (no Arabic).*
-- 🎛️ **Fully Customizable UI** — titles, padding, button styles
+- 🎯 **Intelligent Auto-Capture** — Real-time analysis of image stability and document alignment triggers automatic capture
+- 🔄 **Dual-Sided Workflow** — Native support for multi-step scanning (e.g., ID Front → ID Back) with animated transitions
+- 📳 **Haptic Guidance** — Integrated vibration patterns to guide users without them needing to look at the screen
+
+### 🔎 Precision Computer Vision
+- 🎯 **ML Kit Edge Detection** — Sub-millisecond boundary detection for precise document isolation
+- � **Perspective Correction** — Automatically transforms skewed or angled captures into flat, top-down professional documents
+- 🖼️ **Frame-to-Sensor Mapping** — Ensures high-resolution sensor output matches the UI overlay perfectly, preventing "cutoff" edges
+- �📢 **Live Guidance Engine** — Real-time alignment feedback (e.g., "Move closer", "Move right", "Centering...")
+- 🎨 **Multi-Object Filtering** — Smart logic to ignore background clutter and focus solely on the primary document
+
+### 🧠 On-Device Intelligence & OCR
+- 📝 **Privacy-First OCR** — Extract text from Latin-script documents 100% offline. No API keys, no latency, no data leaks
+- 🔒 **On-Device Processing** — Set `enableExtractText: true` to get extracted text in the save callback. *OCR is Latin-only (no Arabic).*
+- 💡 **Context-Aware Hints** — Dynamic UI prompts (e.g., "Move Closer", "Too Dark") to maximize first-time capture success
+
+### 📄 Export & Output Formats
+- 📄 **Multiple Export Formats** — JPG (default), PNG, PDF, and TIFF with configurable quality
+- 📑 **PDF Generation** — Multi-page PDFs with A4 or Letter page sizes
+- �️ **Quality Control** — Adjustable compression for optimal file size vs. quality balance
+
+### 🎨 Customization & UI
+- 🎛️ **Fully Decoupled UI** — The detection engine is separated from the UI, allowing you to build completely custom overlays
+- 🎨 **Theming Engine** — Full control over frame colors, stroke thickness, button styles, and hint typography
 - 🪝 **Easy Event Callbacks** — `onDocumentSaved`, `onFrontCaptured`, `onBackCaptured`, `onRetake`
 
-## Quick Start
+### 🔐 Security & Compliance
+- 🔒 **Offline-Only** — Designed for FinTech and HealthTech—zero external network calls
+- 🛡️ **No Data Retention** — Images stay in the app's sandbox; you control the lifecycle
+- 🔐 **Privacy-First Architecture** — All processing happens on-device
+
 ## Installation
 
 Add the package to your Flutter project using:
@@ -81,7 +79,10 @@ flutter pub add document_camera_frame
 
 ---
 
-## Minimal Example
+## Quick Start
+
+### Minimal Example
+
 ```dart
 import 'package:document_camera_frame/document_camera_frame.dart';
 import 'package:flutter/material.dart';
@@ -93,7 +94,7 @@ class QuickExample extends StatelessWidget {
       frameWidth: 320,
       frameHeight: 200,
       requireBothSides: false,
-      enableAutoCapture: true, // Enable automatic capture
+      enableAutoCapture: true,
       onDocumentSaved: (documentData) {
         print('Document saved: ${documentData.frontImagePath}');
         Navigator.pop(context);
@@ -103,16 +104,209 @@ class QuickExample extends StatelessWidget {
 }
 ```
 
-## OCR (Text extraction)
+---
+
+## Common Use Cases
+
+### Driver's License (Both Sides)
+
+```dart
+DocumentCameraFrame(
+  frameWidth: 320,
+  frameHeight: 200,
+  titleStyle: DocumentCameraTitleStyle(
+    frontSideTitle: Text('Scan Front of License', 
+      style: TextStyle(color: Colors.white)),
+    backSideTitle: Text('Scan Back of License',
+      style: TextStyle(color: Colors.white)),
+  ),
+  requireBothSides: true,
+  enableAutoCapture: true,
+  onFrontCaptured: (imagePath) => print('Front: $imagePath'),
+  onBackCaptured: (imagePath) => print('Back: $imagePath'),
+  onDocumentSaved: (data) => handleDocument(data),
+)
+```
+
+### Passport (Single Side)
+
+```dart
+DocumentCameraFrame(
+  frameWidth: 300,
+  frameHeight: 450,
+  titleStyle: DocumentCameraTitleStyle(
+    title: Text('Scan Passport', style: TextStyle(color: Colors.white)),
+  ),
+  requireBothSides: false,
+  sideIndicatorStyle: DocumentCameraSideIndicatorStyle(
+    showSideIndicator: false,
+  ),
+  enableAutoCapture: false, // Manual capture only
+  instructionStyle: DocumentCameraInstructionStyle(
+    frontSideInstruction: "Position passport within the frame",
+  ),
+  onDocumentSaved: (data) => handlePassport(data),
+)
+```
+
+### ID Card with Custom Styling
+
+```dart
+DocumentCameraFrame(
+  frameWidth: 320,
+  frameHeight: 200,
+  requireBothSides: true,
+  enableAutoCapture: true,
+  buttonStyle: DocumentCameraButtonStyle(
+    captureButtonText: "Take Photo",
+    saveButtonText: "Done",
+    retakeButtonText: "Try Again",
+  ),
+  progressStyle: DocumentCameraProgressStyle(
+    progressIndicatorColor: Colors.blue,
+  ),
+  frameStyle: DocumentCameraFrameStyle(
+    outerFrameBorderRadius: 16.0,
+  ),
+  onDocumentSaved: (data) => processIdCard(data),
+)
+```
+
+---
+
+## Export Formats
+
+Choose the output format for your captured documents. The package supports **4 formats**: JPG (default), PNG, PDF, and TIFF.
+
+### Supported Formats
+
+| Format   | Description                        | Best For                                  |
+|----------|------------------------------------|-------------------------------------------|
+| **JPG**  | Default format, adjustable quality | General purpose, backward compatible      |
+| **PNG**  | Lossless compression               | High-quality images, transparency support |
+| **PDF**  | Multi-page document                | Professional documents, archival          |
+| **TIFF** | High-quality archival format       | Professional archival, maximum quality    |
+
+### Basic Usage
+
+```dart
+// JPG (default - backward compatible)
+DocumentCameraFrame(
+  frameWidth: 320,
+  frameHeight: 200,
+  onDocumentSaved: (data) => print(data.frontImagePath), // .jpg file
+)
+
+// PNG format
+DocumentCameraFrame(
+  frameWidth: 320,
+  frameHeight: 200,
+  outputFormat: DocumentOutputFormat.png,
+  onDocumentSaved: (data) => print(data.frontImagePath), // .png file
+)
+
+
+```
+
+### PDF Generation
+
+Generate multi-page PDFs from captured documents with configurable page sizes.
+
+```dart
+DocumentCameraFrame(
+  frameWidth: 320,
+  frameHeight: 200,
+  outputFormat: DocumentOutputFormat.pdf,
+  pdfPageSize: PdfPageSize.a4, // or PdfPageSize.letter
+  requireBothSides: true, // Creates 2-page PDF
+  onDocumentSaved: (data) {
+    print('Front image: ${data.frontImagePath}'); // Individual .jpg images
+    print('Back image: ${data.backImagePath}');
+    print('PDF document: ${data.pdfPath}'); // Generated .pdf file
+  },
+)
+```
+
+**PDF Features:**
+- **Multi-page support**: Front and back images become separate pages
+- **Page sizes**: A4 (210×297mm) or Letter (8.5×11 inches)
+- **Automatic compression**: Optimized file size while maintaining quality
+- **Single-page PDFs**: Works with `requireBothSides: false` for passports, etc.
+- **Automatic Cleanup**: Temporary JPG files are automatically deleted after PDF generation to save disk space.
+
+### Format Parameters
+
+| Parameter          | Type                   | Description                           | Default                     |
+|--------------------|------------------------|---------------------------------------|-----------------------------|
+| `outputFormat`     | `DocumentOutputFormat` | Output format (jpg, png, pdf, tiff)   | `DocumentOutputFormat.jpg`  |
+| `pdfPageSize`      | `PdfPageSize`          | PDF page size (a4 or letter)          | `PdfPageSize.a4`            |
+| `imageQuality`     | `int`                  | Compression quality for JPG (1-100)   | `90`                        |
+| `initialFlashMode` | `FlashMode`            | Initial camera flash mode             | `FlashMode.auto`            |
+
+### DocumentCaptureData Fields
+
+When using different formats, the `DocumentCaptureData` object contains:
+
+```dart
+class DocumentCaptureData {
+  final String? frontImagePath;    // Path to front image (.jpg, .png, etc.)
+  final String? backImagePath;     // Path to back image (if captured)
+  final String? frontPreviewPath;  // Path to displayable JPG (especially for TIFF)
+  final String? backPreviewPath;   // Path to displayable JPG (especially for TIFF)
+  final String? pdfPath;           // Path to PDF (only when outputFormat is PDF)
+  final String? frontOcrText;      // OCR text (if enableExtractText is true)
+  final String? backOcrText;       // OCR text (if enableExtractText is true)
+  
+  bool get hasPdf => pdfPath != null && pdfPath!.isNotEmpty;
+  bool get hasFrontText => frontOcrText != null && frontOcrText!.isNotEmpty;
+  bool get hasBackText => backOcrText != null && backOcrText!.isNotEmpty;
+}
+```
+
+### Complete Example
+
+```dart
+DocumentCameraFrame(
+  frameWidth: 320,
+  frameHeight: 200,
+  outputFormat: DocumentOutputFormat.pdf,
+  pdfPageSize: PdfPageSize.a4,
+  imageQuality: 90,
+  initialFlashMode: FlashMode.auto,
+  requireBothSides: true,
+  enableAutoCapture: true,
+  enableExtractText: true,
+  titleStyle: DocumentCameraTitleStyle(
+    frontSideTitle: Text('Scan Front', style: TextStyle(color: Colors.white)),
+    backSideTitle: Text('Scan Back', style: TextStyle(color: Colors.white)),
+  ),
+  onDocumentSaved: (data) {
+    if (data.hasPdf) {
+      // PDF was generated
+      sharePdf(data.pdfPath!);
+    }
+    // Individual images are also available
+    print('Front: ${data.frontImagePath}');
+    print('Back: ${data.backImagePath}');
+    // OCR text if enabled
+    print('Front text: ${data.frontOcrText}');
+  },
+)
+```
+
+> **Note:** All format parameters are optional. Existing code continues to work without changes (JPG is the default format).
+
+---
+
+## OCR (Text Extraction)
 
 > **Note:** OCR is Latin-only (no Arabic). The on-device ML Kit model supports English and other Latin-script languages only.
 
-Set **`enableExtractText: true`** to run on-device text recognition after capture. The **`onDocumentSaved`** callback then receives **`DocumentCaptureData`** with:
+Extract text from captured documents using on-device OCR. No API key or internet required.
 
-- **`frontImagePath`** / **`backImagePath`** — image file paths (unchanged)
-- **`frontOcrText`** / **`backOcrText`** — extracted text (when `enableExtractText` is true)
+### Basic OCR Usage
 
-No API key or internet is required. OCR uses Google ML Kit and supports **Latin script** (English and other Latin-based languages). **Arabic is not supported** by the on-device model.
+Set `enableExtractText: true` to run on-device text recognition after capture:
 
 ```dart
 DocumentCameraFrame(
@@ -126,7 +320,26 @@ DocumentCameraFrame(
 )
 ```
 
-For custom OCR (e.g. from file paths elsewhere), use the exported **`OcrService`** class and its **`extractText(String imagePath)`** method.
+### OCR Data Fields
+
+The `onDocumentSaved` callback receives `DocumentCaptureData` with:
+
+- **`frontImagePath`** / **`backImagePath`** — Image file paths
+- **`frontOcrText`** / **`backOcrText`** — Extracted text (when `enableExtractText` is true)
+
+### Custom OCR
+
+For custom OCR (e.g., from file paths elsewhere), use the exported `OcrService` class:
+
+```dart
+import 'package:document_camera_frame/document_camera_frame.dart';
+
+final ocrService = OcrService();
+final text = await ocrService.extractText('/path/to/image.jpg');
+print('Extracted text: $text');
+```
+
+---
 
 ## Setup Requirements
 
@@ -202,76 +415,26 @@ are the possible error codes:
 | `AudioAccessDeniedWithoutPrompt`  | iOS only. User previously denied microphone access and needs to enable it manually via Settings. |
 | `AudioAccessRestricted`           | iOS only. Microphone access is restricted (e.g., parental controls).                             |
 
----
-
-## Common Use Cases
-
-### Driver's License (Both Sides)
-
-```dart
-DocumentCameraFrame(
-  frameWidth: 320,
-  frameHeight: 200,
-  frontSideTitle: Text('Scan Front of License', 
-    style: TextStyle(color: Colors.white)),
-  backSideTitle: Text('Scan Back of License',
-    style: TextStyle(color: Colors.white)),
-  requireBothSides: true,
-  enableAutoCapture: true, // Automatically capture when document is aligned
-  onFrontCaptured: (imagePath) => print('Front: $imagePath'),
-  onBackCaptured: (imagePath) => print('Back: $imagePath'),
-  onDocumentSaved: (data) => handleDocument(data),
-)
-```
-
-### Passport (Single Side)
-
-```dart
-DocumentCameraFrame(
-  frameWidth: 300,
-  frameHeight: 450,
-  title: Text('Scan Passport', style: TextStyle(color: Colors.white)),
-  requireBothSides: false,
-  showSideIndicator: false,
-  enableAutoCapture: false, // Manual capture only
-  frontSideInstruction: "Position passport within the frame",
-  onDocumentSaved: (data) => handlePassport(data),
-)
-```
-
-### ID Card with Custom Styling
-
-```dart
-DocumentCameraFrame(
-  frameWidth: 320,
-  frameHeight: 200,
-  requireBothSides: true,
-  enableAutoCapture: true,
-  captureButtonText: "Take Photo",
-  saveButtonText: "Done",
-  retakeButtonText: "Try Again",
-  progressIndicatorColor: Colors.blue,
-  outerFrameBorderRadius: 16.0,
-  onDocumentSaved: (data) => processIdCard(data),
-)
-```
-
 ## Widget Parameters
 
 ### Core Parameters
 
-| Parameter                   | Type      | Description                                                                      | Required | Default Value |
-|-----------------------------|-----------|----------------------------------------------------------------------------------|----------|---------------|
-| `frameWidth`                | `double`  | Width of the document capture frame.                                             | ✅        | —             |
-| `frameHeight`               | `double`  | Height of the document capture frame.                                            | ✅        | —             |
-| `enableAutoCapture`         | `bool`    | Enables automatic capture when a document is properly aligned in the frame.      | ❌        | `false`       |
-| `requireBothSides`          | `bool`    | Whether to require both sides (if false, can save with just front side).         | ❌        | `true`        |
-| `showCloseButton`           | `bool`    | Flag to control the visibility of the CloseButton (optional).                    | ❌        | `false`       |
-| `cameraIndex`               | `int?`    | Index to specify which camera to use (e.g., 0 for back, 1 for front) (optional). | ❌        | `0` (back)    |
-| `bottomFrameContainerChild` | `Widget?` | Custom content for the bottom container (optional).                              | ❌        | `null`        |
-| `bottomHintText`            | `String?` | Optional bottom hint text shown in the bottom container.                         | ❌        | `null`        |
-| `sideInfoOverlay`           | `Widget?` | Optional widget shown on the right (e.g. a check icon).                          | ❌        | `null`        |
-| `showDetectionStatusText`   | `bool`    | Show the (dynamic) live detection status text (e.g. "Move closer").              | ❌        | `true`        |
+| Parameter                    | Type                     | Description                                                                        | Required   | Default Value              |
+|------------------------------|--------------------------|------------------------------------------------------------------------------------|------------|----------------------------|
+| `frameWidth`                 | `double`                 | Width of the document capture frame.                                               | ✅          | —                          |
+| `frameHeight`                | `double`                 | Height of the document capture frame.                                              | ✅          | —                          |
+| `outputFormat`               | `DocumentOutputFormat`   | Output format: jpg, png, pdf, or tiff.                                             | ❌          | `DocumentOutputFormat.jpg` |
+| `pdfPageSize`                | `PdfPageSize`            | PDF page size (a4 or letter) when outputFormat is PDF.                             | ❌          | `PdfPageSize.a4`           |
+| `imageQuality`               | `int`                    | Compression quality for JPG formats (1-100).                                       | ❌          | `90`                       |
+| `enableAutoCapture`          | `bool`                   | Enables automatic capture when a document is properly aligned in the frame.        | ❌          | `false`                    |
+| `requireBothSides`           | `bool`                   | Whether to require both sides (if false, can save with just front side).           | ❌          | `true`                     |
+| `showCloseButton`            | `bool`                   | Flag to control the visibility of the CloseButton (optional).                      | ❌          | `false`                    |
+| `cameraIndex`                | `int?`                   | Index to specify which camera to use (e.g., 0 for back, 1 for front) (optional).   | ❌          | `0` (back)                 |
+| `bottomFrameContainerChild`  | `Widget?`                | Custom content for the bottom container (optional).                                | ❌          | `null`                     |
+| `bottomHintText`             | `String?`                | Optional bottom hint text shown in the bottom container.                           | ❌          | `null`                     |
+| `sideInfoOverlay`            | `Widget?`                | Optional widget shown on the right (e.g. a check icon).                            | ❌          | `null`                     |
+| `showDetectionStatusText`    | `bool`                   | Show the (dynamic) live detection status text (e.g. "Move closer").                | ❌          | `true`                     |
+| `initialFlashMode`           | `FlashMode`              | Initial camera flash mode: auto, off, on, torch.                                   | ❌          | `FlashMode.auto`           |
 
 ### Styling Classes
 
@@ -287,15 +450,15 @@ DocumentCameraFrame(
 
 ### Callbacks
 
-| Parameter          | Type                            | Description                                                                                                  | Required | Default Value |
-|--------------------|---------------------------------|--------------------------------------------------------------------------------------------------------------|----------|---------------|
-| `onFrontCaptured`  | `Function(String)?`             | Callback triggered when front side is captured.                                                              | ❌        | `null`        |
-| `onBackCaptured`   | `Function(String)?`             | Callback triggered when back side is captured.                                                               | ❌        | `null`        |
-| `onDocumentSaved` | `Function(DocumentCaptureData)?` | Callback when document is saved (one-sided e.g. passport, or both sides). One of `onDocumentSaved` or `onBothSidesSaved` required. | ✅*       | —             |
-| `onBothSidesSaved` | `Function(DocumentCaptureData)?` | **Deprecated.** Use `onDocumentSaved` instead. Still supported for backward compatibility.                                  | ✅*       | —             |
-| `enableExtractText` | `bool` | When true, runs on-device OCR and sets `documentData.frontOcrText` / `backOcrText` before the callback.   | ❌        | `false`       |
-| `onRetake`         | `VoidCallback?`                 | Callback triggered when the "Retake" button is pressed.                                                      | ❌        | `null`        |
-| `onCameraError`    | `void Function(Object error)?`  | Callback triggered when a camera-related error occurs (e.g., initialization, streaming, or capture failure). | ❌        | `null`        |
+| Parameter           | Type                              | Description                                                                                                                        | Required | Default Value |
+|---------------------|-----------------------------------|------------------------------------------------------------------------------------------------------------------------------------|----------|---------------|
+| `onFrontCaptured`   | `Function(String)?`               | Callback triggered when front side is captured.                                                                                    | ❌        | `null`        |
+| `onBackCaptured`    | `Function(String)?`               | Callback triggered when back side is captured.                                                                                     | ❌        | `null`        |
+| `onDocumentSaved`   | `Function(DocumentCaptureData)?`  | Callback when document is saved (one-sided e.g. passport, or both sides). One of `onDocumentSaved` or `onBothSidesSaved` required. | ✅*       | —             |
+| `onBothSidesSaved`  | `Function(DocumentCaptureData)?`  | **Deprecated.** Use `onDocumentSaved` instead. Still supported for backward compatibility.                                         | ✅*       | —             |
+| `enableExtractText` | `bool`                            | When true, runs on-device OCR and sets `documentData.frontOcrText` / `backOcrText` before the callback.                            | ❌        | `false`       |
+| `onRetake`          | `VoidCallback?`                   | Callback triggered when the "Retake" button is pressed.                                                                            | ❌        | `null`        |
+| `onCameraError`     | `void Function(Object error)?`    | Callback triggered when a camera-related error occurs (e.g., initialization, streaming, or capture failure).                       | ❌        | `null`        |
 
 *At least one of `onDocumentSaved` or `onBothSidesSaved` must be provided. Prefer `onDocumentSaved`.
 

@@ -7,6 +7,7 @@ export 'src/core/enums.dart';
 export 'src/services/camera_service.dart';
 export 'src/services/image_processing_service.dart';
 export 'src/services/ocr_service.dart';
+export 'src/services/pdf_generation_service.dart';
 
 // Models
 export 'src/models/document_capture_data.dart';
@@ -24,3 +25,4 @@ export 'src/ui/widgets/side_indicator.dart';
 export 'src/ui/widgets/two_sided_action_buttons.dart';
 export 'src/ui/widgets/two_sided_animated_frame.dart';
 export 'src/ui/widgets/two_sided_bottom_frame_container.dart';
+export 'package:camera/camera.dart' show FlashMode;

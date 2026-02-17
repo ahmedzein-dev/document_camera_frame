@@ -55,9 +55,10 @@ class TwoSidedBottomFrameContainer extends StatelessWidget {
                       ? Icons.credit_card_outlined
                       : Icons.credit_card;
 
+                  final data = documentDataNotifier.value;
                   final imagePath = isFront
-                      ? documentDataNotifier.value.frontImagePath
-                      : documentDataNotifier.value.backImagePath;
+                      ? (data.frontPreviewPath ?? data.frontImagePath)
+                      : (data.backPreviewPath ?? data.backImagePath);
 
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

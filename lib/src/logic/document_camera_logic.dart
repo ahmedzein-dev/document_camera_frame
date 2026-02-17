@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
@@ -8,6 +9,7 @@ import '../core/enums.dart';
 import '../models/document_capture_data.dart';
 import '../services/document_detection_service.dart';
 import '../services/ocr_service.dart';
+import '../services/pdf_generation_service.dart';
 
 class DocumentCameraLogic {
   final BuildContext context;
@@ -20,6 +22,10 @@ class DocumentCameraLogic {
   final bool enableAutoCapture;
   final bool requireBothSides;
   final Duration frameFlipDuration;
+  final DocumentOutputFormat outputFormat;
+  final PdfPageSize pdfPageSize;
+  final int imageQuality;
+  final FlashMode initialFlashMode;
 
   DocumentCameraLogic({
     required this.context,
@@ -32,6 +38,10 @@ class DocumentCameraLogic {
     this.enableAutoCapture = false,
     this.requireBothSides = true,
     this.frameFlipDuration = const Duration(milliseconds: 1200),
+    this.outputFormat = DocumentOutputFormat.jpg,
+    this.pdfPageSize = PdfPageSize.a4,
+    this.imageQuality = 90,
+    this.initialFlashMode = FlashMode.auto,
   });
 
   Timer? _debounceTimer;
@@ -97,6 +107,7 @@ class DocumentCameraLogic {
       await controller.initialize(
         cameraIndex ?? 0,
         imageFormatGroup: ImageFormatGroup.nv21,
+        initialFlashMode: initialFlashMode,
       );
       isInitializedNotifier.value = true;
 
@@ -230,9 +241,11 @@ class DocumentCameraLogic {
         frameHeight,
         screenWidth,
         screenHeight,
+        outputFormat: outputFormat,
+        imageQuality: imageQuality,
       );
 
-      capturedImageNotifier.value = controller.imagePath;
+      capturedImageNotifier.value = controller.previewPath;
       _handleCapture(controller.imagePath);
     } catch (e) {
       debugPrint('Capture failed: $e');
@@ -245,15 +258,18 @@ class DocumentCameraLogic {
   void _handleCapture(String imagePath) {
     final currentSide = currentSideNotifier.value;
     final currentData = documentDataNotifier.value;
+    final previewPath = controller.previewPath;
 
     if (currentSide == DocumentSide.front) {
       documentDataNotifier.value = currentData.copyWith(
         frontImagePath: imagePath,
+        frontPreviewPath: previewPath,
       );
       onFrontCaptured?.call(imagePath);
     } else {
       documentDataNotifier.value = currentData.copyWith(
         backImagePath: imagePath,
+        backPreviewPath: previewPath,
       );
       onBackCaptured?.call(imagePath);
     }
@@ -271,17 +287,18 @@ class DocumentCameraLogic {
 
   void switchToFrontSide() {
     currentSideNotifier.value = DocumentSide.front;
-    final frontImagePath = documentDataNotifier.value.frontImagePath;
+    final data = documentDataNotifier.value;
+    final displayPath = data.frontPreviewPath ?? data.frontImagePath;
 
-    if (frontImagePath != null && frontImagePath.isNotEmpty) {
-      capturedImageNotifier.value = frontImagePath;
+    if (displayPath != null && displayPath.isNotEmpty) {
+      capturedImageNotifier.value = displayPath;
     } else {
       controller.resetImage();
       capturedImageNotifier.value = controller.imagePath;
     }
 
     if (enableAutoCapture &&
-        (frontImagePath == null || frontImagePath.isEmpty)) {
+        (data.frontImagePath == null || data.frontImagePath!.isEmpty)) {
       restartImageStreamSafely();
     }
   }
@@ -295,8 +312,8 @@ class DocumentCameraLogic {
         isLoadingNotifier.value = true;
         try {
           final ocrService = OcrService();
-          final frontPath = data.frontImagePath;
-          final backPath = data.backImagePath;
+          final frontPath = data.frontPreviewPath ?? data.frontImagePath;
+          final backPath = data.backPreviewPath ?? data.backImagePath;
           final results = await Future.wait<String?>([
             if (frontPath != null && frontPath.isNotEmpty)
               ocrService.extractText(frontPath)
@@ -317,6 +334,68 @@ class DocumentCameraLogic {
           isLoadingNotifier.value = false;
         }
       }
+
+      // Generate PDF if output format is PDF
+      if (outputFormat == DocumentOutputFormat.pdf) {
+        isLoadingNotifier.value = true;
+        try {
+          final pdfService = PdfGenerationService();
+          final frontPath = resultData.frontImagePath;
+          final backPath = resultData.backImagePath;
+
+          if (frontPath != null && frontPath.isNotEmpty) {
+            final pdfPath = await pdfService.generatePdf(
+              frontImagePath: frontPath,
+              backImagePath: backPath,
+              pageSize: pdfPageSize,
+              imageQuality: imageQuality,
+            );
+
+            // Delete temporary image files after PDF generation
+            try {
+              final frontFile = File(frontPath);
+              if (await frontFile.exists()) {
+                await frontFile.delete();
+              }
+              final frontPreview = resultData.frontPreviewPath;
+              if (frontPreview != null && frontPreview.isNotEmpty) {
+                final fPreviewFile = File(frontPreview);
+                if (await fPreviewFile.exists()) {
+                  await fPreviewFile.delete();
+                }
+              }
+
+              if (backPath != null && backPath.isNotEmpty) {
+                final backFile = File(backPath);
+                if (await backFile.exists()) {
+                  await backFile.delete();
+                }
+                final backPreview = resultData.backPreviewPath;
+                if (backPreview != null && backPreview.isNotEmpty) {
+                  final bPreviewFile = File(backPreview);
+                  if (await bPreviewFile.exists()) {
+                    await bPreviewFile.delete();
+                  }
+                }
+              }
+            } catch (e) {
+              debugPrint('Failed to delete temporary image files: $e');
+            }
+
+            // For PDF format, only set pdfPath, clear image paths
+            resultData = DocumentCaptureData(
+              pdfPath: pdfPath,
+              frontOcrText: resultData.frontOcrText,
+              backOcrText: resultData.backOcrText,
+            );
+          }
+        } catch (e) {
+          debugPrint('PDF generation failed: $e');
+        } finally {
+          isLoadingNotifier.value = false;
+        }
+      }
+
       onDocumentSaved?.call(resultData);
       resetCapture();
     }
@@ -334,6 +413,7 @@ class DocumentCameraLogic {
 
     controller.retakeImage();
     capturedImageNotifier.value = controller.imagePath;
+    isDocumentAlignedNotifier.value = false;
 
     if (enableAutoCapture) {
       restartImageStreamSafely();

@@ -12,6 +12,7 @@ class CameraService {
   Future<void> initialize(
     CameraDescription camera, {
     ImageFormatGroup? imageFormatGroup,
+    FlashMode initialFlashMode = FlashMode.auto,
   }) async {
     if (cameraController != null) {
       await cameraController!.dispose(); // Dispose only if it's already running
@@ -27,7 +28,11 @@ class CameraService {
     await cameraController!.initialize();
 
     // Optional: Set flash mode
-    await cameraController!.setFlashMode(FlashMode.auto);
+    try {
+      await cameraController!.setFlashMode(initialFlashMode);
+    } catch (e) {
+      // Some devices might not support flash mode
+    }
   }
 
   Future<String> captureImage() async {

@@ -95,6 +95,7 @@ class DocumentTypeSelectionScreen extends StatelessWidget {
         return DocumentCameraFrame(
           frameWidth: 320,
           frameHeight: 200,
+          outputFormat: DocumentOutputFormat.jpg,
           titleStyle: const DocumentCameraTitleStyle(
             frontSideTitle: Text('Scan Front of License',
                 style: TextStyle(color: Colors.white)),
@@ -199,8 +200,6 @@ class DocumentResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final frontOcrText = documentData.frontOcrText;
     final backOcrText = documentData.backOcrText;
-    final hasFront = documentData.hasFrontSide;
-    final hasBack = documentData.hasBackSide;
 
     return Scaffold(
       appBar: AppBar(
@@ -212,7 +211,7 @@ class DocumentResultScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (hasFront) ...[
+              if (documentData.hasFrontText) ...[
                 const Text(
                   'Front side',
                   style: TextStyle(
@@ -229,7 +228,7 @@ class DocumentResultScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
               ],
-              if (hasBack) ...[
+              if (documentData.hasBackText) ...[
                 const Text(
                   'Back side',
                   style: TextStyle(

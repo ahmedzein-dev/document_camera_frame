@@ -15,6 +15,7 @@ dependencies:
   # Local package (use path). For published version: document_camera_frame: ^2.0.5
   document_camera_frame:
     path: ..
+  open_file: ^3.5.11
 
 dev_dependencies:
   flutter_test:
