@@ -4,7 +4,7 @@
 [![Pub Points](https://img.shields.io/pub/points/document_camera_frame)](https://pub.dev/packages/document_camera_frame/score)
 [![Likes](https://img.shields.io/pub/likes/document_camera_frame)](https://pub.dev/packages/document_camera_frame/score)
 
-`DocumentCameraFrame` is an enterprise-grade document scanner for Flutter. It bridges the gap between raw camera streams and structured data by combining real-time ML edge detection, perspective-corrected cropping, and secure on-device OCR.
+`DocumentCameraFrame` — Scan, crop, and extract text from physical documents with a single Flutter widget. Edge detection, perspective correction, OCR, and PDF/image export included.
 
 ## Demo
 
