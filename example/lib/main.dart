@@ -1,249 +1,116 @@
 import 'package:document_camera_frame/document_camera_frame.dart';
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+import 'core/result_screen.dart';
+import 'core/selection_screen.dart';
+import 'core/export_format_example.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+void main() => runApp(const ExampleApp());
+
+class ExampleApp extends StatelessWidget {
+  const ExampleApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'Document Camera Example',
       debugShowCheckedModeBanner: false,
-      home: const DocumentTypeSelectionScreen(),
-    );
-  }
-}
-
-/// Example for different document types
-class DocumentTypeSelectionScreen extends StatelessWidget {
-  const DocumentTypeSelectionScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Select Document Type'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            _buildDocumentTypeCard(
-              context,
-              'Driver\'s License',
-              'Capture both front and back sides',
-              Icons.credit_card,
-              () => _navigateToCamera(context, DocumentType.driverLicense),
-            ),
-            const SizedBox(height: 16),
-            _buildDocumentTypeCard(
-              context,
-              'Passport',
-              'Capture the main page only',
-              Icons.book,
-              () => _navigateToCamera(context, DocumentType.passport),
-            ),
-            const SizedBox(height: 16),
-            _buildDocumentTypeCard(
-              context,
-              'ID Card',
-              'Capture both sides',
-              Icons.badge,
-              () => _navigateToCamera(context, DocumentType.idCard),
-            ),
-          ],
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF2563EB),
+          brightness: Brightness.light,
         ),
       ),
+      home: const QuickStartScreen(),
     );
-  }
-
-  Widget _buildDocumentTypeCard(
-    BuildContext context,
-    String title,
-    String subtitle,
-    IconData icon,
-    VoidCallback onTap,
-  ) {
-    return Card(
-      child: ListTile(
-        leading: Icon(icon, size: 40, color: Theme.of(context).primaryColor),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(subtitle),
-        trailing: const Icon(Icons.arrow_forward_ios),
-        onTap: onTap,
-      ),
-    );
-  }
-
-  void _navigateToCamera(BuildContext context, DocumentType documentType) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            _buildCameraForDocumentType(context, documentType),
-      ),
-    );
-  }
-
-  Widget _buildCameraForDocumentType(
-      BuildContext context, DocumentType documentType) {
-    switch (documentType) {
-      case DocumentType.driverLicense:
-        return DocumentCameraFrame(
-          frameWidth: 320,
-          frameHeight: 200,
-          outputFormat: DocumentOutputFormat.jpg,
-          titleStyle: const DocumentCameraTitleStyle(
-            frontSideTitle: Text('Scan Front of License',
-                style: TextStyle(color: Colors.white)),
-            backSideTitle: Text('Scan Back of License',
-                style: TextStyle(color: Colors.white)),
-          ),
-          showDetectionStatusText: true,
-          requireBothSides: true,
-          enableAutoCapture: true,
-          enableExtractText: true,
-          onFrontCaptured: (imagePath) {
-            debugPrint('Front side captured: $imagePath');
-          },
-          onBackCaptured: (imagePath) {
-            debugPrint('Back side captured: $imagePath');
-          },
-          onDocumentSaved: (documentData) {
-            debugPrint('Document capture completed!');
-            Navigator.of(context).pop();
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (context) => DocumentResultScreen(
-                  documentData: documentData,
-                ),
-              ),
-            );
-          },
-        );
-
-      case DocumentType.passport:
-        return DocumentCameraFrame(
-          frameWidth: 300,
-          frameHeight: 450,
-          titleStyle: const DocumentCameraTitleStyle(
-            title: Text('Scan Passport', style: TextStyle(color: Colors.white)),
-          ),
-          buttonStyle: const DocumentCameraButtonStyle(
-            actionButtonHeight: 40,
-          ),
-          sideIndicatorStyle: const DocumentCameraSideIndicatorStyle(
-            showSideIndicator: false,
-          ),
-          instructionStyle: const DocumentCameraInstructionStyle(
-            showInstructionText: false,
-          ),
-          showDetectionStatusText: false,
-          requireBothSides: false,
-          enableAutoCapture: false,
-          enableExtractText: true,
-          onDocumentSaved: (documentData) {
-            debugPrint('Passport captured');
-            Navigator.of(context).pop();
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (context) => DocumentResultScreen(
-                  documentData: documentData,
-                ),
-              ),
-            );
-          },
-        );
-
-      case DocumentType.idCard:
-        return DocumentCameraFrame(
-          frameWidth: 320,
-          frameHeight: 200,
-          titleStyle: const DocumentCameraTitleStyle(
-            frontSideTitle:
-                Text('Scan Front of ID', style: TextStyle(color: Colors.white)),
-            backSideTitle:
-                Text('Scan Back of ID', style: TextStyle(color: Colors.white)),
-          ),
-          sideIndicatorStyle: const DocumentCameraSideIndicatorStyle(
-            showSideIndicator: false,
-          ),
-          requireBothSides: true,
-          enableAutoCapture: true,
-          enableExtractText: true,
-          onDocumentSaved: (documentData) {
-            Navigator.of(context).pop();
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (context) => DocumentResultScreen(
-                  documentData: documentData,
-                ),
-              ),
-            );
-          },
-        );
-    }
   }
 }
 
-/// Screen that displays extracted text from [DocumentCaptureData]
-/// when [enableExtractText] was true on [DocumentCameraFrame].
-class DocumentResultScreen extends StatelessWidget {
-  const DocumentResultScreen({super.key, required this.documentData});
-
-  final DocumentCaptureData documentData;
+/// A "Quick Start" screen showing the simplest way to use the package.
+class QuickStartScreen extends StatelessWidget {
+  const QuickStartScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final frontOcrText = documentData.frontOcrText;
-    final backOcrText = documentData.backOcrText;
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Extracted Text'),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+      appBar: AppBar(title: const Text('Quick Start')),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (documentData.hasFrontText) ...[
-                const Text(
-                  'Front side',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+              const Icon(Icons.camera_alt_rounded,
+                  size: 64, color: Colors.blue),
+              const SizedBox(height: 24),
+              const Text(
+                'Document Camera',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'The simplest way to start capturing documents.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 48),
+
+              // --- QUICK START BUTTON ---
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () => _launchSimpleCamera(context),
+                  icon: const Icon(Icons.flash_on),
+                  label: const Text('Launch Simple ID Capture'),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                 ),
-                const SizedBox(height: 8),
-                _buildTextBlock(
-                  context,
-                  frontOcrText?.isEmpty ?? true
-                      ? '(No text detected)'
-                      : (frontOcrText ?? '(Text extraction not requested)'),
-                ),
-                const SizedBox(height: 24),
-              ],
-              if (documentData.hasBackText) ...[
-                const Text(
-                  'Back side',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+              ),
+
+              const SizedBox(height: 16),
+
+              // --- EXPORT FORMATS BUTTON ---
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const ExportFormatScreen()),
+                    );
+                  },
+                  icon: const Icon(Icons.picture_as_pdf_rounded),
+                  label:
+                      const Text('Test Export Formats (JPG, PNG, PDF, TIFF)'),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                 ),
-                const SizedBox(height: 8),
-                _buildTextBlock(
-                  context,
-                  backOcrText?.isEmpty ?? true
-                      ? '(No text detected)'
-                      : (backOcrText ?? '(Text extraction not requested)'),
+              ),
+
+              const SizedBox(height: 16),
+
+              // --- ADVANCED EXAMPLES BUTTON ---
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const SelectionScreen()),
+                    );
+                  },
+                  icon: const Icon(Icons.settings_input_component),
+                  label: const Text('Advanced Modes (Minimal, Kiosk, Overlay)'),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
                 ),
-              ],
+              ),
             ],
           ),
         ),
@@ -251,22 +118,33 @@ class DocumentResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTextBlock(BuildContext context, String text) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Theme.of(context)
-            .colorScheme
-            .surfaceContainerHighest
-            .withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: SelectableText(
-        text,
-        style: Theme.of(context).textTheme.bodyMedium,
+  void _launchSimpleCamera(BuildContext context) {
+    // -------------------------------------------------------------------------
+    // QUICK START EXAMPLE:
+    // Just pass the frame dimensions and a save callback.
+    // -------------------------------------------------------------------------
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (ctx) => DocumentCameraFrame(
+          // 1. Set the visual frame size (e.g. standard ID card ratio)
+          frameWidth: 320,
+          frameHeight: 200,
+
+          // 2. Decide if you need front+back or just front
+          requireBothSides: true,
+
+          // 3. Handle the result
+          onDocumentSaved: (data) {
+            Navigator.pop(ctx);
+            Navigator.push(
+              ctx,
+              MaterialPageRoute(
+                  builder: (_) => ResultScreen(documentData: data)),
+            );
+          },
+        ),
       ),
     );
   }
 }
-
-enum DocumentType { driverLicense, passport, idCard }

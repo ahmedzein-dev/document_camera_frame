@@ -1,21 +1,24 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-
 import '../../core/app_constants.dart';
+import '../../core/enums.dart';
 
 class CapturedImagePreview extends StatelessWidget {
   final ValueNotifier<String> capturedImageNotifier;
   final double frameWidth;
   final double frameHeight;
+  final DocumentCameraUIMode uiMode;
 
   final double borderRadius;
+  final double innerCornerBroderRadius;
   const CapturedImagePreview({
     super.key,
     required this.capturedImageNotifier,
     required this.frameWidth,
     required this.frameHeight,
     required this.borderRadius,
+    required this.innerCornerBroderRadius,
+    required this.uiMode,
   });
 
   @override
@@ -26,22 +29,30 @@ class CapturedImagePreview extends StatelessWidget {
         if (imagePath.isEmpty) {
           return const SizedBox.shrink();
         }
+        final double height = uiMode == DocumentCameraUIMode.minimal
+            ? frameHeight
+            : frameHeight + AppConstants.bottomFrameContainerHeight;
+
+        final double cornerBroderRadius = uiMode == DocumentCameraUIMode.minimal
+            ? innerCornerBroderRadius
+            : 0;
+
         return Align(
           alignment: Alignment.center,
           child: SizedBox(
             width: frameWidth,
-            height: frameHeight + AppConstants.bottomFrameContainerHeight,
+            height: height,
             child: Stack(
               children: [
                 Positioned(
-                  top: 3,
-                  left: 3,
-                  right: 3,
+                  top: 0,
+                  left: 0,
+                  right: 0,
                   child: Container(
                     width: frameWidth,
-                    height:
-                        frameHeight + AppConstants.bottomFrameContainerHeight,
+                    height: height,
                     decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(cornerBroderRadius),
                       image: DecorationImage(
                         image: FileImage(File(imagePath)),
                         fit: BoxFit.fill,

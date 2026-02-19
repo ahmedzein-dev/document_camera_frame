@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-
 import '../../core/app_constants.dart';
+import '../../core/enums.dart';
 
 class FrameCaptureAnimation extends StatelessWidget {
   const FrameCaptureAnimation({
@@ -11,6 +11,7 @@ class FrameCaptureAnimation extends StatelessWidget {
     this.animationColor,
     this.animationDuration = const Duration(milliseconds: 600),
     this.curve = Curves.easeInOut,
+    required this.uiMode,
   });
 
   final double frameWidth;
@@ -18,17 +19,22 @@ class FrameCaptureAnimation extends StatelessWidget {
   final Duration? animationDuration;
   final Color? animationColor;
   final Curve? curve;
+  final DocumentCameraUIMode uiMode;
 
   static final Color _defaultAnimationColor = Colors.black.withAlpha(127);
 
   @override
   Widget build(BuildContext context) {
+    final double height = uiMode == DocumentCameraUIMode.minimal
+        ? frameHeight
+        : frameHeight + AppConstants.bottomFrameContainerHeight;
+
     return Align(
       alignment: Alignment.center,
       child:
           Container(
                 width: frameWidth,
-                height: frameHeight + AppConstants.bottomFrameContainerHeight,
+                height: height,
                 color: animationColor ?? _defaultAnimationColor,
               )
               .animate(

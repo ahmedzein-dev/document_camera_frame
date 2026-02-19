@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import '../../core/enums.dart';
 
 import '../../logic/document_camera_logic.dart';
 import 'captured_image_preview.dart';
@@ -13,6 +14,9 @@ class DocumentCameraPreviewLayer extends StatelessWidget {
   /// Border radius for the frame.
   final double borderRadius;
 
+  /// Border radius for the inner corners of the frame.
+  final double innerCornerBroderRadius;
+
   /// Duration for the capturing animation (optional).
   final Duration? capturingAnimationDuration;
 
@@ -22,13 +26,18 @@ class DocumentCameraPreviewLayer extends StatelessWidget {
   /// Curve for the capturing animation (optional).
   final Curve? capturingAnimationCurve;
 
+  /// Controls which UI elements are rendered.
+  final DocumentCameraUIMode uiMode;
+
   const DocumentCameraPreviewLayer({
     super.key,
     required this.logic,
     required this.borderRadius,
+    required this.innerCornerBroderRadius,
     this.capturingAnimationDuration,
     this.capturingAnimationColor,
     this.capturingAnimationCurve,
+    required this.uiMode,
   });
 
   @override
@@ -51,6 +60,8 @@ class DocumentCameraPreviewLayer extends StatelessWidget {
               frameWidth: logic.updatedFrameWidth,
               frameHeight: logic.updatedFrameHeight,
               borderRadius: borderRadius,
+              innerCornerBroderRadius: innerCornerBroderRadius,
+              uiMode: uiMode,
             ),
 
             // Frame capture animation
@@ -62,6 +73,7 @@ class DocumentCameraPreviewLayer extends StatelessWidget {
                 animationDuration: capturingAnimationDuration,
                 animationColor: capturingAnimationColor,
                 curve: capturingAnimationCurve,
+                uiMode: uiMode,
               ),
               builder: (context, isLoading, child) {
                 return isLoading ? child! : const SizedBox.shrink();

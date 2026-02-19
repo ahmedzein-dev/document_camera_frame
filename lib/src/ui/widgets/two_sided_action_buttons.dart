@@ -50,8 +50,6 @@ class TwoSidedActionButtons extends StatelessWidget {
   // Callbacks
   final Future<void> Function(
     BuildContext context,
-    double frameWidth,
-    double frameHeight,
     int screenWidth,
     int screenHeight,
   )
@@ -64,6 +62,11 @@ class TwoSidedActionButtons extends StatelessWidget {
 
   // Configuration
   final bool requireBothSides;
+
+  /// When true, the capture button (circle) and camera-switcher are hidden.
+  /// All post-capture action buttons (Next, Previous, Use photo, Retake) remain.
+  /// Used by kiosk mode where auto-capture fires and no manual trigger is needed.
+  final bool hideCaptureButton;
 
   const TwoSidedActionButtons({
     super.key,
@@ -104,6 +107,7 @@ class TwoSidedActionButtons extends StatelessWidget {
     required this.onPrevious,
     required this.onCameraSwitched,
     this.requireBothSides = true,
+    this.hideCaptureButton = false,
   });
 
   void _retakeImage() {
@@ -117,7 +121,10 @@ class TwoSidedActionButtons extends StatelessWidget {
     if (!requireBothSides) {
       return data.frontImagePath?.isNotEmpty == true;
     }
-    return data.isCompleteFor(requireBothSides: requireBothSides);
+    // If both sides are required, only allow save if on the back side
+    // AND the data is complete.
+    return currentSideNotifier.value == DocumentSide.back &&
+        data.isCompleteFor(requireBothSides: requireBothSides);
   }
 
   bool _showNextButton() {
@@ -180,48 +187,7 @@ class TwoSidedActionButtons extends StatelessWidget {
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        if (imagePath.isEmpty)
-                          // Capture mode with camera switcher like original ActionButtons
-                          Padding(
-                            padding:
-                                captureButtonPadding ??
-                                const EdgeInsets.symmetric(
-                                  horizontal: 8.0,
-                                  vertical: 32.0,
-                                ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                SizedBox(width: 45, height: 45),
-                                ValueListenableBuilder<bool>(
-                                  valueListenable: isLoadingNotifier,
-                                  builder: (context, isLoading, child) {
-                                    return CaptureButton(
-                                      onPressed: () async {
-                                        if (isLoading) return;
-                                        await onManualCapture(
-                                          context,
-                                          frameWidth,
-                                          frameHeight +
-                                              bottomFrameContainerHeight,
-                                          1.sw(context).toInt(),
-                                          1.sh(context).toInt(),
-                                        );
-                                      },
-                                      captureInnerCircleRadius:
-                                          captureInnerCircleRadius,
-                                      captureOuterCircleRadius:
-                                          captureOuterCircleRadius,
-                                    );
-                                  },
-                                ),
-
-                                // Camera Switch Button - same as original ActionButtons
-                                CameraSwitcher(onTap: onCameraSwitched),
-                              ],
-                            ),
-                          )
-                        else ...[
+                        if (imagePath.isNotEmpty) ...[
                           // Action buttons after capture
                           if (_showNextButton())
                             Padding(
@@ -311,6 +277,48 @@ class TwoSidedActionButtons extends StatelessWidget {
                                   ),
                               width: actionButtonWidth,
                               height: _getDynamicButtonHeight(),
+                            ),
+                          ),
+                        ] else if (!hideCaptureButton) ...[
+                          // Capture mode with camera switcher
+                          Padding(
+                            padding:
+                                captureButtonPadding ??
+                                const EdgeInsets.symmetric(
+                                  horizontal: 8.0,
+                                  vertical: 32.0,
+                                ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                const SizedBox(width: 45, height: 45),
+                                ValueListenableBuilder<bool>(
+                                  valueListenable: isLoadingNotifier,
+                                  builder: (context, isLoading, child) {
+                                    return CaptureButton(
+                                      onPressed: () async {
+                                        if (isLoading) return;
+                                        await onManualCapture(
+                                          context,
+                                          MediaQuery.of(
+                                            context,
+                                          ).size.width.toInt(),
+                                          MediaQuery.of(
+                                            context,
+                                          ).size.height.toInt(),
+                                        );
+                                      },
+                                      captureInnerCircleRadius:
+                                          captureInnerCircleRadius,
+                                      captureOuterCircleRadius:
+                                          captureOuterCircleRadius,
+                                    );
+                                  },
+                                ),
+
+                                // Camera Switch Button
+                                CameraSwitcher(onTap: onCameraSwitched),
+                              ],
                             ),
                           ),
                         ],

@@ -1,3 +1,25 @@
+# 2.4.0
+
+## Added
+- **`DocumentCameraUIMode` enum** — support for five distinct UI modes: `defaultMode`, `minimal`, `overlay`, `kiosk`, and `textExtract`.
+- **`uiMode` parameter on `DocumentCameraFrame`** (fully backward compatible).
+- **Comprehensive UI Mode Matrix**:
+  - `defaultMode`: Standard full-featured experience.
+  - `minimal`: Bare-bones UI with four corner indicators and action buttons.
+  - `overlay`: Focuses on the document frame and screen title.
+  - `kiosk`: Automated flow for unattended environments (auto-capture only).
+  - `textExtract`: Optimized layout for OCR-focused workflows.
+- Replaced `MinimalCornerIndicators` with standardized **`CornerBox`** component across all modes for better consistency.
+- **Smooth Flip Fading**: Implemented opacity-based fading transitions during frame flipping for a more premium feel.
+- **Refined Minimal Mode Constraints**: Capture animation, image cropping, and previews are now strictly pixel-perfectly bounded by the corner indicators.
+- **Matched Preview Aesthetics**: Synchronized border radius between `CornerBox` indicators and captured image previews for a seamless visual experience.
+
+## Notes
+- Default mode behavior is **unchanged** — no existing consumers are affected.
+- Instructions are fully supported in minimal mode but hidden by default (minimal mode always suppresses instruction overlays).
+
+---
+
 # 2.3.0
 added:
 - **Export Format Support:** Choose output format for captured documents.
@@ -27,6 +49,8 @@ notes:
 - Existing code continues to work without modifications (JPG is default).
 - PDF generation only occurs when `outputFormat` is set to `DocumentOutputFormat.pdf`.
 - See `example/lib/export_format_example.dart` for usage examples of all formats.
+
+---
 
 # 2.2.1 - 2.2.3
 - Update Readme.md

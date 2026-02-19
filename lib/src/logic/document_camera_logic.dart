@@ -26,6 +26,7 @@ class DocumentCameraLogic {
   final PdfPageSize pdfPageSize;
   final int imageQuality;
   final FlashMode initialFlashMode;
+  final DocumentCameraUIMode uiMode;
 
   DocumentCameraLogic({
     required this.context,
@@ -42,6 +43,7 @@ class DocumentCameraLogic {
     this.pdfPageSize = PdfPageSize.a4,
     this.imageQuality = 90,
     this.initialFlashMode = FlashMode.auto,
+    required this.uiMode,
   });
 
   Timer? _debounceTimer;
@@ -70,6 +72,8 @@ class DocumentCameraLogic {
 
   double updatedFrameWidth = 0;
   double updatedFrameHeight = 0;
+
+  bool get _isMinimal => uiMode == DocumentCameraUIMode.minimal;
 
   void initialize({
     required double frameWidth,
@@ -193,8 +197,6 @@ class DocumentCameraLogic {
             if (isDocumentAlignedNotifier.value) {
               await captureAndHandleImageUnified(
                 context,
-                updatedFrameWidth,
-                updatedFrameHeight + AppConstants.bottomFrameContainerHeight,
                 MediaQuery.of(context).size.width.toInt(),
                 MediaQuery.of(context).size.height.toInt(),
               );
@@ -220,8 +222,6 @@ class DocumentCameraLogic {
 
   Future<void> captureAndHandleImageUnified(
     BuildContext context,
-    double frameWidth,
-    double frameHeight,
     int screenWidth,
     int screenHeight,
   ) async {
@@ -236,9 +236,13 @@ class DocumentCameraLogic {
         await stopImageStream();
       }
 
+      final double heightToCapture = _isMinimal
+          ? updatedFrameHeight
+          : updatedFrameHeight + AppConstants.bottomFrameContainerHeight;
+
       await controller.takeAndCropPicture(
-        frameWidth,
-        frameHeight,
+        updatedFrameWidth,
+        heightToCapture,
         screenWidth,
         screenHeight,
         outputFormat: outputFormat,
@@ -277,10 +281,18 @@ class DocumentCameraLogic {
 
   void switchToBackSide() {
     currentSideNotifier.value = DocumentSide.back;
-    controller.resetImage();
-    capturedImageNotifier.value = controller.imagePath;
+    final data = documentDataNotifier.value;
+    final displayPath = data.backPreviewPath ?? data.backImagePath;
 
-    if (enableAutoCapture) {
+    if (displayPath != null && displayPath.isNotEmpty) {
+      capturedImageNotifier.value = displayPath;
+    } else {
+      controller.resetImage();
+      capturedImageNotifier.value = controller.imagePath;
+    }
+
+    if (enableAutoCapture &&
+        (data.backImagePath == null || data.backImagePath!.isEmpty)) {
       restartImageStreamSafely();
     }
   }

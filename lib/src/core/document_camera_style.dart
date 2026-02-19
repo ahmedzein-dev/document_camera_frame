@@ -248,4 +248,18 @@ class DocumentCameraInstructionStyle {
     this.backSideInstruction,
     this.instructionTextStyle,
   });
+
+  DocumentCameraInstructionStyle copyWith({
+    bool? showInstructionText,
+    String? frontSideInstruction,
+    String? backSideInstruction,
+    TextStyle? instructionTextStyle,
+  }) {
+    return DocumentCameraInstructionStyle(
+      showInstructionText: showInstructionText ?? this.showInstructionText,
+      frontSideInstruction: frontSideInstruction ?? this.frontSideInstruction,
+      backSideInstruction: backSideInstruction ?? this.backSideInstruction,
+      instructionTextStyle: instructionTextStyle ?? this.instructionTextStyle,
+    );
+  }
 }

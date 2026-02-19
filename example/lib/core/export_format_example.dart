@@ -3,29 +3,9 @@ import 'package:document_camera_frame/document_camera_frame.dart';
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 
-/// Example demonstrating different export formats with verification and preview
-void main() {
-  runApp(const ExportFormatExampleApp());
-}
-
-class ExportFormatExampleApp extends StatelessWidget {
-  const ExportFormatExampleApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-      ),
-      home: const FormatSelectionScreen(),
-    );
-  }
-}
-
-class FormatSelectionScreen extends StatelessWidget {
-  const FormatSelectionScreen({super.key});
+/// Example screen demonstrating different export formats with verification and preview
+class ExportFormatScreen extends StatelessWidget {
+  const ExportFormatScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -100,6 +100,18 @@ class DocumentCameraFrame extends StatefulWidget {
   /// Initial flash mode for the camera (default: FlightMode.auto)
   final FlashMode initialFlashMode;
 
+  /// Controls which UI elements are rendered.
+  ///
+  /// - [DocumentCameraUIMode.defaultMode] (default): full UI.
+  /// - [DocumentCameraUIMode.minimal]: camera preview + four corner indicators only.
+  /// - [DocumentCameraUIMode.overlay]: full UI but without the dark cutout overlay,
+  ///   side indicator and instructions are hidden.
+  /// - [DocumentCameraUIMode.kiosk]: full UI but all action buttons are hidden.
+  /// - [DocumentCameraUIMode.guided]: full UI with a pulsing frame border.
+  /// - [DocumentCameraUIMode.textExtract]: like [DocumentCameraUIMode.defaultMode]
+  ///   but with on-device OCR automatically enabled.
+  final DocumentCameraUIMode uiMode;
+
   /// Constructor for the [DocumentCameraFrame].
   const DocumentCameraFrame({
     super.key,
@@ -131,10 +143,44 @@ class DocumentCameraFrame extends StatefulWidget {
     this.pdfPageSize = PdfPageSize.a4,
     this.imageQuality = 90,
     this.initialFlashMode = FlashMode.auto,
+    this.uiMode = DocumentCameraUIMode.defaultMode,
   }) : assert(
          onDocumentSaved != null || onBothSidesSaved != null,
          'Either onDocumentSaved or onBothSidesSaved must be provided',
        );
+
+  // ── Per-mode smart defaults ─────────────────────────────────────────────
+  //
+  // All mode-based behaviour is resolved here inside the package.
+  // The example app / caller only needs to pass [uiMode] — no manual
+  // conditionals required.
+
+  /// Auto-capture is **on** for every mode except [DocumentCameraUIMode.minimal].
+  /// Kiosk and guided force it on; minimal uses manual capture only.
+  bool get _effectiveAutoCapture => uiMode != DocumentCameraUIMode.minimal;
+
+  /// Detection status text (e.g. "Move closer") is shown for all full-UI
+  /// modes; hidden only in [DocumentCameraUIMode.minimal].
+  bool get _effectiveShowDetectionText =>
+      uiMode != DocumentCameraUIMode.minimal;
+
+  /// Text extraction (OCR) is only enabled automatically for
+  /// [DocumentCameraUIMode.textExtract]. For all other modes it defers to
+  /// the caller's [enableExtractText] flag (default: false).
+  bool get _effectiveEnableExtractText =>
+      uiMode == DocumentCameraUIMode.textExtract ? true : enableExtractText;
+
+  /// Side indicator is hidden in [DocumentCameraUIMode.minimal] and
+  /// [DocumentCameraUIMode.overlay].
+  bool get _effectiveShowSideIndicator =>
+      uiMode != DocumentCameraUIMode.minimal &&
+      uiMode != DocumentCameraUIMode.overlay;
+
+  /// Instruction text is hidden in [DocumentCameraUIMode.minimal] and
+  /// [DocumentCameraUIMode.overlay].
+  bool get _effectiveShowInstruction =>
+      uiMode != DocumentCameraUIMode.minimal &&
+      uiMode != DocumentCameraUIMode.overlay;
 
   @override
   State<DocumentCameraFrame> createState() => _DocumentCameraFrameState();
@@ -158,18 +204,21 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
       onBackCaptured: widget.onBackCaptured,
       onDocumentSaved: (data) =>
           (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(data),
-      enableExtractText: widget.enableExtractText,
+      // Use effective values so the package handles all mode logic.
+      enableExtractText: widget._effectiveEnableExtractText,
       onRetake: widget.onRetake,
-      enableAutoCapture: widget.enableAutoCapture,
+      enableAutoCapture: widget._effectiveAutoCapture,
       requireBothSides: widget.requireBothSides,
       frameFlipDuration: widget.animationStyle.frameFlipDuration,
       outputFormat: widget.outputFormat,
       pdfPageSize: widget.pdfPageSize,
       imageQuality: widget.imageQuality,
       initialFlashMode: widget.initialFlashMode,
+      uiMode: widget.uiMode,
     );
 
-    if (widget.sideIndicatorStyle.showSideIndicator) {
+    // Progress animation only makes sense when the side indicator is visible.
+    if (widget._effectiveShowSideIndicator) {
       _initializeProgressAnimation();
     }
 
@@ -215,12 +264,14 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
           DocumentCameraPreviewLayer(
             logic: _logic,
             borderRadius: widget.frameStyle.outerFrameBorderRadius,
+            innerCornerBroderRadius: widget.frameStyle.innerCornerBroderRadius,
             capturingAnimationDuration:
                 widget.animationStyle.capturingAnimationDuration,
             capturingAnimationColor:
                 widget.animationStyle.capturingAnimationColor,
             capturingAnimationCurve:
                 widget.animationStyle.capturingAnimationCurve,
+            uiMode: widget.uiMode,
           ),
 
           // Overlay Layer
@@ -237,11 +288,15 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
                 sideIndicatorStyle: widget.sideIndicatorStyle,
                 progressStyle: widget.progressStyle,
                 progressAnimation: _progressAnimation,
-                showDetectionStatusText: widget.showDetectionStatusText,
+                // Pass effective values — the package decides, not the caller.
+                showDetectionStatusText: widget._effectiveShowDetectionText,
+                showSideIndicator: widget._effectiveShowSideIndicator,
+                showInstruction: widget._effectiveShowInstruction,
                 instructionStyle: widget.instructionStyle,
                 titleStyle: widget.titleStyle,
                 showCloseButton: widget.showCloseButton,
                 buttonStyle: widget.buttonStyle,
+                uiMode: widget.uiMode,
               );
             },
           ),

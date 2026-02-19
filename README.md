@@ -4,7 +4,7 @@
 [![Pub Points](https://img.shields.io/pub/points/document_camera_frame)](https://pub.dev/packages/document_camera_frame/score)
 [![Likes](https://img.shields.io/pub/likes/document_camera_frame)](https://pub.dev/packages/document_camera_frame/score)
 
-`DocumentCameraFrame` — Scan, crop, and extract text from physical documents with a single Flutter widget. Edge detection, perspective correction, OCR, and PDF/image export included.
+`DocumentCameraFrame` — Scan, crop, and extract text from physical documents with a single Flutter widget. Edge detection, perspective correction, OCR, five distinct UI modes, and PDF/image export included.
 
 ## Demo
 
@@ -62,7 +62,27 @@ Here's a quick preview of `DocumentCameraFrame` in action:
 ### 🎨 Customization & UI
 - 🎛️ **Fully Decoupled UI** — The detection engine is separated from the UI, allowing you to build completely custom overlays
 - 🎨 **Theming Engine** — Full control over frame colors, stroke thickness, button styles, and hint typography
+- 🕹️ **Pre-built UI Modes** — Choose from `default`, `minimal`, `overlay`, `kiosk`, or `textExtract` for instant styling.
 - 🪝 **Easy Event Callbacks** — `onDocumentSaved`, `onFrontCaptured`, `onBackCaptured`, `onRetake`
+
+### 📱 UI Mode Visibility Matrix
+
+The `DocumentCameraUIMode` enum controls the visibility of various elements and default behaviors:
+
+| Feature                    | default | minimal | overlay | kiosk  | textExtract |
+|----------------------------|---------|---------|---------|--------|-------------|
+| Dark cutout overlay        | ✅      | ❌      | ❌      | ✅     | ✅           |
+| Frame border + corners     | ✅      | ❌      | ✅      | ✅     | ✅           |
+| Bottom frame container     | ✅      | ❌      | ✅      | ✅     | ✅           |
+| Progress bar               | ✅      | ❌      | ❌      | ✅     | ✅           |
+| Guidance / instructions    | ✅      | ❌      | ❌      | ✅     | ✅           |
+| Screen title               | ✅      | ❌      | ✅      | ✅     | ✅           |
+| Side indicator (dots)      | ✅      | ❌      | ❌      | ✅     | ✅           |
+| Capture button (circle)    | ✅      | ✅      | ✅      | ❌     | ✅           |
+| Auto-capture trigger       | ✅      | ❌      | ✅      | ✅     | ✅           |
+| On-device OCR (default)    | ❌      | ❌      | ❌      | ❌     | ✅           |
+
+
 
 ### 🔐 Security & Compliance
 - 🔒 **Offline-Only** — Designed for FinTech and HealthTech—zero external network calls
@@ -171,6 +191,26 @@ DocumentCameraFrame(
   onDocumentSaved: (data) => processIdCard(data),
 )
 ```
+
+### 📱 UI Modes
+
+Easily switch between different UI layouts using the `uiMode` parameter:
+
+```dart
+// Kiosk Mode (Auto-capture only, no capture button)
+DocumentCameraFrame(
+  uiMode: DocumentCameraUIMode.kiosk,
+  enableAutoCapture: true,
+  onDocumentSaved: (data) => print('Saved!'),
+)
+
+// Minimal Mode (Clean view, only corners and buttons)
+DocumentCameraFrame(
+  uiMode: DocumentCameraUIMode.minimal,
+  onDocumentSaved: (data) => print('Saved!'),
+)
+```
+
 
 ---
 
@@ -435,6 +475,7 @@ are the possible error codes:
 | `sideInfoOverlay`            | `Widget?`                | Optional widget shown on the right (e.g. a check icon).                            | ❌          | `null`                     |
 | `showDetectionStatusText`    | `bool`                   | Show the (dynamic) live detection status text (e.g. "Move closer").                | ❌          | `true`                     |
 | `initialFlashMode`           | `FlashMode`              | Initial camera flash mode: auto, off, on, torch.                                   | ❌          | `FlashMode.auto`           |
+| `uiMode`                     | `DocumentCameraUIMode`   | Controls which UI elements are rendered (see UI Mode Visibility Matrix).           | ❌          | `defaultMode`              |
 
 ### Styling Classes
 
