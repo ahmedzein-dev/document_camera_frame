@@ -47,7 +47,9 @@ class DocumentCameraFrame extends StatefulWidget {
   final Function(DocumentCaptureData documentData)? onDocumentSaved;
 
   /// Deprecated. Use [onDocumentSaved] instead.
-  @Deprecated('Use onDocumentSaved instead (works for one-sided and two-sided documents)')
+  @Deprecated(
+    'Use onDocumentSaved instead (works for one-sided and two-sided documents)',
+  )
   final Function(DocumentCaptureData documentData)? onBothSidesSaved;
 
   /// When true, runs on-device OCR and includes [DocumentCaptureData.frontOcrText] and
@@ -157,17 +159,21 @@ class DocumentCameraFrame extends StatefulWidget {
 
   /// Auto-capture is **on** for every mode except [DocumentCameraUIMode.minimal]
   /// and [DocumentCameraUIMode.camScanner].
-  bool get _effectiveAutoCapture => uiMode != DocumentCameraUIMode.minimal && uiMode != DocumentCameraUIMode.camScanner;
+  bool get _effectiveAutoCapture =>
+      uiMode != DocumentCameraUIMode.minimal &&
+      uiMode != DocumentCameraUIMode.camScanner;
 
   /// Detection status text (e.g. "Move closer") is shown for all full-UI
   /// modes; hidden in minimal and camScanner.
   bool get _effectiveShowDetectionText =>
-      uiMode != DocumentCameraUIMode.minimal && uiMode != DocumentCameraUIMode.camScanner;
+      uiMode != DocumentCameraUIMode.minimal &&
+      uiMode != DocumentCameraUIMode.camScanner;
 
   /// Text extraction (OCR) is only enabled automatically for
   /// [DocumentCameraUIMode.textExtract]. For all other modes it defers to
   /// the caller's [enableExtractText] flag (default: false).
-  bool get _effectiveEnableExtractText => uiMode == DocumentCameraUIMode.textExtract ? true : enableExtractText;
+  bool get _effectiveEnableExtractText =>
+      uiMode == DocumentCameraUIMode.textExtract ? true : enableExtractText;
 
   /// Side indicator is hidden in [DocumentCameraUIMode.minimal],
   /// [DocumentCameraUIMode.overlay], and [DocumentCameraUIMode.camScanner].
@@ -187,7 +193,8 @@ class DocumentCameraFrame extends StatefulWidget {
   State<DocumentCameraFrame> createState() => _DocumentCameraFrameState();
 }
 
-class _DocumentCameraFrameState extends State<DocumentCameraFrame> with TickerProviderStateMixin {
+class _DocumentCameraFrameState extends State<DocumentCameraFrame>
+    with TickerProviderStateMixin {
   late final DocumentCameraLogic _logic;
 
   // Animation controllers
@@ -195,7 +202,9 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> with TickerPr
   Animation<double>? _progressAnimation;
 
   // camScanner mode: current side label (shown on the loading scaffold)
-  final ValueNotifier<String> _camScannerLabel = ValueNotifier<String>('Scan Front Side');
+  final ValueNotifier<String> _camScannerLabel = ValueNotifier<String>(
+    'Scan Front Side',
+  );
 
   @override
   void initState() {
@@ -208,7 +217,8 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> with TickerPr
         onCameraError: () => widget.onCameraError?.call('Camera error'),
         onFrontCaptured: widget.onFrontCaptured,
         onBackCaptured: widget.onBackCaptured,
-        onDocumentSaved: (data) => (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(data),
+        onDocumentSaved: (data) =>
+            (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(data),
         enableExtractText: false,
         onRetake: widget.onRetake,
         enableAutoCapture: false,
@@ -229,7 +239,8 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> with TickerPr
       onCameraError: () => widget.onCameraError?.call('Camera error'),
       onFrontCaptured: widget.onFrontCaptured,
       onBackCaptured: widget.onBackCaptured,
-      onDocumentSaved: (data) => (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(data),
+      onDocumentSaved: (data) =>
+          (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(data),
       // Use effective values so the package handles all mode logic.
       enableExtractText: widget._effectiveEnableExtractText,
       onRetake: widget.onRetake,
@@ -298,7 +309,10 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> with TickerPr
 
       if (backPaths.isEmpty) {
         // Return with front only if they cancelled the second session
-        final data = DocumentCaptureData(frontImagePath: frontPath, frontPreviewPath: frontPath);
+        final data = DocumentCaptureData(
+          frontImagePath: frontPath,
+          frontPreviewPath: frontPath,
+        );
         (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(data);
         safePop();
         return;
@@ -330,18 +344,26 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> with TickerPr
       final frontPath = paths.last;
       widget.onFrontCaptured?.call(frontPath);
 
-      final data = DocumentCaptureData(frontImagePath: frontPath, frontPreviewPath: frontPath);
+      final data = DocumentCaptureData(
+        frontImagePath: frontPath,
+        frontPreviewPath: frontPath,
+      );
       (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(data);
       safePop();
     }
   }
 
   void _initializeProgressAnimation() {
-    _progressAnimationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
-    _progressAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _progressAnimationController!, curve: Curves.easeInOut));
+    _progressAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _progressAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _progressAnimationController!,
+        curve: Curves.easeInOut,
+      ),
+    );
 
     // Sync animation with logic
     _logic.currentSideNotifier.addListener(() {
@@ -369,7 +391,11 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> with TickerPr
                   valueListenable: _camScannerLabel,
                   builder: (context, label, _) => Text(
                     label,
-                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 if (widget.requireBothSides) ...[
@@ -396,9 +422,12 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame> with TickerPr
             logic: _logic,
             borderRadius: widget.frameStyle.outerFrameBorderRadius,
             innerCornerBroderRadius: widget.frameStyle.innerCornerBroderRadius,
-            capturingAnimationDuration: widget.animationStyle.capturingAnimationDuration,
-            capturingAnimationColor: widget.animationStyle.capturingAnimationColor,
-            capturingAnimationCurve: widget.animationStyle.capturingAnimationCurve,
+            capturingAnimationDuration:
+                widget.animationStyle.capturingAnimationDuration,
+            capturingAnimationColor:
+                widget.animationStyle.capturingAnimationColor,
+            capturingAnimationCurve:
+                widget.animationStyle.capturingAnimationCurve,
             uiMode: widget.uiMode,
           ),
 

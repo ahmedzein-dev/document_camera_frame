@@ -240,8 +240,6 @@ class DocumentCameraLogic {
           ? updatedFrameHeight
           : updatedFrameHeight + AppConstants.bottomFrameContainerHeight;
 
-
-
       await controller.takeAndCropPicture(
         updatedFrameWidth,
         heightToCapture,
