@@ -1,3 +1,7 @@
+# 2.5.3
+- **Score Fix**: Added Swift Package Manager (SPM) support for iOS to achieve full 160/160 pub points.
+- **Maintenance**: Synced podspec and package metadata.
+
 # 2.5.2
 - **Score Fix**: Restored 160/160 pub points by properly registering the Android platform implementation.
 - **Dependency Update**: Bumped `camera` dependency to `^0.12.0` for latest platform supports.
