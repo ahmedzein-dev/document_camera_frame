@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'document_camera_frame'
-  s.version          = '2.5.3'
+  s.version          = '2.5.4'
   s.summary          = 'Flutter plugin for capturing and scanning documents.'
   s.description      = <<-DESC
     Provides DocumentCameraUIMode.camScanner which launches VNDocumentCameraViewController

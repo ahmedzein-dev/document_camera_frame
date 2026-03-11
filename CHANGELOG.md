@@ -1,3 +1,6 @@
+# 2.5.4
+- **Score Fix**: Fixed Swift Package Manager path — moved `Package.swift` to the correct location `ios/document_camera_frame/Package.swift` as required by the `pana` analyzer.
+
 # 2.5.3
 - **Score Fix**: Added Swift Package Manager (SPM) support for iOS to achieve full 160/160 pub points.
 - **Maintenance**: Synced podspec and package metadata.

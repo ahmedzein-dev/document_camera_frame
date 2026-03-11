@@ -9,13 +9,10 @@ let package = Package(
     products: [
         .library(name: "document_camera_frame", targets: ["document_camera_frame"])
     ],
-    dependencies: [],
     targets: [
         .target(
             name: "document_camera_frame",
-            dependencies: [],
-            path: "Classes",
-            resources: []
+            path: "Sources/document_camera_frame"
         )
     ]
 )
