@@ -1,4 +1,4 @@
-# 2.5.0
+#  2.5.0 - 2.5.1
 
 ## Added
 - **`DocumentCameraUIMode.camScanner`**: Integrated a new mode that delegates scanning to platform-native engines for professional-grade results.
@@ -10,6 +10,7 @@
 
 ## Changed
 - **Pubspec Update**: Updated dependencies to ensure compatibility with the latest ML Kit and VisionKit APIs.
+- **Platform Support**: Explicitly registered Android platform support in `pubspec.yaml` and added minimal native Android project structure to ensure correct platform detection on pub.dev.
 
 # 2.4.0
 
