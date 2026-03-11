@@ -1,3 +1,8 @@
+# 2.5.2
+- **Score Fix**: Restored 160/160 pub points by properly registering the Android platform implementation.
+- **Dependency Update**: Bumped `camera` dependency to `^0.12.0` for latest platform supports.
+- **Platform support**: Enhanced Android native registration structure for better compatibility with `pana` analyzer.
+
 #  2.5.0 - 2.5.1
 
 ## Added
