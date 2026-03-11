@@ -39,7 +39,8 @@ Here's a quick preview of `DocumentCameraFrame` in action:
 - 📸 **Live Camera Preview** with adjustable document frame
 - ✂️ **Custom Frame Dimensions** for precise cropping
 - 🎯 **Intelligent Auto-Capture** — Real-time analysis of image stability and document alignment triggers automatic capture
-- 🔄 **Dual-Sided Workflow** — Native support for multi-step scanning (e.g., ID Front → ID Back) with animated transitions
+- 🔄 **Dual-Sided Workflow** — Native support for multi-step scanning (e.g., ID Front → ID Back) with animated transitions or native flow
+- 📲 **Native Scanning Engine** — Delegate scanning to platform-native UIs (Google ML Kit on Android, VisionKit on iOS) for professional-grade edge detection and perspective correction
 - 📳 **Haptic Guidance** — Integrated vibration patterns to guide users without them needing to look at the screen
 
 ### 🔎 Precision Computer Vision
@@ -62,25 +63,32 @@ Here's a quick preview of `DocumentCameraFrame` in action:
 ### 🎨 Customization & UI
 - 🎛️ **Fully Decoupled UI** — The detection engine is separated from the UI, allowing you to build completely custom overlays
 - 🎨 **Theming Engine** — Full control over frame colors, stroke thickness, button styles, and hint typography
-- 🕹️ **Pre-built UI Modes** — Choose from `default`, `minimal`, `overlay`, `kiosk`, or `textExtract` for instant styling.
+- 🕹️ **Pre-built UI Modes** — Choose from `default`, `minimal`, `overlay`, `kiosk`, `textExtract`, or `camScanner` for instant styling.
 - 🪝 **Easy Event Callbacks** — `onDocumentSaved`, `onFrontCaptured`, `onBackCaptured`, `onRetake`
 
 ### 📱 UI Mode Visibility Matrix
 
 The `DocumentCameraUIMode` enum controls the visibility of various elements and default behaviors:
 
-| Feature                    | default | minimal | overlay | kiosk  | textExtract |
-|----------------------------|---------|---------|---------|--------|-------------|
-| Dark cutout overlay        | ✅      | ❌      | ❌      | ✅     | ✅           |
-| Frame border + corners     | ✅      | ❌      | ✅      | ✅     | ✅           |
-| Bottom frame container     | ✅      | ❌      | ✅      | ✅     | ✅           |
-| Progress bar               | ✅      | ❌      | ❌      | ✅     | ✅           |
-| Guidance / instructions    | ✅      | ❌      | ❌      | ✅     | ✅           |
-| Screen title               | ✅      | ❌      | ✅      | ✅     | ✅           |
-| Side indicator (dots)      | ✅      | ❌      | ❌      | ✅     | ✅           |
-| Capture button (circle)    | ✅      | ✅      | ✅      | ❌     | ✅           |
-| Auto-capture trigger       | ✅      | ❌      | ✅      | ✅     | ✅           |
-| On-device OCR (default)    | ❌      | ❌      | ❌      | ❌     | ✅           |
+| Feature                    | default | minimal | overlay | kiosk  | textExtract | camScanner |
+|----------------------------|---------|---------|---------|--------|-------------|------------|
+| Dark cutout overlay        | ✅      | ❌      | ❌      | ✅     | ✅           | ❌ (Native)|
+| Frame border + corners     | ✅      | ✅*     | ✅      | ✅     | ✅           | ❌ (Native)|
+| Bottom frame container     | ✅      | ❌      | ✅      | ✅     | ✅           | ❌ (Native)|
+| Progress bar & dots        | ✅      | ❌      | ❌      | ✅     | ✅           | ❌ (Native)|
+| Static instructions (Top)  | ✅      | ❌      | ❌      | ✅     | ✅           | ❌ (Native)|
+| Dynamic Alignment Hints**  | ✅      | ❌      | ✅      | ✅     | ✅           | ❌ (Native)|
+| Screen title / Close btn   | ✅      | ❌      | ✅      | ✅     | ✅           | ❌ (Native)|
+| Camera Switcher            | ✅      | ✅      | ✅      | ❌     | ✅           | ❌ (Native)|
+| Capture button (circle)    | ✅      | ✅      | ✅      | ❌     | ✅           | ❌ (Native)|
+| Action buttons (Save/Retake)| ✅      | ✅      | ✅      | ✅     | ✅           | ❌ (Native)|
+| Auto-capture trigger       | ✅      | ❌      | ✅      | ✅     | ✅           | ❌ (Native)|
+| On-device OCR (default)    | ❌      | ❌      | ❌      | ❌     | ✅           | ❌          |
+| Native Scanning UI         | ❌      | ❌      | ❌      | ❌     | ❌           | ✅          |
+
+\* Minimal uses `CornerBox` indicators instead of a full-screen frame border.
+\** Dynamic feedback based on document alignment (e.g., "Move closer", "Move right").
+
 
 
 
@@ -209,6 +217,18 @@ DocumentCameraFrame(
   uiMode: DocumentCameraUIMode.minimal,
   onDocumentSaved: (data) => print('Saved!'),
 )
+
+// Native CamScanner Mode (Delegates to the OS's native document scanner)
+DocumentCameraFrame(
+  uiMode: DocumentCameraUIMode.camScanner,
+  requireBothSides: true, // Can guide user to scan front then back separately
+  onDocumentSaved: (data) {
+    print('Front path: ${data.frontImagePath}');
+    print('Back path: ${data.backImagePath}');
+  },
+)
+
+> **Note:** In `camScanner` mode, all custom frame and styling properties (borders, colors, buttons) are ignored as the platform's native scanner UI takes over.
 ```
 
 
@@ -377,6 +397,21 @@ import 'package:document_camera_frame/document_camera_frame.dart';
 final ocrService = OcrService();
 final text = await ocrService.extractText('/path/to/image.jpg');
 print('Extracted text: $text');
+```
+
+### Native Scanning (Direct Access)
+
+If you want to launch the native scanner directly without the `DocumentCameraFrame` widget, you can use the `CamScannerService`:
+
+```dart
+import 'package:document_camera_frame/document_camera_frame.dart';
+
+final service = CamScannerService();
+final List<String> paths = await service.scan(maxPages: 2);
+
+if (paths.isNotEmpty) {
+  print('Scanned files: $paths');
+}
 ```
 
 ---

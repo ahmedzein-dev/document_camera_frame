@@ -240,6 +240,8 @@ class DocumentCameraLogic {
           ? updatedFrameHeight
           : updatedFrameHeight + AppConstants.bottomFrameContainerHeight;
 
+
+
       await controller.takeAndCropPicture(
         updatedFrameWidth,
         heightToCapture,
@@ -259,21 +261,21 @@ class DocumentCameraLogic {
     }
   }
 
-  void _handleCapture(String imagePath) {
+  void _handleCapture(String imagePath, {String? previewPath}) {
     final currentSide = currentSideNotifier.value;
     final currentData = documentDataNotifier.value;
-    final previewPath = controller.previewPath;
+    final effectivePreview = previewPath ?? controller.previewPath;
 
     if (currentSide == DocumentSide.front) {
       documentDataNotifier.value = currentData.copyWith(
         frontImagePath: imagePath,
-        frontPreviewPath: previewPath,
+        frontPreviewPath: effectivePreview,
       );
       onFrontCaptured?.call(imagePath);
     } else {
       documentDataNotifier.value = currentData.copyWith(
         backImagePath: imagePath,
-        backPreviewPath: previewPath,
+        backPreviewPath: effectivePreview,
       );
       onBackCaptured?.call(imagePath);
     }

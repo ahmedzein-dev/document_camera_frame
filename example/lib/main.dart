@@ -86,7 +86,7 @@ class QuickStartScreen extends StatelessWidget {
                   label:
                       const Text('Test Export Formats (JPG, PNG, PDF, TIFF)'),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.all(8),
                   ),
                 ),
               ),
@@ -105,9 +105,10 @@ class QuickStartScreen extends StatelessWidget {
                     );
                   },
                   icon: const Icon(Icons.settings_input_component),
-                  label: const Text('Advanced Modes (Minimal, Kiosk, Overlay)'),
+                  label: const Text(
+                      'Advanced Modes (Minimal, Kiosk, Overlay, Text Extract, Cam Scanner)'),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.all(8),
                   ),
                 ),
               ),

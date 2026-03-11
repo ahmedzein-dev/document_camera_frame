@@ -4,6 +4,7 @@ export 'src/core/context_extensions.dart';
 export 'src/core/enums.dart';
 
 // Services
+export 'src/services/cam_scanner_service.dart';
 export 'src/services/camera_service.dart';
 export 'src/services/image_processing_service.dart';
 export 'src/services/ocr_service.dart';

@@ -32,6 +32,15 @@ enum DocumentCameraUIMode {
   /// For all other modes, text extraction is **off** by default and can be
   /// enabled explicitly via [DocumentCameraFrame.enableExtractText].
   textExtract,
+
+  /// Launches the platform's native document scanner UI and returns the
+  /// scanned images through [onDocumentSaved].
+  ///
+  /// - **Android**: uses `google_mlkit_document_scanner`.
+  /// - **iOS**: uses `VNDocumentCameraViewController` (requires a real device).
+  ///
+  /// All custom frame/styling properties are ignored in this mode.
+  camScanner,
 }
 
 /// Enum to define document sides

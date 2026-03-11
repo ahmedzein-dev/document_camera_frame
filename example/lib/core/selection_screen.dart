@@ -77,6 +77,13 @@ class _SelectionScreenState extends State<SelectionScreen> {
       description: 'Auto-captures and runs OCR — text returned in result',
       icon: Icons.text_fields_rounded,
     ),
+    UiModeInfo(
+      mode: DocumentCameraUIMode.camScanner,
+      label: 'Cam Scanner',
+      description:
+          'Launches native scanner (ML Kit on Android, VisionKit on iOS)',
+      icon: Icons.document_scanner_rounded,
+    ),
   ];
 
   DocTypeInfo get _currentDoc =>

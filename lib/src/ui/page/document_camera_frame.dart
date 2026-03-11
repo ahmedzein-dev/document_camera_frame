@@ -47,9 +47,7 @@ class DocumentCameraFrame extends StatefulWidget {
   final Function(DocumentCaptureData documentData)? onDocumentSaved;
 
   /// Deprecated. Use [onDocumentSaved] instead.
-  @Deprecated(
-    'Use onDocumentSaved instead (works for one-sided and two-sided documents)',
-  )
+  @Deprecated('Use onDocumentSaved instead (works for one-sided and two-sided documents)')
   final Function(DocumentCaptureData documentData)? onBothSidesSaved;
 
   /// When true, runs on-device OCR and includes [DocumentCaptureData.frontOcrText] and
@@ -154,56 +152,84 @@ class DocumentCameraFrame extends StatefulWidget {
   // All mode-based behaviour is resolved here inside the package.
   // The example app / caller only needs to pass [uiMode] — no manual
   // conditionals required.
+  /// `true` when this widget should delegate to the native document scanner.
+  bool get _isCamScanner => uiMode == DocumentCameraUIMode.camScanner;
 
-  /// Auto-capture is **on** for every mode except [DocumentCameraUIMode.minimal].
-  /// Kiosk and guided force it on; minimal uses manual capture only.
-  bool get _effectiveAutoCapture => uiMode != DocumentCameraUIMode.minimal;
+  /// Auto-capture is **on** for every mode except [DocumentCameraUIMode.minimal]
+  /// and [DocumentCameraUIMode.camScanner].
+  bool get _effectiveAutoCapture => uiMode != DocumentCameraUIMode.minimal && uiMode != DocumentCameraUIMode.camScanner;
 
   /// Detection status text (e.g. "Move closer") is shown for all full-UI
-  /// modes; hidden only in [DocumentCameraUIMode.minimal].
+  /// modes; hidden in minimal and camScanner.
   bool get _effectiveShowDetectionText =>
-      uiMode != DocumentCameraUIMode.minimal;
+      uiMode != DocumentCameraUIMode.minimal && uiMode != DocumentCameraUIMode.camScanner;
 
   /// Text extraction (OCR) is only enabled automatically for
   /// [DocumentCameraUIMode.textExtract]. For all other modes it defers to
   /// the caller's [enableExtractText] flag (default: false).
-  bool get _effectiveEnableExtractText =>
-      uiMode == DocumentCameraUIMode.textExtract ? true : enableExtractText;
+  bool get _effectiveEnableExtractText => uiMode == DocumentCameraUIMode.textExtract ? true : enableExtractText;
 
-  /// Side indicator is hidden in [DocumentCameraUIMode.minimal] and
-  /// [DocumentCameraUIMode.overlay].
+  /// Side indicator is hidden in [DocumentCameraUIMode.minimal],
+  /// [DocumentCameraUIMode.overlay], and [DocumentCameraUIMode.camScanner].
   bool get _effectiveShowSideIndicator =>
       uiMode != DocumentCameraUIMode.minimal &&
-      uiMode != DocumentCameraUIMode.overlay;
+      uiMode != DocumentCameraUIMode.overlay &&
+      uiMode != DocumentCameraUIMode.camScanner;
 
-  /// Instruction text is hidden in [DocumentCameraUIMode.minimal] and
-  /// [DocumentCameraUIMode.overlay].
+  /// Instruction text is hidden in [DocumentCameraUIMode.minimal],
+  /// [DocumentCameraUIMode.overlay], and [DocumentCameraUIMode.camScanner].
   bool get _effectiveShowInstruction =>
       uiMode != DocumentCameraUIMode.minimal &&
-      uiMode != DocumentCameraUIMode.overlay;
+      uiMode != DocumentCameraUIMode.overlay &&
+      uiMode != DocumentCameraUIMode.camScanner;
 
   @override
   State<DocumentCameraFrame> createState() => _DocumentCameraFrameState();
 }
 
-class _DocumentCameraFrameState extends State<DocumentCameraFrame>
-    with TickerProviderStateMixin {
+class _DocumentCameraFrameState extends State<DocumentCameraFrame> with TickerProviderStateMixin {
   late final DocumentCameraLogic _logic;
 
   // Animation controllers
   AnimationController? _progressAnimationController;
   Animation<double>? _progressAnimation;
 
+  // camScanner mode: current side label (shown on the loading scaffold)
+  final ValueNotifier<String> _camScannerLabel = ValueNotifier<String>('Scan Front Side');
+
   @override
   void initState() {
     super.initState();
+
+    if (widget._isCamScanner) {
+      // camScanner mode: skip the camera pipeline; launch native UI after build.
+      _logic = DocumentCameraLogic(
+        context: context,
+        onCameraError: () => widget.onCameraError?.call('Camera error'),
+        onFrontCaptured: widget.onFrontCaptured,
+        onBackCaptured: widget.onBackCaptured,
+        onDocumentSaved: (data) => (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(data),
+        enableExtractText: false,
+        onRetake: widget.onRetake,
+        enableAutoCapture: false,
+        requireBothSides: widget.requireBothSides,
+        frameFlipDuration: widget.animationStyle.frameFlipDuration,
+        outputFormat: widget.outputFormat,
+        pdfPageSize: widget.pdfPageSize,
+        imageQuality: widget.imageQuality,
+        initialFlashMode: widget.initialFlashMode,
+        uiMode: widget.uiMode,
+      );
+      WidgetsBinding.instance.addPostFrameCallback((_) => _launchCamScanner());
+      return;
+    }
+
     _logic = DocumentCameraLogic(
       context: context,
       onCameraError: () => widget.onCameraError?.call('Camera error'),
       onFrontCaptured: widget.onFrontCaptured,
       onBackCaptured: widget.onBackCaptured,
-      onDocumentSaved: (data) =>
-          (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(data),
+      onDocumentSaved: (data) => (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(data),
       // Use effective values so the package handles all mode logic.
       enableExtractText: widget._effectiveEnableExtractText,
       onRetake: widget.onRetake,
@@ -231,17 +257,91 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
     });
   }
 
+  // ---------------------------------------------------------------------------
+  // camScanner mode — sequential front → back native scans
+  // ---------------------------------------------------------------------------
+
+  Future<void> _launchCamScanner() async {
+    final service = CamScannerService();
+
+    // Helper to safely pop if this is still the current route
+    void safePop() {
+      if (!mounted) return;
+      final route = ModalRoute.of(context);
+      if (route != null && route.isCurrent) {
+        Navigator.of(context).maybePop();
+      }
+    }
+
+    if (widget.requireBothSides) {
+      // ── Step 1: FRONT Session ─────────────────────────────────────────────
+      _camScannerLabel.value = 'Scan Front Side, then tap Save';
+      final paths = await service.scan(maxPages: 2);
+      if (!mounted) return;
+
+      if (paths.isEmpty) {
+        safePop();
+        return;
+      }
+
+      // Take only the last image of the front session
+      final frontPath = paths.last;
+      widget.onFrontCaptured?.call(frontPath);
+
+      // ── Step 2: BACK Session ──────────────────────────────────────────────
+      await Future<void>.delayed(const Duration(milliseconds: 600));
+      if (!mounted) return;
+
+      _camScannerLabel.value = 'Scan Back Side, then tap Save';
+      final backPaths = await service.scan(maxPages: 2);
+      if (!mounted) return;
+
+      if (backPaths.isEmpty) {
+        // Return with front only if they cancelled the second session
+        final data = DocumentCaptureData(frontImagePath: frontPath, frontPreviewPath: frontPath);
+        (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(data);
+        safePop();
+        return;
+      }
+
+      // Take only the last image of the back session
+      final backPath = backPaths.last;
+      widget.onBackCaptured?.call(backPath);
+
+      final data = DocumentCaptureData(
+        frontImagePath: frontPath,
+        frontPreviewPath: frontPath,
+        backImagePath: backPath,
+        backPreviewPath: backPath,
+      );
+      (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(data);
+      safePop();
+    } else {
+      // ── SINGLE SIDE MODE ───────────────────────────────────────────────────
+      _camScannerLabel.value = 'Scan Document, then tap Save';
+      final paths = await service.scan(maxPages: 2);
+      if (!mounted) return;
+
+      if (paths.isEmpty) {
+        safePop();
+        return;
+      }
+
+      final frontPath = paths.last;
+      widget.onFrontCaptured?.call(frontPath);
+
+      final data = DocumentCaptureData(frontImagePath: frontPath, frontPreviewPath: frontPath);
+      (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(data);
+      safePop();
+    }
+  }
+
   void _initializeProgressAnimation() {
-    _progressAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-    _progressAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _progressAnimationController!,
-        curve: Curves.easeInOut,
-      ),
-    );
+    _progressAnimationController = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
+    _progressAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _progressAnimationController!, curve: Curves.easeInOut));
 
     // Sync animation with logic
     _logic.currentSideNotifier.addListener(() {
@@ -255,6 +355,37 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
 
   @override
   Widget build(BuildContext context) {
+    if (widget._isCamScanner) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(color: Colors.white),
+                const SizedBox(height: 20),
+                ValueListenableBuilder<String>(
+                  valueListenable: _camScannerLabel,
+                  builder: (context, label, _) => Text(
+                    label,
+                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+                ),
+                if (widget.requireBothSides) ...[
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Scan the front, then the back.\nWe will use the last image from each session.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white54, fontSize: 13),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -265,12 +396,9 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
             logic: _logic,
             borderRadius: widget.frameStyle.outerFrameBorderRadius,
             innerCornerBroderRadius: widget.frameStyle.innerCornerBroderRadius,
-            capturingAnimationDuration:
-                widget.animationStyle.capturingAnimationDuration,
-            capturingAnimationColor:
-                widget.animationStyle.capturingAnimationColor,
-            capturingAnimationCurve:
-                widget.animationStyle.capturingAnimationCurve,
+            capturingAnimationDuration: widget.animationStyle.capturingAnimationDuration,
+            capturingAnimationColor: widget.animationStyle.capturingAnimationColor,
+            capturingAnimationCurve: widget.animationStyle.capturingAnimationCurve,
             uiMode: widget.uiMode,
           ),
 
@@ -309,6 +437,7 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
   void dispose() {
     _logic.dispose();
     _progressAnimationController?.dispose();
+    _camScannerLabel.dispose();
     super.dispose();
   }
 }

@@ -1,3 +1,16 @@
+# 2.5.0
+
+## Added
+- **`DocumentCameraUIMode.camScanner`**: Integrated a new mode that delegates scanning to platform-native engines for professional-grade results.
+    - **Android**: Leverages Google ML Kit for automatic edge detection, perspective correction, and image filters.
+    - **iOS**: Leverages Apple's VisionKit (`VNDocumentCameraViewController`) for a high-performance system-native experience.
+- **Smart Sequential Flow**: Native mode now supports automated multi-side scanning. It guides the user through "Front Side" and "Back Side" sessions sequentially with built-in loading scaffolds.
+- **Last-Capture Selection**: Both Android and iOS native modes now automatically favor the final (best) capture from a scanning session when `requireBothSides` is enabled.
+- **`CamScannerService`**: Exposed the underlying platform service, allowing developers to trigger native scans programmatically without the full framing UI.
+
+## Changed
+- **Pubspec Update**: Updated dependencies to ensure compatibility with the latest ML Kit and VisionKit APIs.
+
 # 2.4.0
 
 ## Added

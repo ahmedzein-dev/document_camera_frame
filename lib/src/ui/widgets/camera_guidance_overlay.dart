@@ -42,10 +42,7 @@ class CameraGuidanceOverlay extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (showInstruction)
-            _InstructionBanner(
-              currentSideNotifier: currentSideNotifier,
-              instructionStyle: instructionStyle,
-            ),
+            _InstructionBanner(currentSideNotifier: currentSideNotifier, instructionStyle: instructionStyle),
           if (showStatus)
             _DetectionStatusBanner(
               detectionStatusNotifier: detectionStatusNotifier,
@@ -61,10 +58,7 @@ class _InstructionBanner extends StatelessWidget {
   final ValueNotifier<DocumentSide> currentSideNotifier;
   final DocumentCameraInstructionStyle instructionStyle;
 
-  const _InstructionBanner({
-    required this.currentSideNotifier,
-    required this.instructionStyle,
-  });
+  const _InstructionBanner({required this.currentSideNotifier, required this.instructionStyle});
 
   @override
   Widget build(BuildContext context) {
@@ -72,10 +66,8 @@ class _InstructionBanner extends StatelessWidget {
       valueListenable: currentSideNotifier,
       builder: (context, currentSide, child) {
         final instruction = currentSide == DocumentSide.front
-            ? (instructionStyle.frontSideInstruction ??
-                  'Position the front side of your document within the frame')
-            : (instructionStyle.backSideInstruction ??
-                  'Now position the back side of your document within the frame');
+            ? (instructionStyle.frontSideInstruction ?? 'Position the front side of your document within the frame')
+            : (instructionStyle.backSideInstruction ?? 'Now position the back side of your document within the frame');
 
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -85,13 +77,7 @@ class _InstructionBanner extends StatelessWidget {
           ),
           child: Text(
             instruction,
-            style:
-                instructionStyle.instructionTextStyle ??
-                const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
+            style: instructionStyle.instructionTextStyle ?? const TextStyle(color: Colors.white, fontSize: 11),
             textAlign: TextAlign.center,
           ),
         );
@@ -104,10 +90,7 @@ class _DetectionStatusBanner extends StatelessWidget {
   final ValueNotifier<String?> detectionStatusNotifier;
   final DocumentCameraInstructionStyle instructionStyle;
 
-  const _DetectionStatusBanner({
-    required this.detectionStatusNotifier,
-    required this.instructionStyle,
-  });
+  const _DetectionStatusBanner({required this.detectionStatusNotifier, required this.instructionStyle});
 
   @override
   Widget build(BuildContext context) {
@@ -119,16 +102,12 @@ class _DetectionStatusBanner extends StatelessWidget {
         }
 
         return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 35),
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
           child: Text(
             status,
             style:
                 instructionStyle.instructionTextStyle ??
-                const TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
+                const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
             textAlign: TextAlign.center,
           ),
         );
