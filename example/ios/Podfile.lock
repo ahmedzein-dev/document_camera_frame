@@ -1,7 +1,7 @@
 PODS:
   - camera_avfoundation (0.0.1):
     - Flutter
-  - document_camera_frame (2.4.0):
+  - document_camera_frame (2.5.4):
     - Flutter
   - Flutter (1.0.0)
   - google_mlkit_commons (0.11.1):
@@ -154,7 +154,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   camera_avfoundation: 769d252259fa21e39ada7399c9dc9c0921af8165
-  document_camera_frame: a73e3e52c0dbd91dcf410640799a1aec5006bf06
+  document_camera_frame: 0c031145b38d93293cd13c48188057e311cba674
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   google_mlkit_commons: 1e6ef6605d7281f35baf2b355e6049b9984fd624
   google_mlkit_document_scanner: d29c639e9bfbeeaba455efb83635d23b127a858f

@@ -1,3 +1,6 @@
+# 2.5.5
+- **Demo Update**: Replaced old example GIFs in README with four new demo recordings added in this version — showcasing the default UI mode, export formats, all built-in UI modes, and the native CamScanner mode.
+
 # 2.5.4
 - **Score Fix**: Fixed Swift Package Manager path — moved `Package.swift` to the correct location `ios/document_camera_frame/Package.swift` as required by the `pana` analyzer.
 

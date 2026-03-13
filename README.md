@@ -13,22 +13,22 @@ Here's a quick preview of `DocumentCameraFrame` in action:
 <table>
   <tr>
     <td style="text-align: center;">
-      <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example_auto_detect.gif" width="350" alt="Auto Detection Example" /><br/>
-      <em>Auto document edge detection in real-time</em>
+      <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/default.gif" width="350" alt="Default Mode" /><br/>
+      <em>Default UI mode — live camera preview with frame, progress bar, side indicators, and auto-capture</em>
     </td>
     <td style="text-align: center;">
-      <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example1.gif?v=2" width="350" alt="example1" /><br/>
-      <em>Driver license dual-side capture (320×200) with auto-capture and side indicators</em>
+      <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/export.gif" width="350" alt="Export Example" /><br/>
+      <em>Export in action — capturing and exporting documents as JPG, PNG, PDF, or TIFF</em>
     </td>
   </tr>
   <tr>
     <td style="text-align: center;">
-      <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example2.gif?v=2" width="350" alt="example2" /><br/>
-      <em>Passport scanning (300×450) with manual capture button, no side indicators, and custom instructions</em>
+      <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/ui_modes.gif" width="350" alt="UI Modes" /><br/>
+      <em>All built-in UI modes — default, minimal, overlay, kiosk, and textExtract</em>
     </td>
     <td style="text-align: center;">
-      <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/example3.gif?v=2" width="350" alt="example3" /><br/>
-      <em>ID card dual-side capture (320×200) with auto-capture, hidden side indicators, and smooth transitions</em>
+      <img src="https://github.com/ahmedzein-dev/document_camera_frame/raw/main/assets/camscanner.gif" width="350" alt="CamScanner Mode" /><br/>
+      <em>Native CamScanner mode — delegates to the platform's built-in document scanner</em>
     </td>
   </tr>
 </table>
