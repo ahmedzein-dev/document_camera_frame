@@ -1,6 +1,5 @@
 // Core functionality
 export 'src/controllers/document_camera_controller.dart';
-export 'src/core/context_extensions.dart';
 export 'src/core/enums.dart';
 
 // Services

@@ -1,3 +1,6 @@
+# 2.5.6
+- **Bug Fix**: Removed export of `context_extensions.dart` from the package export file to prevent conflicts with other packages like `flutter_screenutil` that provide similar BuildContext and double extensions like `.sw()` and `.sh()`. Explicit internal imports were added where needed.
+
 # 2.5.5
 - **Demo Update**: Replaced old example GIFs in README with four new demo recordings added in this version — showcasing the default UI mode, export formats, all built-in UI modes, and the native CamScanner mode.
 
