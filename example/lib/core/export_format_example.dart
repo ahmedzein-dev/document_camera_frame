@@ -85,7 +85,10 @@ class ExportFormatScreen extends StatelessWidget {
 
   // ---------------------------------------------------------------------------
   // Flutter-standard await pattern — push the camera, wait for the result,
-  // then navigate to the preview. No Navigator calls inside onDocumentSaved.
+  // then navigate to the preview.
+  // onDocumentSaved is optional — use it only for side effects like analytics
+  // or intermediate processing. Navigation is already handled: the package
+  // pops with the result automatically.
   // ---------------------------------------------------------------------------
   Future<void> _launchCamera(
     BuildContext context,
@@ -115,7 +118,8 @@ class ExportFormatScreen extends StatelessWidget {
           requireBothSides: true,
           enableAutoCapture: true,
           enableExtractText: true,
-          onDocumentSaved: (_) {},
+          // No callback needed — await the result directly above.
+          // Add onDocumentSaved only for side effects (analytics, logging).
         ),
       ),
     );

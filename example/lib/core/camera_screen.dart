@@ -25,10 +25,9 @@ class CameraScreen extends StatelessWidget {
       frameHeight: docInfo.frameHeight,
       uiMode: uiMode,
       requireBothSides: docInfo.isTwoSided,
-      // onDocumentSaved is optional here — the package pops with the result
-      // automatically. Add a callback only if you need a side effect
-      // (e.g. logging, analytics) before the screen closes.
-      onDocumentSaved: (_) {},
+      // onDocumentSaved is optional — use it only for side effects like
+      // analytics or logging. Navigation is handled automatically:
+      // the package pops with the result so the caller can await it.
     );
   }
 }

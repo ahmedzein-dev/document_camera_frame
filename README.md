@@ -113,7 +113,8 @@ flutter pub add document_camera_frame
 
 The package follows the Flutter-standard `await Navigator.push(...)` pattern — identical to
 `showDatePicker`, `ImagePicker`, and other Flutter APIs. Push the camera, await the result,
-then navigate forward. No `Navigator` calls needed inside `onDocumentSaved`.
+then navigate forward. `onDocumentSaved` is **optional** — the package always pops with the
+result automatically.
 
 ```dart
 import 'package:document_camera_frame/document_camera_frame.dart';
@@ -127,10 +128,9 @@ Future<void> launchCamera(BuildContext context) async {
         frameWidth: 320,
         frameHeight: 200,
         requireBothSides: true,
-        // The package pops itself with the result automatically.
-        // onDocumentSaved is optional — use it only for side effects
-        // like analytics or intermediate processing.
-        onDocumentSaved: (_) {},
+        // onDocumentSaved is optional — use it for side effects like
+        // analytics or intermediate processing. Navigation is already
+        // handled: the package pops with the result automatically.
       ),
     ),
   );
@@ -163,7 +163,9 @@ DocumentCameraFrame(
   enableAutoCapture: true,
   onFrontCaptured: (imagePath) => print('Front: $imagePath'),
   onBackCaptured: (imagePath) => print('Back: $imagePath'),
-  onDocumentSaved: (_) {},
+  // onDocumentSaved is optional — use it for side effects like
+  // analytics or intermediate processing. Navigation is already
+  // handled: the package pops with the result automatically.
 )
 ```
 
@@ -185,7 +187,9 @@ DocumentCameraFrame(
     showInstructionText: true,
     frontSideInstruction: "Position passport within the frame",
   ),
-  onDocumentSaved: (_) {},
+  // onDocumentSaved is optional — use it for side effects like
+  // analytics or intermediate processing. Navigation is already
+  // handled: the package pops with the result automatically.
 )
 ```
 
@@ -208,7 +212,9 @@ DocumentCameraFrame(
   frameStyle: DocumentCameraFrameStyle(
     outerFrameBorderRadius: 16.0,
   ),
-  onDocumentSaved: (_) {},
+  // onDocumentSaved is optional — use it for side effects like
+  // analytics or intermediate processing. Navigation is already
+  // handled: the package pops with the result automatically.
 )
 ```
 
@@ -221,20 +227,20 @@ Easily switch between different UI layouts using the `uiMode` parameter:
 DocumentCameraFrame(
   uiMode: DocumentCameraUIMode.kiosk,
   enableAutoCapture: true,
-  onDocumentSaved: (_) {},
+  // onDocumentSaved is optional — use it for side effects like
+  // analytics or intermediate processing. Navigation is already
+  // handled: the package pops with the result automatically.
 )
 
 // Minimal Mode (Clean view, only corners and buttons)
 DocumentCameraFrame(
   uiMode: DocumentCameraUIMode.minimal,
-  onDocumentSaved: (_) {},
 )
 
 // Native CamScanner Mode (Delegates to the OS's native document scanner)
 DocumentCameraFrame(
   uiMode: DocumentCameraUIMode.camScanner,
   requireBothSides: true, // Guides user to scan front then back separately
-  onDocumentSaved: (_) {},
 )
 ```
 
@@ -262,7 +268,6 @@ Choose the output format for your captured documents. The package supports **4 f
 DocumentCameraFrame(
   frameWidth: 320,
   frameHeight: 200,
-  onDocumentSaved: (_) {},
 )
 
 // PNG format
@@ -270,7 +275,6 @@ DocumentCameraFrame(
   frameWidth: 320,
   frameHeight: 200,
   outputFormat: DocumentOutputFormat.png,
-  onDocumentSaved: (_) {},
 )
 ```
 
@@ -285,7 +289,6 @@ DocumentCameraFrame(
   outputFormat: DocumentOutputFormat.pdf,
   pdfPageSize: PdfPageSize.a4, // or PdfPageSize.letter
   requireBothSides: true, // Creates 2-page PDF
-  onDocumentSaved: (_) {},
 )
 ```
 
@@ -342,7 +345,9 @@ DocumentCameraFrame(
     frontSideTitle: Text('Scan Front', style: TextStyle(color: Colors.white)),
     backSideTitle: Text('Scan Back', style: TextStyle(color: Colors.white)),
   ),
-  onDocumentSaved: (_) {},
+  // onDocumentSaved is optional — use it for side effects like
+  // analytics or intermediate processing. Navigation is already
+  // handled: the package pops with the result automatically.
 )
 ```
 
@@ -368,7 +373,9 @@ final result = await Navigator.push<DocumentCaptureData>(
       frameWidth: 320,
       frameHeight: 200,
       enableExtractText: true,
-      onDocumentSaved: (_) {},
+      // onDocumentSaved is optional — use it for side effects like
+      // analytics or intermediate processing. Navigation is already
+      // handled: the package pops with the result automatically.
     ),
   ),
 );

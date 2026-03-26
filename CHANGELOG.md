@@ -1,3 +1,10 @@
+# 2.6.2
+
+## Documentation
+- **Example & README cleanup**: Removed `onDocumentSaved: (_) {}` from all example code and README snippets. Every snippet now includes the canonical hint comment explaining that `onDocumentSaved` is optional and that navigation is handled automatically.
+
+---
+
 # 2.6.1
 
 ## Changed

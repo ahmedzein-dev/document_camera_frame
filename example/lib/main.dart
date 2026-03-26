@@ -123,12 +123,14 @@ class QuickStartScreen extends StatelessWidget {
   // ---------------------------------------------------------------------------
   // QUICK START — the Flutter-standard await pattern.
   //
-  // This is identical to how Flutter's own APIs work:
+  // Identical to how Flutter's own APIs work:
   //   final date = await showDatePicker(...);
   //   final file = await ImagePicker().pickImage(...);
   //
-  // The package pops itself with the result; the caller decides what's next.
-  // No Navigator calls inside onDocumentSaved — the package handles that.
+  // The package pops itself with the result — no Navigator calls needed inside
+  // the widget. onDocumentSaved is optional; use it only for side effects like
+  // analytics or intermediate processing. Navigation is already handled: the
+  // package pops with the result automatically.
   // ---------------------------------------------------------------------------
   Future<void> _launchSimpleCamera(BuildContext context) async {
     final DocumentCaptureData? result =
@@ -141,12 +143,7 @@ class QuickStartScreen extends StatelessWidget {
           frameHeight: 200,
 
           // 2. Decide if you need front + back or just front.
-          requireBothSides: true,
-
-          // 3. onDocumentSaved is optional — use it for side effects like
-          //    analytics or intermediate processing. Navigation is already
-          //    handled: the package pops with the result automatically.
-          onDocumentSaved: (_) {},
+          requireBothSides: false,
         ),
       ),
     );
