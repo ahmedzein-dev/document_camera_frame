@@ -522,13 +522,11 @@ are the possible error codes:
 |---------------------|-----------------------------------|------------------------------------------------------------------------------------------------------------------------------------|----------|---------------|
 | `onFrontCaptured`   | `Function(String)?`               | Callback triggered when front side is captured.                                                                                    | ❌        | `null`        |
 | `onBackCaptured`    | `Function(String)?`               | Callback triggered when back side is captured.                                                                                     | ❌        | `null`        |
-| `onDocumentSaved`   | `Function(DocumentCaptureData)?`  | Callback when document is saved (one-sided e.g. passport, or both sides). One of `onDocumentSaved` or `onBothSidesSaved` required. | ✅*       | —             |
-| `onBothSidesSaved`  | `Function(DocumentCaptureData)?`  | **Deprecated.** Use `onDocumentSaved` instead. Still supported for backward compatibility.                                         | ✅*       | —             |
-| `enableExtractText` | `bool`                            | When true, runs on-device OCR and sets `documentData.frontOcrText` / `backOcrText` before the callback.                            | ❌        | `false`       |
-| `onRetake`          | `VoidCallback?`                   | Callback triggered when the "Retake" button is pressed.                                                                            | ❌        | `null`        |
-| `onCameraError`     | `void Function(Object error)?`    | Callback triggered when a camera-related error occurs (e.g., initialization, streaming, or capture failure).                       | ❌        | `null`        |
-
-*At least one of `onDocumentSaved` or `onBothSidesSaved` must be provided. Prefer `onDocumentSaved`.
+| `onDocumentSaved`   | `Function(DocumentCaptureData)?`  | Callback when document is saved (one-sided e.g. passport, or both sides). Optional — use `await Navigator.push` to receive the result instead. | ❌        | `null`        |
+| `onBothSidesSaved`  | `Function(DocumentCaptureData)?`  | **Deprecated.** Use `onDocumentSaved` instead. Still supported for backward compatibility.                                                      | ❌        | `null`        |
+| `enableExtractText` | `bool`                            | When true, runs on-device OCR and sets `documentData.frontOcrText` / `backOcrText` before the callback.                                         | ❌        | `false`       |
+| `onRetake`          | `VoidCallback?`                   | Callback triggered when the "Retake" button is pressed.                                                                                         | ❌        | `null`        |
+| `onCameraError`     | `void Function(Object error)?`    | Callback triggered when a camera-related error occurs (e.g., initialization, streaming, or capture failure).                                    | ❌        | `null`        |
 
 > **Navigation note:** `onDocumentSaved` is an optional side-channel for analytics or intermediate
 > processing. The package pops itself with the result automatically — use

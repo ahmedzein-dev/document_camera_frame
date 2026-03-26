@@ -1,3 +1,11 @@
+# 2.6.1
+
+## Changed
+- **`onDocumentSaved` and `onBothSidesSaved` are now fully optional**: Removed the runtime `assert` that required at least one of these callbacks. You can now use the standard `await Navigator.push<DocumentCaptureData>(...)` pattern without supplying any callback at all — the package always pops itself with the result.
+- **Fixed visual flicker on save**: `Navigator.pop(resultData)` is now called before `resetCapture()` inside `handleSave()`. This prevents the live camera feed from briefly flashing back on screen during the pop transition animation.
+
+---
+
 # 2.6.0
 
 ## Added

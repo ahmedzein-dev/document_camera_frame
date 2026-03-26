@@ -396,11 +396,14 @@ class DocumentCameraLogic {
       // callers can use the standard Flutter `await Navigator.push(...)` pattern,
       // identical to showDatePicker / ImagePicker / showModalBottomSheet.
       onDocumentSaved?.call(resultData);
-      resetCapture();
 
       if (context.mounted) {
         Navigator.of(context).pop(resultData);
       }
+
+      // Reset capture after popping to avoid a visual flicker
+      // where the live camera flashes back during the pop animation.
+      resetCapture();
     }
   }
 

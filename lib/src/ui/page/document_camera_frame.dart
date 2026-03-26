@@ -144,10 +144,7 @@ class DocumentCameraFrame extends StatefulWidget {
     this.imageQuality = 90,
     this.initialFlashMode = FlashMode.auto,
     this.uiMode = DocumentCameraUIMode.defaultMode,
-  }) : assert(
-         onDocumentSaved != null || onBothSidesSaved != null,
-         'Either onDocumentSaved or onBothSidesSaved must be provided',
-       );
+  });
 
   bool get _isCamScanner => uiMode == DocumentCameraUIMode.camScanner;
 
