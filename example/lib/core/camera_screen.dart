@@ -1,37 +1,34 @@
 import 'package:document_camera_frame/document_camera_frame.dart';
 import 'package:flutter/material.dart';
 import 'models.dart';
-import 'result_screen.dart';
 
+/// A thin wrapper that hosts [DocumentCameraFrame].
+///
+/// Navigation after save is handled by the package itself — it pops with
+/// [DocumentCaptureData] as the result. The caller (SelectionScreen) awaits
+/// Navigator.push and decides what screen comes next, keeping this widget
+/// free of any post-save routing logic.
 class CameraScreen extends StatelessWidget {
-  final DocTypeInfo docInfo;
-  final DocumentCameraUIMode uiMode;
-
   const CameraScreen({
     super.key,
     required this.docInfo,
     required this.uiMode,
   });
 
-  void _onSaved(BuildContext context, DocumentCaptureData data) {
-    Navigator.of(context).pop();
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => ResultScreen(documentData: data),
-      ),
-    );
-  }
+  final DocTypeInfo docInfo;
+  final DocumentCameraUIMode uiMode;
 
   @override
   Widget build(BuildContext context) {
-    // No logic here — the package handles everything based on uiMode:
-    // auto-capture, detection text, OCR, side indicator, instructions.
     return DocumentCameraFrame(
       frameWidth: docInfo.frameWidth,
       frameHeight: docInfo.frameHeight,
       uiMode: uiMode,
       requireBothSides: docInfo.isTwoSided,
-      onDocumentSaved: (data) => _onSaved(context, data),
+      // onDocumentSaved is optional here — the package pops with the result
+      // automatically. Add a callback only if you need a side effect
+      // (e.g. logging, analytics) before the screen closes.
+      onDocumentSaved: (_) {},
     );
   }
 }

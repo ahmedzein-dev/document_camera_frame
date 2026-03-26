@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/app_constants.dart';
+import '../../core/context_extensions.dart';
 import '../../core/document_camera_style.dart';
 import '../../core/enums.dart';
 
@@ -13,6 +15,7 @@ class CameraGuidanceOverlay extends StatelessWidget {
 
   /// Absolute `top` for the overlay `Positioned`.
   final double top;
+  final double frameHeight;
 
   final bool showDetectionStatusText;
 
@@ -22,6 +25,7 @@ class CameraGuidanceOverlay extends StatelessWidget {
     required this.detectionStatusNotifier,
     required this.instructionStyle,
     required this.top,
+    required this.frameHeight,
     this.showDetectionStatusText = true,
   });
 
@@ -34,25 +38,35 @@ class CameraGuidanceOverlay extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return Positioned(
-      top: top,
-      left: 0,
-      right: 0,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (showInstruction)
-            _InstructionBanner(
+    final bottomPosition =
+        (1.sh(context) -
+            frameHeight -
+            AppConstants.bottomFrameContainerHeight) /
+        2;
+
+    return Stack(
+      children: [
+        if (showInstruction)
+          Positioned(
+            top: top,
+            left: 0,
+            right: 0,
+            child: _InstructionBanner(
               currentSideNotifier: currentSideNotifier,
               instructionStyle: instructionStyle,
             ),
-          if (showStatus)
-            _DetectionStatusBanner(
+          ),
+        if (showStatus)
+          Positioned(
+            top: bottomPosition - 40,
+            left: 0,
+            right: 0,
+            child: _DetectionStatusBanner(
               detectionStatusNotifier: detectionStatusNotifier,
               instructionStyle: instructionStyle,
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 }
@@ -87,7 +101,7 @@ class _InstructionBanner extends StatelessWidget {
             instruction,
             style:
                 instructionStyle.instructionTextStyle ??
-                const TextStyle(color: Colors.white, fontSize: 11),
+                const TextStyle(color: Colors.white, fontSize: 13),
             textAlign: TextAlign.center,
           ),
         );
@@ -115,7 +129,7 @@ class _DetectionStatusBanner extends StatelessWidget {
         }
 
         return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+          margin: const EdgeInsets.symmetric(horizontal: 20),
           child: Text(
             status,
             style:

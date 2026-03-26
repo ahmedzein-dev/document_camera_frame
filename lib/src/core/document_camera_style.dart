@@ -32,14 +32,14 @@ class DocumentCameraFrameStyle {
   final double outerFrameBorderRadius;
 
   /// Border radius for the inner corners of the frame.
-  final double innerCornerBroderRadius;
+  final double innerCornerBorderRadius;
 
   /// Border for the displayed frame (optional).
   final BoxBorder? frameBorder;
 
   const DocumentCameraFrameStyle({
     this.outerFrameBorderRadius = 12,
-    this.innerCornerBroderRadius = 8,
+    this.innerCornerBorderRadius = 8,
     this.frameBorder,
   });
 }
@@ -144,14 +144,21 @@ class DocumentCameraButtonStyle {
 
 /// Title styling configuration for DocumentCameraFrame
 class DocumentCameraTitleStyle {
+  /// Whether to show the screen title. Defaults to `true`.
+  ///
+  /// Set to `false` to hide the title bar entirely in full UI mode.
+  final bool showScreenTitle;
+
   /// Widget to display as the screen's title (optional).
   final Widget? title;
 
-  /// Custom title for front side capture (optional).
-  final Widget? frontSideTitle;
+  /// Custom title for front side capture.
+  /// Defaults to a white "Front Side" label.
+  final Widget frontSideTitle;
 
-  /// Custom title for back side capture (optional).
-  final Widget? backSideTitle;
+  /// Custom title for back side capture.
+  /// Defaults to a white "Back Side" label.
+  final Widget backSideTitle;
 
   /// Alignment of the screen title (optional).
   final Alignment? screenTitleAlignment;
@@ -160,9 +167,24 @@ class DocumentCameraTitleStyle {
   final EdgeInsets? screenTitlePadding;
 
   const DocumentCameraTitleStyle({
+    this.showScreenTitle = true,
     this.title,
-    this.frontSideTitle,
-    this.backSideTitle,
+    this.frontSideTitle = const Text(
+      'Front Side',
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+    this.backSideTitle = const Text(
+      'Back Side',
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
     this.screenTitleAlignment,
     this.screenTitlePadding,
   });
@@ -202,7 +224,7 @@ class DocumentCameraSideIndicatorStyle {
   final TextStyle? sideIndicatorTextStyle;
 
   const DocumentCameraSideIndicatorStyle({
-    this.showSideIndicator = true,
+    this.showSideIndicator = false,
     this.topPosition,
     this.rightPosition,
     this.sideIndicatorBackgroundColor,
@@ -243,7 +265,7 @@ class DocumentCameraInstructionStyle {
   final TextStyle? instructionTextStyle;
 
   const DocumentCameraInstructionStyle({
-    this.showInstructionText = true,
+    this.showInstructionText = false,
     this.frontSideInstruction,
     this.backSideInstruction,
     this.instructionTextStyle,

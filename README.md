@@ -45,9 +45,9 @@ Here's a quick preview of `DocumentCameraFrame` in action:
 
 ### 🔎 Precision Computer Vision
 - 🎯 **ML Kit Edge Detection** — Sub-millisecond boundary detection for precise document isolation
-- � **Perspective Correction** — Automatically transforms skewed or angled captures into flat, top-down professional documents
+- 🖼️ **Perspective Correction** — Automatically transforms skewed or angled captures into flat, top-down professional documents
 - 🖼️ **Frame-to-Sensor Mapping** — Ensures high-resolution sensor output matches the UI overlay perfectly, preventing "cutoff" edges
-- �📢 **Live Guidance Engine** — Real-time alignment feedback (e.g., "Move closer", "Move right", "Centering...")
+- 📢 **Live Guidance Engine** — Real-time alignment feedback (e.g., "Move closer", "Move right", "Centering...")
 - 🎨 **Multi-Object Filtering** — Smart logic to ignore background clutter and focus solely on the primary document
 
 ### 🧠 On-Device Intelligence & OCR
@@ -58,7 +58,7 @@ Here's a quick preview of `DocumentCameraFrame` in action:
 ### 📄 Export & Output Formats
 - 📄 **Multiple Export Formats** — JPG (default), PNG, PDF, and TIFF with configurable quality
 - 📑 **PDF Generation** — Multi-page PDFs with A4 or Letter page sizes
-- �️ **Quality Control** — Adjustable compression for optimal file size vs. quality balance
+- 🗜️ **Quality Control** — Adjustable compression for optimal file size vs. quality balance
 
 ### 🎨 Customization & UI
 - 🎛️ **Fully Decoupled UI** — The detection engine is separated from the UI, allowing you to build completely custom overlays
@@ -111,23 +111,34 @@ flutter pub add document_camera_frame
 
 ### Minimal Example
 
+The package follows the Flutter-standard `await Navigator.push(...)` pattern — identical to
+`showDatePicker`, `ImagePicker`, and other Flutter APIs. Push the camera, await the result,
+then navigate forward. No `Navigator` calls needed inside `onDocumentSaved`.
+
 ```dart
 import 'package:document_camera_frame/document_camera_frame.dart';
 import 'package:flutter/material.dart';
 
-class QuickExample extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return DocumentCameraFrame(
-      frameWidth: 320,
-      frameHeight: 200,
-      requireBothSides: false,
-      enableAutoCapture: true,
-      onDocumentSaved: (documentData) {
-        print('Document saved: ${documentData.frontImagePath}');
-        Navigator.pop(context);
-      },
-    );
+Future<void> launchCamera(BuildContext context) async {
+  final DocumentCaptureData? result = await Navigator.push<DocumentCaptureData>(
+    context,
+    MaterialPageRoute(
+      builder: (_) => DocumentCameraFrame(
+        frameWidth: 320,
+        frameHeight: 200,
+        requireBothSides: true,
+        // The package pops itself with the result automatically.
+        // onDocumentSaved is optional — use it only for side effects
+        // like analytics or intermediate processing.
+        onDocumentSaved: (_) {},
+      ),
+    ),
+  );
+
+  if (result != null && context.mounted) {
+    // Navigate to your result screen — or do anything else with the data.
+    print('Front image: ${result.frontImagePath}');
+    print('Back image:  ${result.backImagePath}');
   }
 }
 ```
@@ -152,7 +163,7 @@ DocumentCameraFrame(
   enableAutoCapture: true,
   onFrontCaptured: (imagePath) => print('Front: $imagePath'),
   onBackCaptured: (imagePath) => print('Back: $imagePath'),
-  onDocumentSaved: (data) => handleDocument(data),
+  onDocumentSaved: (_) {},
 )
 ```
 
@@ -171,9 +182,10 @@ DocumentCameraFrame(
   ),
   enableAutoCapture: false, // Manual capture only
   instructionStyle: DocumentCameraInstructionStyle(
+    showInstructionText: true,
     frontSideInstruction: "Position passport within the frame",
   ),
-  onDocumentSaved: (data) => handlePassport(data),
+  onDocumentSaved: (_) {},
 )
 ```
 
@@ -196,7 +208,7 @@ DocumentCameraFrame(
   frameStyle: DocumentCameraFrameStyle(
     outerFrameBorderRadius: 16.0,
   ),
-  onDocumentSaved: (data) => processIdCard(data),
+  onDocumentSaved: (_) {},
 )
 ```
 
@@ -209,28 +221,24 @@ Easily switch between different UI layouts using the `uiMode` parameter:
 DocumentCameraFrame(
   uiMode: DocumentCameraUIMode.kiosk,
   enableAutoCapture: true,
-  onDocumentSaved: (data) => print('Saved!'),
+  onDocumentSaved: (_) {},
 )
 
 // Minimal Mode (Clean view, only corners and buttons)
 DocumentCameraFrame(
   uiMode: DocumentCameraUIMode.minimal,
-  onDocumentSaved: (data) => print('Saved!'),
+  onDocumentSaved: (_) {},
 )
 
 // Native CamScanner Mode (Delegates to the OS's native document scanner)
 DocumentCameraFrame(
   uiMode: DocumentCameraUIMode.camScanner,
-  requireBothSides: true, // Can guide user to scan front then back separately
-  onDocumentSaved: (data) {
-    print('Front path: ${data.frontImagePath}');
-    print('Back path: ${data.backImagePath}');
-  },
+  requireBothSides: true, // Guides user to scan front then back separately
+  onDocumentSaved: (_) {},
 )
-
-> **Note:** In `camScanner` mode, all custom frame and styling properties (borders, colors, buttons) are ignored as the platform's native scanner UI takes over.
 ```
 
+> **Note:** In `camScanner` mode, all custom frame and styling properties (borders, colors, buttons) are ignored as the platform's native scanner UI takes over.
 
 ---
 
@@ -254,7 +262,7 @@ Choose the output format for your captured documents. The package supports **4 f
 DocumentCameraFrame(
   frameWidth: 320,
   frameHeight: 200,
-  onDocumentSaved: (data) => print(data.frontImagePath), // .jpg file
+  onDocumentSaved: (_) {},
 )
 
 // PNG format
@@ -262,10 +270,8 @@ DocumentCameraFrame(
   frameWidth: 320,
   frameHeight: 200,
   outputFormat: DocumentOutputFormat.png,
-  onDocumentSaved: (data) => print(data.frontImagePath), // .png file
+  onDocumentSaved: (_) {},
 )
-
-
 ```
 
 ### PDF Generation
@@ -279,11 +285,7 @@ DocumentCameraFrame(
   outputFormat: DocumentOutputFormat.pdf,
   pdfPageSize: PdfPageSize.a4, // or PdfPageSize.letter
   requireBothSides: true, // Creates 2-page PDF
-  onDocumentSaved: (data) {
-    print('Front image: ${data.frontImagePath}'); // Individual .jpg images
-    print('Back image: ${data.backImagePath}');
-    print('PDF document: ${data.pdfPath}'); // Generated .pdf file
-  },
+  onDocumentSaved: (_) {},
 )
 ```
 
@@ -340,17 +342,7 @@ DocumentCameraFrame(
     frontSideTitle: Text('Scan Front', style: TextStyle(color: Colors.white)),
     backSideTitle: Text('Scan Back', style: TextStyle(color: Colors.white)),
   ),
-  onDocumentSaved: (data) {
-    if (data.hasPdf) {
-      // PDF was generated
-      sharePdf(data.pdfPath!);
-    }
-    // Individual images are also available
-    print('Front: ${data.frontImagePath}');
-    print('Back: ${data.backImagePath}');
-    // OCR text if enabled
-    print('Front text: ${data.frontOcrText}');
-  },
+  onDocumentSaved: (_) {},
 )
 ```
 
@@ -369,23 +361,23 @@ Extract text from captured documents using on-device OCR. No API key or internet
 Set `enableExtractText: true` to run on-device text recognition after capture:
 
 ```dart
-DocumentCameraFrame(
-  frameWidth: 320,
-  frameHeight: 200,
-  enableExtractText: true,
-  onDocumentSaved: (data) {
-    print('Front text: ${data.frontOcrText}');
-    print('Back text: ${data.backOcrText}');
-  },
-)
+final result = await Navigator.push<DocumentCaptureData>(
+  context,
+  MaterialPageRoute(
+    builder: (_) => DocumentCameraFrame(
+      frameWidth: 320,
+      frameHeight: 200,
+      enableExtractText: true,
+      onDocumentSaved: (_) {},
+    ),
+  ),
+);
+
+if (result != null) {
+  print('Front text: ${result.frontOcrText}');
+  print('Back text:  ${result.backOcrText}');
+}
 ```
-
-### OCR Data Fields
-
-The `onDocumentSaved` callback receives `DocumentCaptureData` with:
-
-- **`frontImagePath`** / **`backImagePath`** — Image file paths
-- **`frontOcrText`** / **`backOcrText`** — Extracted text (when `enableExtractText` is true)
 
 ### Custom OCR
 
@@ -538,6 +530,11 @@ are the possible error codes:
 
 *At least one of `onDocumentSaved` or `onBothSidesSaved` must be provided. Prefer `onDocumentSaved`.
 
+> **Navigation note:** `onDocumentSaved` is an optional side-channel for analytics or intermediate
+> processing. The package pops itself with the result automatically — use
+> `await Navigator.push<DocumentCaptureData>(...)` to receive the data, identical to
+> `showDatePicker` or `ImagePicker`.
+
 ## Styling Classes Details
 
 ### DocumentCameraAnimationStyle
@@ -555,8 +552,11 @@ are the possible error codes:
 | Property                       | Type         | Description                                           | Default Value                    |
 |--------------------------------|--------------|-------------------------------------------------------|----------------------------------|
 | `outerFrameBorderRadius`       | `double`     | Radius of the outer border of the frame.              | `12.0`                           |
-| `innerCornerBroderRadius`      | `double`     | Radius of the inner corners of the frame.             | `8.0`                            |
+| `innerCornerBorderRadius`      | `double`     | Radius of the inner corners of the frame.             | `8.0`                            |
 | `frameBorder`                  | `BoxBorder?` | Border for the displayed frame (optional).            | `null`                           |
+
+> **⚠️ Breaking change (v2.5.7):** `innerCornerBorderRadius` was previously misnamed
+> `innerCornerBroderRadius`. Update any references in your code if upgrading from v2.5.6 or earlier.
 
 ### DocumentCameraButtonStyle
 
@@ -588,27 +588,28 @@ are the possible error codes:
 
 ### DocumentCameraTitleStyle
 
-| Property                       | Type          | Description                                           | Default Value                    |
-|--------------------------------|---------------|-------------------------------------------------------|----------------------------------|
-| `title`                        | `Widget?`     | Widget to display as the screen's title (optional).   | `null`                           |
-| `frontSideTitle`               | `Widget?`     | Custom title for front side capture.                  | `null`                           |
-| `backSideTitle`                | `Widget?`     | Custom title for back side capture.                   | `null`                           |
-| `screenTitleAlignment`         | `Alignment?`  | Alignment of the screen title (optional).             | `null`                           |
-| `screenTitlePadding`           | `EdgeInsets?` | Padding for the screen title (optional).              | `null`                           |
+| Property               | Type          | Description                                                                 | Default Value          |
+|------------------------|---------------|-----------------------------------------------------------------------------|------------------------|
+| `showScreenTitle`      | `bool`        | Show or hide the screen title area at the top of the frame.                 | `true`                 |
+| `title`                | `Widget?`     | Widget to display as the screen's title (optional).                         | `null`                 |
+| `frontSideTitle`       | `Widget?`     | Title for the front side. Defaults to white `"Front Side"` text.            | White "Front Side"     |
+| `backSideTitle`        | `Widget?`     | Title for the back side. Defaults to white `"Back Side"` text.              | White "Back Side"      |
+| `screenTitleAlignment` | `Alignment?`  | Alignment of the screen title (optional).                                   | `null`                 |
+| `screenTitlePadding`   | `EdgeInsets?` | Padding for the screen title (optional).                                    | `null`                 |
 
 ### DocumentCameraSideIndicatorStyle
 
-| Property                       | Type         | Description                                           | Default Value                    |
-|--------------------------------|--------------|-------------------------------------------------------|----------------------------------|
-| `showSideIndicator`            | `bool`       | Show the side indicator (optional).                   | `true`                           |
-| `topPosition`                  | `double?`    | Side indicator position from the top (optional).      | `null`                           |
-| `rightPosition`                | `double?`    | Side indicator position from the right (optional).    | `null`                           |
-| `sideIndicatorBackgroundColor` | `Color?`     | Background color for side indicator.                  | `null`                           |
-| `sideIndicatorBorderColor`     | `Color?`     | Border color for side indicator.                      | `null`                           |
-| `sideIndicatorActiveColor`     | `Color?`     | Active color for side indicator.                      | `null`                           |
-| `sideIndicatorInactiveColor`   | `Color?`     | Inactive color for side indicator.                    | `null`                           |
-| `sideIndicatorCompletedColor`  | `Color?`     | Completed color for side indicator.                   | `null`                           |
-| `sideIndicatorTextStyle`       | `TextStyle?` | Text style for side indicator text.                   | `null`                           |
+| Property                       | Type         | Description                                                    | Default Value |
+|--------------------------------|--------------|----------------------------------------------------------------|---------------|
+| `showSideIndicator`            | `bool`       | Show the side indicator. Set `true` to enable.                 | `false`       |
+| `topPosition`                  | `double?`    | Side indicator position from the top (optional).               | `null`        |
+| `rightPosition`                | `double?`    | Side indicator position from the right (optional).             | `null`        |
+| `sideIndicatorBackgroundColor` | `Color?`     | Background color for side indicator.                           | `null`        |
+| `sideIndicatorBorderColor`     | `Color?`     | Border color for side indicator.                               | `null`        |
+| `sideIndicatorActiveColor`     | `Color?`     | Active color for side indicator.                               | `null`        |
+| `sideIndicatorInactiveColor`   | `Color?`     | Inactive color for side indicator.                             | `null`        |
+| `sideIndicatorCompletedColor`  | `Color?`     | Completed color for side indicator.                            | `null`        |
+| `sideIndicatorTextStyle`       | `TextStyle?` | Text style for side indicator text.                            | `null`        |
 
 ### DocumentCameraProgressStyle
 
@@ -619,12 +620,12 @@ are the possible error codes:
 
 ### DocumentCameraInstructionStyle
 
-| Property                       | Type         | Description                                           | Default Value                    |
-|--------------------------------|--------------|-------------------------------------------------------|----------------------------------|
-| `showInstructionText`          | `bool`       | Show the (static) top instruction text.               | `true`                           |
-| `frontSideInstruction`         | `String?`    | Instruction text for front side capture.              | `null`                           |
-| `backSideInstruction`          | `String?`    | Instruction text for back side capture.               | `null`                           |
-| `instructionTextStyle`         | `TextStyle?` | Text style for instruction text (optional).           | `null`                           |
+| Property              | Type         | Description                                                      | Default Value |
+|-----------------------|--------------|------------------------------------------------------------------|---------------|
+| `showInstructionText` | `bool`       | Show the (static) top instruction banner. Hidden by default.     | `false`       |
+| `frontSideInstruction`| `String?`    | Instruction text for front side capture.                         | `null`        |
+| `backSideInstruction` | `String?`    | Instruction text for back side capture.                          | `null`        |
+| `instructionTextStyle`| `TextStyle?` | Text style for instruction text (optional).                      | `null`        |
 
 ---
 

@@ -15,7 +15,7 @@ class DocumentCameraPreviewLayer extends StatelessWidget {
   final double borderRadius;
 
   /// Border radius for the inner corners of the frame.
-  final double innerCornerBroderRadius;
+  final double innerCornerBorderRadius;
 
   /// Duration for the capturing animation (optional).
   final Duration? capturingAnimationDuration;
@@ -33,7 +33,7 @@ class DocumentCameraPreviewLayer extends StatelessWidget {
     super.key,
     required this.logic,
     required this.borderRadius,
-    required this.innerCornerBroderRadius,
+    required this.innerCornerBorderRadius,
     this.capturingAnimationDuration,
     this.capturingAnimationColor,
     this.capturingAnimationCurve,
@@ -60,7 +60,7 @@ class DocumentCameraPreviewLayer extends StatelessWidget {
               frameWidth: logic.updatedFrameWidth,
               frameHeight: logic.updatedFrameHeight,
               borderRadius: borderRadius,
-              innerCornerBroderRadius: innerCornerBroderRadius,
+              innerCornerBorderRadius: innerCornerBorderRadius,
               uiMode: uiMode,
             ),
 

@@ -7,7 +7,7 @@ class CornerBox extends StatelessWidget {
   final bool bottomRight;
   final double flipProgress;
   final bool isDocumentAligned;
-  final double innerCornerBroderRadius;
+  final double innerCornerBorderRadius;
 
   const CornerBox({
     super.key,
@@ -17,7 +17,7 @@ class CornerBox extends StatelessWidget {
     this.bottomRight = false,
     required this.flipProgress,
     required this.isDocumentAligned,
-    required this.innerCornerBroderRadius,
+    required this.innerCornerBorderRadius,
   });
 
   @override
@@ -57,16 +57,16 @@ class CornerBox extends StatelessWidget {
         ),
         borderRadius: BorderRadius.only(
           topLeft: topLeft
-              ? Radius.circular(innerCornerBroderRadius)
+              ? Radius.circular(innerCornerBorderRadius)
               : Radius.zero,
           topRight: topRight
-              ? Radius.circular(innerCornerBroderRadius)
+              ? Radius.circular(innerCornerBorderRadius)
               : Radius.zero,
           bottomLeft: bottomLeft
-              ? Radius.circular(innerCornerBroderRadius)
+              ? Radius.circular(innerCornerBorderRadius)
               : Radius.zero,
           bottomRight: bottomRight
-              ? Radius.circular(innerCornerBroderRadius)
+              ? Radius.circular(innerCornerBorderRadius)
               : Radius.zero,
         ),
       ),

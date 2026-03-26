@@ -79,15 +79,16 @@ class QuickStartScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (_) => const ExportFormatScreen()),
+                        builder: (_) => const ExportFormatScreen(),
+                      ),
                     );
                   },
                   icon: const Icon(Icons.picture_as_pdf_rounded),
-                  label:
-                      const Text('Test Export Formats (JPG, PNG, PDF, TIFF)'),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.all(8),
+                  label: const Text(
+                    'Test Export Formats (JPG, PNG, PDF, TIFF)',
                   ),
+                  style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.all(8)),
                 ),
               ),
 
@@ -106,10 +107,10 @@ class QuickStartScreen extends StatelessWidget {
                   },
                   icon: const Icon(Icons.settings_input_component),
                   label: const Text(
-                      'Advanced Modes (Minimal, Kiosk, Overlay, Text Extract, Cam Scanner)'),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.all(8),
+                    'Advanced Modes (Minimal, Kiosk, Overlay, Text Extract, Cam Scanner)',
                   ),
+                  style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.all(8)),
                 ),
               ),
             ],
@@ -119,33 +120,43 @@ class QuickStartScreen extends StatelessWidget {
     );
   }
 
-  void _launchSimpleCamera(BuildContext context) {
-    // -------------------------------------------------------------------------
-    // QUICK START EXAMPLE:
-    // Just pass the frame dimensions and a save callback.
-    // -------------------------------------------------------------------------
-    Navigator.push(
+  // ---------------------------------------------------------------------------
+  // QUICK START — the Flutter-standard await pattern.
+  //
+  // This is identical to how Flutter's own APIs work:
+  //   final date = await showDatePicker(...);
+  //   final file = await ImagePicker().pickImage(...);
+  //
+  // The package pops itself with the result; the caller decides what's next.
+  // No Navigator calls inside onDocumentSaved — the package handles that.
+  // ---------------------------------------------------------------------------
+  Future<void> _launchSimpleCamera(BuildContext context) async {
+    final DocumentCaptureData? result =
+        await Navigator.push<DocumentCaptureData>(
       context,
       MaterialPageRoute(
-        builder: (ctx) => DocumentCameraFrame(
-          // 1. Set the visual frame size (e.g. standard ID card ratio)
+        builder: (_) => DocumentCameraFrame(
+          // 1. Set the visual frame size (e.g. standard ID card ratio).
           frameWidth: 320,
           frameHeight: 200,
 
-          // 2. Decide if you need front+back or just front
+          // 2. Decide if you need front + back or just front.
           requireBothSides: true,
 
-          // 3. Handle the result
-          onDocumentSaved: (data) {
-            Navigator.pop(ctx);
-            Navigator.push(
-              ctx,
-              MaterialPageRoute(
-                  builder: (_) => ResultScreen(documentData: data)),
-            );
-          },
+          // 3. onDocumentSaved is optional — use it for side effects like
+          //    analytics or intermediate processing. Navigation is already
+          //    handled: the package pops with the result automatically.
+          onDocumentSaved: (_) {},
         ),
       ),
     );
+
+    // 4. The result arrives here once the camera screen closes.
+    if (result != null && context.mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => ResultScreen(documentData: result)),
+      );
+    }
   }
 }

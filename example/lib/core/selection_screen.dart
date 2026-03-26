@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'models.dart';
 import 'widgets.dart';
 import 'camera_screen.dart';
+import 'result_screen.dart';
 
 class SelectionScreen extends StatefulWidget {
   const SelectionScreen({super.key});
@@ -19,7 +20,7 @@ class _SelectionScreenState extends State<SelectionScreen> {
     DocTypeInfo(
       type: DocumentType.idCard,
       label: 'ID Card',
-      subtitle: 'National ID / Driver\'s licence',
+      subtitle: "National ID / Driver's licence",
       icon: Icons.credit_card_rounded,
       frameWidth: 320,
       frameHeight: 200,
@@ -36,7 +37,7 @@ class _SelectionScreenState extends State<SelectionScreen> {
     ),
     DocTypeInfo(
       type: DocumentType.driverLicense,
-      label: 'Driver\'s Licence',
+      label: "Driver's Licence",
       subtitle: 'Full licence — front & back',
       icon: Icons.drive_eta_rounded,
       frameWidth: 320,
@@ -89,16 +90,29 @@ class _SelectionScreenState extends State<SelectionScreen> {
   DocTypeInfo get _currentDoc =>
       _docTypes.firstWhere((d) => d.type == _selectedDocType);
 
-  void _launch() {
-    Navigator.push(
+  // ---------------------------------------------------------------------------
+  // Flutter-standard await pattern — push the camera, wait for it to pop
+  // with the result, then navigate forward. Identical to showDatePicker /
+  // ImagePicker / showModalBottomSheet — no surprises for any Flutter dev.
+  // ---------------------------------------------------------------------------
+  Future<void> _launch() async {
+    final DocumentCaptureData? result =
+        await Navigator.push<DocumentCaptureData>(
       context,
-      MaterialPageRoute<void>(
-        builder: (ctx) => CameraScreen(
+      MaterialPageRoute<DocumentCaptureData>(
+        builder: (_) => CameraScreen(
           docInfo: _currentDoc,
           uiMode: _selectedUiMode,
         ),
       ),
     );
+
+    if (result != null && mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => ResultScreen(documentData: result)),
+      );
+    }
   }
 
   @override

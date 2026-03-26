@@ -55,7 +55,7 @@ class DocumentCameraLogic {
   // State notifiers
   final ValueNotifier<bool> isInitializedNotifier = ValueNotifier(false);
   final ValueNotifier<bool> isLoadingNotifier = ValueNotifier(false);
-  final ValueNotifier<String> capturedImageNotifier = ValueNotifier("");
+  final ValueNotifier<String> capturedImageNotifier = ValueNotifier('');
   final ValueNotifier<DocumentSide> currentSideNotifier = ValueNotifier(
     DocumentSide.front,
   );
@@ -320,6 +320,8 @@ class DocumentCameraLogic {
     if (!requireBothSides ||
         data.isCompleteFor(requireBothSides: requireBothSides)) {
       DocumentCaptureData resultData = data;
+
+      // ── OCR ────────────────────────────────────────────────────────────────
       if (enableExtractText) {
         isLoadingNotifier.value = true;
         try {
@@ -347,7 +349,7 @@ class DocumentCameraLogic {
         }
       }
 
-      // Generate PDF if output format is PDF
+      // ── PDF generation ─────────────────────────────────────────────────────
       if (outputFormat == DocumentOutputFormat.pdf) {
         isLoadingNotifier.value = true;
         try {
@@ -363,38 +365,18 @@ class DocumentCameraLogic {
               imageQuality: imageQuality,
             );
 
-            // Delete temporary image files after PDF generation
+            // Clean up temporary image files after PDF generation.
             try {
-              final frontFile = File(frontPath);
-              if (await frontFile.exists()) {
-                await frontFile.delete();
-              }
-              final frontPreview = resultData.frontPreviewPath;
-              if (frontPreview != null && frontPreview.isNotEmpty) {
-                final fPreviewFile = File(frontPreview);
-                if (await fPreviewFile.exists()) {
-                  await fPreviewFile.delete();
-                }
-              }
-
+              await _deleteIfExists(frontPath);
+              await _deleteIfExists(resultData.frontPreviewPath);
               if (backPath != null && backPath.isNotEmpty) {
-                final backFile = File(backPath);
-                if (await backFile.exists()) {
-                  await backFile.delete();
-                }
-                final backPreview = resultData.backPreviewPath;
-                if (backPreview != null && backPreview.isNotEmpty) {
-                  final bPreviewFile = File(backPreview);
-                  if (await bPreviewFile.exists()) {
-                    await bPreviewFile.delete();
-                  }
-                }
+                await _deleteIfExists(backPath);
+                await _deleteIfExists(resultData.backPreviewPath);
               }
             } catch (e) {
               debugPrint('Failed to delete temporary image files: $e');
             }
 
-            // For PDF format, only set pdfPath, clear image paths
             resultData = DocumentCaptureData(
               pdfPath: pdfPath,
               frontOcrText: resultData.frontOcrText,
@@ -408,9 +390,24 @@ class DocumentCameraLogic {
         }
       }
 
+      // ── Notify caller, then close ──────────────────────────────────────────
+      // onDocumentSaved is an optional side-channel (e.g. for intermediate
+      // processing). Navigation is handled by popping with the result so
+      // callers can use the standard Flutter `await Navigator.push(...)` pattern,
+      // identical to showDatePicker / ImagePicker / showModalBottomSheet.
       onDocumentSaved?.call(resultData);
       resetCapture();
+
+      if (context.mounted) {
+        Navigator.of(context).pop(resultData);
+      }
     }
+  }
+
+  Future<void> _deleteIfExists(String? path) async {
+    if (path == null || path.isEmpty) return;
+    final file = File(path);
+    if (await file.exists()) await file.delete();
   }
 
   void handleRetake() {
@@ -418,9 +415,9 @@ class DocumentCameraLogic {
     final currentData = documentDataNotifier.value;
 
     if (currentSide == DocumentSide.front) {
-      documentDataNotifier.value = currentData.copyWith(frontImagePath: "");
+      documentDataNotifier.value = currentData.copyWith(frontImagePath: '');
     } else {
-      documentDataNotifier.value = currentData.copyWith(backImagePath: "");
+      documentDataNotifier.value = currentData.copyWith(backImagePath: '');
     }
 
     controller.retakeImage();

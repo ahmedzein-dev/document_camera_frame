@@ -3,17 +3,15 @@ import 'package:document_camera_frame/document_camera_frame.dart';
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 
-/// Example screen demonstrating different export formats with verification and preview
+/// Example screen demonstrating different export formats with verification and preview.
 class ExportFormatScreen extends StatelessWidget {
   const ExportFormatScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Export Format Demo'),
-        centerTitle: true,
-      ),
+      appBar:
+          AppBar(title: const Text('Export Format Demo'), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -80,16 +78,24 @@ class ExportFormatScreen extends StatelessWidget {
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text(subtitle),
         trailing: const Icon(Icons.arrow_forward_ios),
-        onTap: () => _navigateToCamera(context, format),
+        onTap: () => _launchCamera(context, format),
       ),
     );
   }
 
-  void _navigateToCamera(BuildContext context, DocumentOutputFormat format) {
-    Navigator.push(
+  // ---------------------------------------------------------------------------
+  // Flutter-standard await pattern — push the camera, wait for the result,
+  // then navigate to the preview. No Navigator calls inside onDocumentSaved.
+  // ---------------------------------------------------------------------------
+  Future<void> _launchCamera(
+    BuildContext context,
+    DocumentOutputFormat format,
+  ) async {
+    final DocumentCaptureData? result =
+        await Navigator.push<DocumentCaptureData>(
       context,
       MaterialPageRoute(
-        builder: (context) => DocumentCameraFrame(
+        builder: (_) => DocumentCameraFrame(
           frameWidth: 320,
           frameHeight: 200,
           outputFormat: format,
@@ -109,41 +115,33 @@ class ExportFormatScreen extends StatelessWidget {
           requireBothSides: true,
           enableAutoCapture: true,
           enableExtractText: true,
-          onDocumentSaved: (documentData) {
-            Navigator.of(context).pop();
-            _navigateToPreview(context, documentData, format);
-          },
+          onDocumentSaved: (_) {},
         ),
       ),
     );
-  }
 
-  void _navigateToPreview(
-    BuildContext context,
-    DocumentCaptureData data,
-    DocumentOutputFormat format,
-  ) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => DocumentPreviewScreen(
-          data: data,
-          format: format,
+    if (result != null && context.mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => DocumentPreviewScreen(data: result, format: format),
         ),
-      ),
-    );
+      );
+    }
   }
 }
 
-class DocumentPreviewScreen extends StatelessWidget {
-  final DocumentCaptureData data;
-  final DocumentOutputFormat format;
+// =============================================================================
 
+class DocumentPreviewScreen extends StatelessWidget {
   const DocumentPreviewScreen({
     super.key,
     required this.data,
     required this.format,
   });
+
+  final DocumentCaptureData data;
+  final DocumentOutputFormat format;
 
   @override
   Widget build(BuildContext context) {
@@ -179,7 +177,7 @@ class DocumentPreviewScreen extends StatelessWidget {
               const SizedBox(height: 24),
               _buildFileInfo(),
               const SizedBox(height: 24),
-              _buildExtractedText(data),
+              _buildExtractedText(),
             ],
           ),
         ),
@@ -187,26 +185,28 @@ class DocumentPreviewScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildExtractedText(DocumentCaptureData documentData) {
+  // ── Extracted text ──────────────────────────────────────────────────────────
+
+  Widget _buildExtractedText() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (documentData.hasFrontText) ...[
+        if (data.hasFrontText) ...[
           const Text(
             'Front side',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           const SizedBox(height: 8),
-          _buildTextBlock(documentData.frontOcrText!),
+          _buildTextBlock(data.frontOcrText!),
           const SizedBox(height: 24),
         ],
-        if (documentData.hasBackText) ...[
+        if (data.hasBackText) ...[
           const Text(
             'Back side',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           const SizedBox(height: 8),
-          _buildTextBlock(documentData.backOcrText!),
+          _buildTextBlock(data.backOcrText!),
         ],
       ],
     );
@@ -226,22 +226,21 @@ class DocumentPreviewScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFormatVerification() {
-    final expectedExtension = _getExpectedExtension();
-    final frontExtension = data.frontImagePath?.split('.').last ?? '';
-    final backExtension = data.backImagePath?.split('.').last ?? '';
-    final pdfExtension = data.pdfPath?.split('.').last ?? '';
+  // ── Format verification ─────────────────────────────────────────────────────
 
-    bool isFormatCorrect = false;
-    if (format == DocumentOutputFormat.pdf) {
-      isFormatCorrect = pdfExtension == 'pdf';
-    } else {
-      isFormatCorrect = frontExtension == expectedExtension &&
-          (data.backImagePath == null || backExtension == expectedExtension);
-    }
+  Widget _buildFormatVerification() {
+    final expected = _expectedExtension();
+    final frontExt = data.frontImagePath?.split('.').last ?? '';
+    final backExt = data.backImagePath?.split('.').last ?? '';
+    final pdfExt = data.pdfPath?.split('.').last ?? '';
+
+    final bool ok = format == DocumentOutputFormat.pdf
+        ? pdfExt == 'pdf'
+        : frontExt == expected &&
+            (data.backImagePath == null || backExt == expected);
 
     return Card(
-      color: isFormatCorrect ? Colors.green.shade50 : Colors.red.shade50,
+      color: ok ? Colors.green.shade50 : Colors.red.shade50,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -250,8 +249,8 @@ class DocumentPreviewScreen extends StatelessWidget {
             Row(
               children: [
                 Icon(
-                  isFormatCorrect ? Icons.check_circle : Icons.error,
-                  color: isFormatCorrect ? Colors.green : Colors.red,
+                  ok ? Icons.check_circle : Icons.error,
+                  color: ok ? Colors.green : Colors.red,
                   size: 28,
                 ),
                 const SizedBox(width: 12),
@@ -260,32 +259,26 @@ class DocumentPreviewScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: isFormatCorrect
-                        ? Colors.green.shade900
-                        : Colors.red.shade900,
+                    color: ok ? Colors.green.shade900 : Colors.red.shade900,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            _buildVerificationRow(
-                'Expected Format', expectedExtension.toUpperCase()),
+            _buildVerificationRow('Expected Format', expected.toUpperCase()),
             if (data.hasFrontSide)
-              _buildVerificationRow('Front Image', '.$frontExtension'),
+              _buildVerificationRow('Front Image', '.$frontExt'),
             if (data.hasBackSide)
-              _buildVerificationRow('Back Image', '.$backExtension'),
-            if (data.hasPdf)
-              _buildVerificationRow('PDF Document', '.$pdfExtension'),
+              _buildVerificationRow('Back Image', '.$backExt'),
+            if (data.hasPdf) _buildVerificationRow('PDF Document', '.$pdfExt'),
             const SizedBox(height: 8),
             Text(
-              isFormatCorrect
+              ok
                   ? '✓ All files exported in correct format!'
                   : '✗ Format mismatch detected',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: isFormatCorrect
-                    ? Colors.green.shade700
-                    : Colors.red.shade700,
+                color: ok ? Colors.green.shade700 : Colors.red.shade700,
               ),
             ),
           ],
@@ -299,18 +292,14 @@ class DocumentPreviewScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Text(
-            '$label: ',
-            style: const TextStyle(fontWeight: FontWeight.w500),
-          ),
-          Text(
-            value,
-            style: const TextStyle(fontFamily: 'monospace'),
-          ),
+          Text('$label: ', style: const TextStyle(fontWeight: FontWeight.w500)),
+          Text(value, style: const TextStyle(fontFamily: 'monospace')),
         ],
       ),
     );
   }
+
+  // ── File info ───────────────────────────────────────────────────────────────
 
   Widget _buildFileInfo() {
     return Card(
@@ -343,8 +332,7 @@ class DocumentPreviewScreen extends StatelessWidget {
   Widget _buildFileDetails(String label, String path) {
     final file = File(path);
     final exists = file.existsSync();
-    final size = exists ? file.lengthSync() : 0;
-    final sizeKB = (size / 1024).toStringAsFixed(2);
+    final sizeKB = exists ? (file.lengthSync() / 1024).toStringAsFixed(2) : '0';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -369,24 +357,20 @@ class DocumentPreviewScreen extends StatelessWidget {
         children: [
           SizedBox(
             width: 80,
-            child: Text(
-              '$label:',
-              style: const TextStyle(color: Colors.grey),
-            ),
+            child: Text('$label:', style: const TextStyle(color: Colors.grey)),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
-                fontFamily: 'monospace',
-                fontSize: 12,
-              ),
+              style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
             ),
           ),
         ],
       ),
     );
   }
+
+  // ── Image preview ───────────────────────────────────────────────────────────
 
   Widget _buildImagePreview(String title, String path) {
     final file = File(path);
@@ -407,35 +391,7 @@ class DocumentPreviewScreen extends StatelessWidget {
               file,
               width: double.infinity,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  height: 200,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey.shade400),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.broken_image,
-                          size: 48, color: Colors.grey),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Preview not available',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Format may not be supported by device viewer',
-                        style: TextStyle(
-                            color: Colors.grey.shade600, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                );
-              },
+              errorBuilder: (_, __, ___) => _previewUnavailable(),
             ),
           )
         else
@@ -445,19 +401,46 @@ class DocumentPreviewScreen extends StatelessWidget {
               color: Colors.grey.shade200,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Center(
-              child: Text('Image not found'),
-            ),
+            child: const Center(child: Text('Image not found')),
           ),
       ],
     );
   }
 
+  Widget _previewUnavailable() {
+    return Container(
+      height: 200,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade400),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.broken_image, size: 48, color: Colors.grey),
+          const SizedBox(height: 12),
+          const Text(
+            'Preview not available',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Format may not be supported by device viewer',
+            style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── PDF info ────────────────────────────────────────────────────────────────
+
   Widget _buildPdfInfo(BuildContext context) {
     final file = File(data.pdfPath!);
     final exists = file.existsSync();
-    final size = exists ? file.lengthSync() : 0;
-    final sizeKB = (size / 1024).toStringAsFixed(2);
+    final sizeKB = exists ? (file.lengthSync() / 1024).toStringAsFixed(2) : '0';
 
     return Card(
       color: Colors.blue.shade50,
@@ -521,7 +504,9 @@ class DocumentPreviewScreen extends StatelessWidget {
     );
   }
 
-  String _getExpectedExtension() {
+  // ── Helpers ─────────────────────────────────────────────────────────────────
+
+  String _expectedExtension() {
     switch (format) {
       case DocumentOutputFormat.jpg:
         return 'jpg';
@@ -529,7 +514,6 @@ class DocumentPreviewScreen extends StatelessWidget {
         return 'png';
       case DocumentOutputFormat.pdf:
         return 'pdf';
-
       case DocumentOutputFormat.tiff:
         return 'tiff';
     }

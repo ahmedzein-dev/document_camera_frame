@@ -10,14 +10,14 @@ class CapturedImagePreview extends StatelessWidget {
   final DocumentCameraUIMode uiMode;
 
   final double borderRadius;
-  final double innerCornerBroderRadius;
+  final double innerCornerBorderRadius;
   const CapturedImagePreview({
     super.key,
     required this.capturedImageNotifier,
     required this.frameWidth,
     required this.frameHeight,
     required this.borderRadius,
-    required this.innerCornerBroderRadius,
+    required this.innerCornerBorderRadius,
     required this.uiMode,
   });
 
@@ -33,8 +33,8 @@ class CapturedImagePreview extends StatelessWidget {
             ? frameHeight
             : frameHeight + AppConstants.bottomFrameContainerHeight;
 
-        final double cornerBroderRadius = uiMode == DocumentCameraUIMode.minimal
-            ? innerCornerBroderRadius
+        final double cornerBorderRadius = uiMode == DocumentCameraUIMode.minimal
+            ? innerCornerBorderRadius
             : 0;
 
         return Align(
@@ -52,7 +52,7 @@ class CapturedImagePreview extends StatelessWidget {
                     width: frameWidth,
                     height: height,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(cornerBroderRadius),
+                      borderRadius: BorderRadius.circular(cornerBorderRadius),
                       image: DecorationImage(
                         image: FileImage(File(imagePath)),
                         fit: BoxFit.fill,

@@ -9,7 +9,7 @@ class TwoSidedAnimatedFrame extends StatefulWidget {
   final double frameHeight;
   final double frameWidth;
   final double outerFrameBorderRadius;
-  final double innerCornerBroderRadius;
+  final double innerCornerBorderRadius;
   final Duration frameFlipDuration;
   final Curve frameFlipCurve;
   final BoxBorder? border;
@@ -26,7 +26,7 @@ class TwoSidedAnimatedFrame extends StatefulWidget {
     required this.frameHeight,
     required this.frameWidth,
     required this.outerFrameBorderRadius,
-    required this.innerCornerBroderRadius,
+    required this.innerCornerBorderRadius,
     required this.frameFlipDuration,
     required this.frameFlipCurve,
     this.border,
@@ -187,7 +187,7 @@ class _TwoSidedAnimatedFrameState extends State<TwoSidedAnimatedFrame>
                     : 3,
               ),
               borderRadius: BorderRadius.circular(
-                widget.innerCornerBroderRadius,
+                widget.innerCornerBorderRadius,
               ),
             ),
           ),
@@ -222,8 +222,8 @@ class _TwoSidedAnimatedFrameState extends State<TwoSidedAnimatedFrame>
                                 ? _flipAnimation.value
                                 : 0.0,
                             isDocumentAligned: widget.isDocumentAligned,
-                            innerCornerBroderRadius:
-                                widget.innerCornerBroderRadius,
+                            innerCornerBorderRadius:
+                                widget.innerCornerBorderRadius,
                           ),
                         ),
                         Positioned(
@@ -239,8 +239,8 @@ class _TwoSidedAnimatedFrameState extends State<TwoSidedAnimatedFrame>
                                 ? _flipAnimation.value
                                 : 0.0,
                             isDocumentAligned: widget.isDocumentAligned,
-                            innerCornerBroderRadius:
-                                widget.innerCornerBroderRadius,
+                            innerCornerBorderRadius:
+                                widget.innerCornerBorderRadius,
                           ),
                         ),
                         Positioned(
@@ -252,8 +252,8 @@ class _TwoSidedAnimatedFrameState extends State<TwoSidedAnimatedFrame>
                                 ? _flipAnimation.value
                                 : 0.0,
                             isDocumentAligned: widget.isDocumentAligned,
-                            innerCornerBroderRadius:
-                                widget.innerCornerBroderRadius,
+                            innerCornerBorderRadius:
+                                widget.innerCornerBorderRadius,
                           ),
                         ),
                         Positioned(
@@ -265,8 +265,8 @@ class _TwoSidedAnimatedFrameState extends State<TwoSidedAnimatedFrame>
                                 ? _flipAnimation.value
                                 : 0.0,
                             isDocumentAligned: widget.isDocumentAligned,
-                            innerCornerBroderRadius:
-                                widget.innerCornerBroderRadius,
+                            innerCornerBorderRadius:
+                                widget.innerCornerBorderRadius,
                           ),
                         ),
                       ],

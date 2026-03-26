@@ -97,7 +97,7 @@ class DocumentCameraFrame extends StatefulWidget {
   /// Image quality for lossy formats like JPG and WebP (1-100, default: 90)
   final int imageQuality;
 
-  /// Initial flash mode for the camera (default: FlightMode.auto)
+  /// Initial flash mode for the camera (default: FlashMode.auto)
   final FlashMode initialFlashMode;
 
   /// Controls which UI elements are rendered.
@@ -149,44 +149,37 @@ class DocumentCameraFrame extends StatefulWidget {
          'Either onDocumentSaved or onBothSidesSaved must be provided',
        );
 
-  // ── Per-mode smart defaults ─────────────────────────────────────────────
-  //
-  // All mode-based behaviour is resolved here inside the package.
-  // The example app / caller only needs to pass [uiMode] — no manual
-  // conditionals required.
-  /// `true` when this widget should delegate to the native document scanner.
   bool get _isCamScanner => uiMode == DocumentCameraUIMode.camScanner;
 
-  /// Auto-capture is **on** for every mode except [DocumentCameraUIMode.minimal]
-  /// and [DocumentCameraUIMode.camScanner].
   bool get _effectiveAutoCapture =>
       uiMode != DocumentCameraUIMode.minimal &&
       uiMode != DocumentCameraUIMode.camScanner;
 
-  /// Detection status text (e.g. "Move closer") is shown for all full-UI
-  /// modes; hidden in minimal and camScanner.
   bool get _effectiveShowDetectionText =>
       uiMode != DocumentCameraUIMode.minimal &&
       uiMode != DocumentCameraUIMode.camScanner;
 
-  /// Text extraction (OCR) is only enabled automatically for
-  /// [DocumentCameraUIMode.textExtract]. For all other modes it defers to
-  /// the caller's [enableExtractText] flag (default: false).
   bool get _effectiveEnableExtractText =>
       uiMode == DocumentCameraUIMode.textExtract ? true : enableExtractText;
 
-  /// Side indicator is hidden in [DocumentCameraUIMode.minimal],
-  /// [DocumentCameraUIMode.overlay], and [DocumentCameraUIMode.camScanner].
   bool get _effectiveShowSideIndicator =>
+      sideIndicatorStyle.showSideIndicator &&
       uiMode != DocumentCameraUIMode.minimal &&
       uiMode != DocumentCameraUIMode.overlay &&
       uiMode != DocumentCameraUIMode.camScanner;
 
-  /// Instruction text is hidden in [DocumentCameraUIMode.minimal],
-  /// [DocumentCameraUIMode.overlay], and [DocumentCameraUIMode.camScanner].
   bool get _effectiveShowInstruction =>
+      instructionStyle.showInstructionText &&
       uiMode != DocumentCameraUIMode.minimal &&
       uiMode != DocumentCameraUIMode.overlay &&
+      uiMode != DocumentCameraUIMode.camScanner;
+
+  /// Whether the screen title should be rendered.
+  /// Respects [DocumentCameraTitleStyle.showScreenTitle] and is always
+  /// false in `minimal` and `camScanner` modes.
+  bool get _effectiveShowScreenTitle =>
+      titleStyle.showScreenTitle &&
+      uiMode != DocumentCameraUIMode.minimal &&
       uiMode != DocumentCameraUIMode.camScanner;
 
   @override
@@ -197,11 +190,9 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
     with TickerProviderStateMixin {
   late final DocumentCameraLogic _logic;
 
-  // Animation controllers
   AnimationController? _progressAnimationController;
   Animation<double>? _progressAnimation;
 
-  // camScanner mode: current side label (shown on the loading scaffold)
   final ValueNotifier<String> _camScannerLabel = ValueNotifier<String>(
     'Scan Front Side',
   );
@@ -211,14 +202,14 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
     super.initState();
 
     if (widget._isCamScanner) {
-      // camScanner mode: skip the camera pipeline; launch native UI after build.
       _logic = DocumentCameraLogic(
         context: context,
         onCameraError: () => widget.onCameraError?.call('Camera error'),
         onFrontCaptured: widget.onFrontCaptured,
         onBackCaptured: widget.onBackCaptured,
-        onDocumentSaved: (data) =>
-            (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(data),
+        onDocumentSaved: (data) {
+          (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(data);
+        },
         enableExtractText: false,
         onRetake: widget.onRetake,
         enableAutoCapture: false,
@@ -239,9 +230,9 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
       onCameraError: () => widget.onCameraError?.call('Camera error'),
       onFrontCaptured: widget.onFrontCaptured,
       onBackCaptured: widget.onBackCaptured,
-      onDocumentSaved: (data) =>
-          (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(data),
-      // Use effective values so the package handles all mode logic.
+      onDocumentSaved: (data) {
+        (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(data);
+      },
       enableExtractText: widget._effectiveEnableExtractText,
       onRetake: widget.onRetake,
       enableAutoCapture: widget._effectiveAutoCapture,
@@ -254,7 +245,6 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
       uiMode: widget.uiMode,
     );
 
-    // Progress animation only makes sense when the side indicator is visible.
     if (widget._effectiveShowSideIndicator) {
       _initializeProgressAnimation();
     }
@@ -275,31 +265,30 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
   Future<void> _launchCamScanner() async {
     final service = CamScannerService();
 
-    // Helper to safely pop if this is still the current route
-    void safePop() {
+    void popWithResult(DocumentCaptureData result) {
       if (!mounted) return;
-      final route = ModalRoute.of(context);
-      if (route != null && route.isCurrent) {
-        Navigator.of(context).maybePop();
-      }
+      (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(result);
+      Navigator.of(context).pop(result);
+    }
+
+    void popCancelled() {
+      if (!mounted) return;
+      Navigator.of(context).maybePop();
     }
 
     if (widget.requireBothSides) {
-      // ── Step 1: FRONT Session ─────────────────────────────────────────────
       _camScannerLabel.value = 'Scan Front Side, then tap Save';
-      final paths = await service.scan(maxPages: 2);
+      final frontPaths = await service.scan(maxPages: 2);
       if (!mounted) return;
 
-      if (paths.isEmpty) {
-        safePop();
+      if (frontPaths.isEmpty) {
+        popCancelled();
         return;
       }
 
-      // Take only the last image of the front session
-      final frontPath = paths.last;
+      final frontPath = frontPaths.last;
       widget.onFrontCaptured?.call(frontPath);
 
-      // ── Step 2: BACK Session ──────────────────────────────────────────────
       await Future<void>.delayed(const Duration(milliseconds: 600));
       if (!mounted) return;
 
@@ -308,48 +297,45 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
       if (!mounted) return;
 
       if (backPaths.isEmpty) {
-        // Return with front only if they cancelled the second session
-        final data = DocumentCaptureData(
-          frontImagePath: frontPath,
-          frontPreviewPath: frontPath,
+        popWithResult(
+          DocumentCaptureData(
+            frontImagePath: frontPath,
+            frontPreviewPath: frontPath,
+          ),
         );
-        (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(data);
-        safePop();
         return;
       }
 
-      // Take only the last image of the back session
       final backPath = backPaths.last;
       widget.onBackCaptured?.call(backPath);
 
-      final data = DocumentCaptureData(
-        frontImagePath: frontPath,
-        frontPreviewPath: frontPath,
-        backImagePath: backPath,
-        backPreviewPath: backPath,
+      popWithResult(
+        DocumentCaptureData(
+          frontImagePath: frontPath,
+          frontPreviewPath: frontPath,
+          backImagePath: backPath,
+          backPreviewPath: backPath,
+        ),
       );
-      (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(data);
-      safePop();
     } else {
-      // ── SINGLE SIDE MODE ───────────────────────────────────────────────────
       _camScannerLabel.value = 'Scan Document, then tap Save';
       final paths = await service.scan(maxPages: 2);
       if (!mounted) return;
 
       if (paths.isEmpty) {
-        safePop();
+        popCancelled();
         return;
       }
 
       final frontPath = paths.last;
       widget.onFrontCaptured?.call(frontPath);
 
-      final data = DocumentCaptureData(
-        frontImagePath: frontPath,
-        frontPreviewPath: frontPath,
+      popWithResult(
+        DocumentCaptureData(
+          frontImagePath: frontPath,
+          frontPreviewPath: frontPath,
+        ),
       );
-      (widget.onDocumentSaved ?? widget.onBothSidesSaved)?.call(data);
-      safePop();
     }
   }
 
@@ -365,7 +351,6 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
       ),
     );
 
-    // Sync animation with logic
     _logic.currentSideNotifier.addListener(() {
       if (_logic.currentSideNotifier.value == DocumentSide.back) {
         _progressAnimationController?.animateTo(1.0);
@@ -412,16 +397,16 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
         ),
       );
     }
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Preview Layer
           DocumentCameraPreviewLayer(
             logic: _logic,
             borderRadius: widget.frameStyle.outerFrameBorderRadius,
-            innerCornerBroderRadius: widget.frameStyle.innerCornerBroderRadius,
+            innerCornerBorderRadius: widget.frameStyle.innerCornerBorderRadius,
             capturingAnimationDuration:
                 widget.animationStyle.capturingAnimationDuration,
             capturingAnimationColor:
@@ -430,8 +415,6 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
                 widget.animationStyle.capturingAnimationCurve,
             uiMode: widget.uiMode,
           ),
-
-          // Overlay Layer
           ValueListenableBuilder<bool>(
             valueListenable: _logic.isInitializedNotifier,
             builder: (context, isInitialized, child) {
@@ -445,10 +428,10 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
                 sideIndicatorStyle: widget.sideIndicatorStyle,
                 progressStyle: widget.progressStyle,
                 progressAnimation: _progressAnimation,
-                // Pass effective values — the package decides, not the caller.
                 showDetectionStatusText: widget._effectiveShowDetectionText,
                 showSideIndicator: widget._effectiveShowSideIndicator,
                 showInstruction: widget._effectiveShowInstruction,
+                showScreenTitle: widget._effectiveShowScreenTitle,
                 instructionStyle: widget.instructionStyle,
                 titleStyle: widget.titleStyle,
                 showCloseButton: widget.showCloseButton,

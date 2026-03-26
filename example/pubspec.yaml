@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.8
+  cupertino_icons: ^1.0.9
   # Local package (use path). For published version: document_camera_frame: ^2.0.5
   document_camera_frame:
     path: ..

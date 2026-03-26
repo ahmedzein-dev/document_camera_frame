@@ -43,6 +43,11 @@ class DocumentCameraOverlayLayer extends StatelessWidget {
   /// Resolved by the package based on [uiMode]; false for `minimal` and `overlay`.
   final bool showInstruction;
 
+  /// Whether the screen title should be shown.
+  /// Resolved by the package from [DocumentCameraTitleStyle.showScreenTitle]
+  /// and [uiMode]; always false for `minimal` and `camScanner`.
+  final bool showScreenTitle;
+
   final DocumentCameraInstructionStyle instructionStyle;
   final DocumentCameraTitleStyle titleStyle;
   final bool showCloseButton;
@@ -62,8 +67,9 @@ class DocumentCameraOverlayLayer extends StatelessWidget {
     required this.progressStyle,
     required this.progressAnimation,
     required this.showDetectionStatusText,
-    this.showSideIndicator = true,
+    this.showSideIndicator = false,
     this.showInstruction = true,
+    this.showScreenTitle = true,
     required this.instructionStyle,
     required this.titleStyle,
     required this.showCloseButton,
@@ -112,17 +118,13 @@ class DocumentCameraOverlayLayer extends StatelessWidget {
     return ValueListenableBuilder<DocumentSide>(
       valueListenable: logic.currentSideNotifier,
       builder: (context, currentSide, child) {
-        Widget? currentTitle;
-        if (currentSide == DocumentSide.front &&
-            titleStyle.frontSideTitle != null) {
-          currentTitle = titleStyle.frontSideTitle;
-        } else if (currentSide == DocumentSide.back &&
-            titleStyle.backSideTitle != null) {
-          currentTitle = titleStyle.backSideTitle;
-        } else if (titleStyle.title != null) {
-          currentTitle = titleStyle.title;
+        // title overrides per-side titles when set
+        if (titleStyle.title != null) {
+          return titleStyle.title!;
         }
-        return currentTitle ?? const SizedBox.shrink();
+        return currentSide == DocumentSide.front
+            ? titleStyle.frontSideTitle
+            : titleStyle.backSideTitle;
       },
     );
   }
@@ -143,7 +145,7 @@ class DocumentCameraOverlayLayer extends StatelessWidget {
                 frameHeight: logic.updatedFrameHeight,
                 frameWidth: logic.updatedFrameWidth,
                 outerFrameBorderRadius: frameStyle.outerFrameBorderRadius,
-                innerCornerBroderRadius: frameStyle.innerCornerBroderRadius,
+                innerCornerBorderRadius: frameStyle.innerCornerBorderRadius,
                 frameFlipDuration: animationStyle.frameFlipDuration,
                 frameFlipCurve: animationStyle.frameFlipCurve,
                 border: frameStyle.frameBorder,
@@ -185,13 +187,11 @@ class DocumentCameraOverlayLayer extends StatelessWidget {
             top: logic.requireBothSides && showSideIndicator
                 ? MediaQuery.of(context).padding.top + 120
                 : MediaQuery.of(context).padding.top + 60,
+            frameHeight: logic.updatedFrameHeight,
           ),
 
-        if (_isFullUi &&
-            (titleStyle.title != null ||
-                titleStyle.frontSideTitle != null ||
-                titleStyle.backSideTitle != null ||
-                showCloseButton))
+        // Screen title — only rendered when showScreenTitle is true
+        if (_isFullUi && showScreenTitle)
           ScreenTitle(
             title: _buildCurrentTitle(),
             showCloseButton: showCloseButton,
@@ -219,8 +219,6 @@ class DocumentCameraOverlayLayer extends StatelessWidget {
           ),
 
         // ── Minimal-only elements ──────────────────────────────────────────
-
-        // Four rounded corner indicators with alignment colour + ambient pulse
         if (_isMinimal)
           ValueListenableBuilder<bool>(
             valueListenable: logic.isDocumentAlignedNotifier,
@@ -239,8 +237,8 @@ class DocumentCameraOverlayLayer extends StatelessWidget {
                       topLeft: true,
                       flipProgress: 0.0,
                       isDocumentAligned: isAligned,
-                      innerCornerBroderRadius:
-                          frameStyle.innerCornerBroderRadius,
+                      innerCornerBorderRadius:
+                          frameStyle.innerCornerBorderRadius,
                     ),
                   ),
                   Positioned(
@@ -250,8 +248,8 @@ class DocumentCameraOverlayLayer extends StatelessWidget {
                       topRight: true,
                       flipProgress: 0.0,
                       isDocumentAligned: isAligned,
-                      innerCornerBroderRadius:
-                          frameStyle.innerCornerBroderRadius,
+                      innerCornerBorderRadius:
+                          frameStyle.innerCornerBorderRadius,
                     ),
                   ),
                   Positioned(
@@ -261,8 +259,8 @@ class DocumentCameraOverlayLayer extends StatelessWidget {
                       bottomLeft: true,
                       flipProgress: 0.0,
                       isDocumentAligned: isAligned,
-                      innerCornerBroderRadius:
-                          frameStyle.innerCornerBroderRadius,
+                      innerCornerBorderRadius:
+                          frameStyle.innerCornerBorderRadius,
                     ),
                   ),
                   Positioned(
@@ -272,8 +270,8 @@ class DocumentCameraOverlayLayer extends StatelessWidget {
                       bottomRight: true,
                       flipProgress: 0.0,
                       isDocumentAligned: isAligned,
-                      innerCornerBroderRadius:
-                          frameStyle.innerCornerBroderRadius,
+                      innerCornerBorderRadius:
+                          frameStyle.innerCornerBorderRadius,
                     ),
                   ),
                 ],

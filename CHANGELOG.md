@@ -1,4 +1,29 @@
+# 2.6.0
+
+## Added
+- **`showScreenTitle` in `DocumentCameraTitleStyle`**: New property to show or hide the screen title bar. Defaults to `true` (visible). Set to `false` to hide the title entirely without affecting other UI elements.
+
+## Changed
+- **Screen Title always enabled in full UI mode**: `frontSideTitle` and `backSideTitle` in `DocumentCameraTitleStyle` now default to a white `"Front Side"` and `"Back Side"` text widgets respectively. The `ScreenTitle` is now always rendered in full UI mode, unless disabled via `showScreenTitle: false`.
+- **`showInstructionText` default changed to `false`**: The top instruction banner is now hidden by default in `DocumentCameraInstructionStyle` to reduce UI clutter.
+- **`showSideIndicator` default changed to `false`**: The side indicator (front/back dots) is now hidden by default in `DocumentCameraSideIndicatorStyle`.
+- **`_DetectionStatusBanner` positioning**: The live detection status text (e.g. "Move closer") is now always anchored directly above the camera frame, regardless of whether the instruction banner or side indicator is visible.
+
+## Fixed
+- **Typo fix**: Renamed `innerCornerBroderRadius` → `innerCornerBorderRadius` in `DocumentCameraFrameStyle`. The old name was a typo; this is a breaking rename — update any references in your code.
+- **`showSideIndicator` was never respected**: Fixed `_effectiveShowSideIndicator` to actually check `sideIndicatorStyle.showSideIndicator`. Previously the flag was declared but ignored.
+- **`showInstructionText` was never respected**: Fixed `_effectiveShowInstruction` to actually check `instructionStyle.showInstructionText`. Previously the flag was declared but ignored.
+- **`camScanner` mode returned no data**: `_launchCamScanner` was calling `Navigator.maybePop()` (no argument) on all completion paths, causing `await Navigator.push(...)` to always resolve to `null`. Fixed by calling `Navigator.pop(result)` with the captured `DocumentCaptureData` on every success path. Cancellations (empty scan) still use `maybePop()` correctly.
+- **Navigation pattern**: The package now follows the Flutter-standard `await Navigator.push<DocumentCaptureData>(...)` pattern across all modes. `handleSave()` and `_launchCamScanner` both call `Navigator.of(context).pop(resultData)` so callers receive the result as a typed Future — identical to `showDatePicker`, `ImagePicker`, and other Flutter APIs. `onDocumentSaved` remains available as an optional side-channel callback.
+
+## Migration Guide
+- Rename any usage of `innerCornerBroderRadius` → `innerCornerBorderRadius` in your `DocumentCameraFrameStyle`.
+- If you relied on `showInstructionText` or `showSideIndicator` being `true` by default, pass them explicitly: `showInstructionText: true` / `showSideIndicator: true`.
+
+---
+
 # 2.5.6
+
 - **Bug Fix**: Removed export of `context_extensions.dart` from the package export file to prevent conflicts with other packages like `flutter_screenutil` that provide similar BuildContext and double extensions like `.sw()` and `.sh()`. Explicit internal imports were added where needed.
 
 # 2.5.5
