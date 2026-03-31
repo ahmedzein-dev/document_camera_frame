@@ -30,6 +30,7 @@ class DocumentCameraOverlayLayer extends StatelessWidget {
   final DocumentCameraAnimationStyle animationStyle;
   final String? bottomHintText;
   final Widget? sideInfoOverlay;
+  final Widget? bottomFrameContainerChild;
   final DocumentCameraSideIndicatorStyle sideIndicatorStyle;
   final DocumentCameraProgressStyle progressStyle;
   final Animation<double>? progressAnimation;
@@ -63,6 +64,7 @@ class DocumentCameraOverlayLayer extends StatelessWidget {
     required this.animationStyle,
     required this.bottomHintText,
     required this.sideInfoOverlay,
+    this.bottomFrameContainerChild,
     required this.sideIndicatorStyle,
     required this.progressStyle,
     required this.progressAnimation,
@@ -163,6 +165,7 @@ class DocumentCameraOverlayLayer extends StatelessWidget {
             borderRadius: frameStyle.outerFrameBorderRadius,
             currentSideNotifier: logic.currentSideNotifier,
             documentDataNotifier: logic.documentDataNotifier,
+            bottomFrameContainerChild: bottomFrameContainerChild,
             bottomHintText: bottomHintText,
             sideInfoOverlay: sideInfoOverlay,
           ),
