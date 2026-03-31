@@ -422,6 +422,7 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
                 animationStyle: widget.animationStyle,
                 bottomHintText: widget.bottomHintText,
                 sideInfoOverlay: widget.sideInfoOverlay,
+                bottomFrameContainerChild: widget.bottomFrameContainerChild,
                 sideIndicatorStyle: widget.sideIndicatorStyle,
                 progressStyle: widget.progressStyle,
                 progressAnimation: _progressAnimation,
