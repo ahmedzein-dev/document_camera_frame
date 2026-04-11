@@ -1,3 +1,10 @@
+# 2.6.3
+
+## Fixed
+- **wire bottomFrameContainerChild through overlay to bottom container
+
+---
+
 # 2.6.2
 
 ## Documentation
