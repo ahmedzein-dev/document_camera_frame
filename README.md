@@ -8,15 +8,13 @@
 
 ## Demo
 
-**Default UI Mode**
-![Default Mode](https://raw.githubusercontent.com/ahmedzein-dev/document_camera_frame/main/assets/default.gif)
-*Live camera preview with frame, progress bar, side indicators, and auto-capture*
+Here's a quick preview of `DocumentCameraFrame` in action:
 
----
-
-**Export & OCR**
-![Export Example](https://raw.githubusercontent.com/ahmedzein-dev/document_camera_frame/main/assets/export.gif)
-*Capturing and exporting documents as JPG, PNG, PDF, or TIFF*
+| Default Mode | Export Example |
+| :---: | :---: |
+| ![Default Mode](https://raw.githubusercontent.com/ahmedzein-dev/document_camera_frame/main/assets/default.gif) <br> *Default UI mode — live camera preview with frame, progress bar, side indicators, and auto-capture* | ![Export Example](https://raw.githubusercontent.com/ahmedzein-dev/document_camera_frame/main/assets/export.gif) <br> *Export in action — capturing and exporting documents as JPG, PNG, PDF, or TIFF* |
+| **UI Modes** | **CamScanner Mode** |
+| ![UI Modes](https://raw.githubusercontent.com/ahmedzein-dev/document_camera_frame/main/assets/ui_modes.gif) <br> *All built-in UI modes — default, minimal, overlay, kiosk, and textExtract* | ![CamScanner Mode](https://raw.githubusercontent.com/ahmedzein-dev/document_camera_frame/main/assets/camscanner.gif) <br> *Native CamScanner mode — delegates to the platform's built-in document scanner* |
 
 ## Features
 
