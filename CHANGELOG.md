@@ -1,3 +1,10 @@
+# 2.6.4
+
+## Fixed
+- **Fix GiF Examples
+
+---
+
 # 2.6.3
 
 ## Fixed
