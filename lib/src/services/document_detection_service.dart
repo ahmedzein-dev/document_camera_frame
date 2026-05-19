@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
 
 import '../models/document_detection_config.dart';
+import '../models/document_detection_status.dart';
 import 'image_converter_service.dart';
 
 /// Service responsible for detecting documents in a live camera stream.
@@ -26,10 +27,7 @@ class DocumentDetectionService {
   /// Detection thresholds used during alignment evaluation.
   final DocumentDetectionConfig config;
 
-  DocumentDetectionService({
-    this.onError,
-    this.config = const DocumentDetectionConfig(),
-  });
+  DocumentDetectionService({this.onError, this.config = const DocumentDetectionConfig()});
 
   late final ObjectDetector _objectDetector;
   bool _isDetectorInitialized = false;
@@ -51,16 +49,13 @@ class DocumentDetectionService {
 
     final options = ObjectDetectorOptions(
       mode: DetectionMode.stream, // Optimized for live camera frames
-      classifyObjects:
-          false, // Classification not needed for document detection
+      classifyObjects: false, // Classification not needed for document detection
       multipleObjects: true, // Detect all candidates, pick best one later
     );
 
     _objectDetector = ObjectDetector(options: options);
     _isDetectorInitialized = true;
-    debugPrint(
-      '[DocumentDetectionService] initialize: ObjectDetector initialized',
-    );
+    debugPrint('[DocumentDetectionService] initialize: ObjectDetector initialized');
   }
 
   /// Closes the [ObjectDetector] and releases its native resources.
@@ -104,14 +99,13 @@ class DocumentDetectionService {
     required int screenWidth,
     required int screenHeight,
     ValueChanged<String>? onStatusUpdated,
+    ValueChanged<DocumentDetectionStatus>? onStatusNotified,
     ValueChanged<List<Rect>>? onDetectedRectUpdated,
     ValueChanged<Rect?>? onBestDetectedRectUpdated,
   }) async {
     // Guard: detector must be initialized before processing frames
     if (!_isDetectorInitialized) {
-      debugPrint(
-        '[DocumentDetectionService] processImage: Detector not initialized',
-      );
+      debugPrint('[DocumentDetectionService] processImage: Detector not initialized');
       return false;
     }
 
@@ -130,13 +124,12 @@ class DocumentDetectionService {
       // ---------------------------------------------------------------------------
       // STEP 2: Run ML Kit object detection
       // ---------------------------------------------------------------------------
-      final List<DetectedObject> objects = await _objectDetector.processImage(
-        inputImage,
-      );
+      final List<DetectedObject> objects = await _objectDetector.processImage(inputImage);
 
       // If nothing was detected, notify the UI and return early
       if (objects.isEmpty) {
         onStatusUpdated?.call('No document found');
+        onStatusNotified?.call(DocumentDetectionStatus.noDocumentFound);
         onDetectedRectUpdated?.call(<Rect>[]);
         onBestDetectedRectUpdated?.call(null);
         return false;
@@ -168,9 +161,7 @@ class DocumentDetectionService {
 
       // Compute the preview's true aspect ratio from camera-reported dimensions.
       // Fallback to analysis dimensions if previewSize is unavailable.
-      final double previewAspectRatio = previewSize != null
-          ? previewSize.height / previewSize.width
-          : analysisHeight / analysisWidth;
+      final double previewAspectRatio = previewSize != null ? previewSize.height / previewSize.width : analysisHeight / analysisWidth;
 
       // The preview is fitted to the display width. Its full (unclipped) height
       // may exceed the visible display area, creating a vertical letterbox offset.
@@ -181,8 +172,7 @@ class DocumentDetectionService {
       // Width uses display width ratio; height uses fittedPreviewHeight (not displayHeight)
       // to correctly account for the letterbox offset.
       final int cropWidth = (frameWidth / displayWidth * analysisWidth).round();
-      final int cropHeight =
-          (frameHeight / fittedPreviewHeight * analysisHeight).round();
+      final int cropHeight = (frameHeight / fittedPreviewHeight * analysisHeight).round();
 
       // Horizontal center of the frame in analysis space
       final int cropX = (analysisWidth - cropWidth) ~/ 2;
@@ -190,8 +180,7 @@ class DocumentDetectionService {
       // Vertical position of the frame top, adjusted for letterbox offset
       final double frameTopOnScreen = (displayHeight - frameHeight) / 2;
       final double frameTopOnPreview = frameTopOnScreen + verticalOffset;
-      final int cropY =
-          ((frameTopOnPreview / fittedPreviewHeight) * analysisHeight).round();
+      final int cropY = ((frameTopOnPreview / fittedPreviewHeight) * analysisHeight).round();
 
       // ---------------------------------------------------------------------------
       // STEP 5: Alignment thresholds (from config)
@@ -201,8 +190,7 @@ class DocumentDetectionService {
       final double frameTolerance = config.frameTolerance;
 
       final double relaxedFrameTop = cropY * (1 - frameTolerance);
-      final double relaxedFrameBottom =
-          (cropY + cropHeight) * (1 + frameTolerance);
+      final double relaxedFrameBottom = (cropY + cropHeight) * (1 + frameTolerance);
       final double frameArea = (cropWidth * cropHeight).toDouble();
 
       // The target aspect ratio of the document frame (portrait = height/width > 1)
@@ -212,23 +200,15 @@ class DocumentDetectionService {
       // STEP 6: Filter objects to candidates within the frame
       // ---------------------------------------------------------------------------
       // A candidate must satisfy both size and position constraints.
-      final bool isFrontCamera =
-          cameraController.description.lensDirection ==
-          CameraLensDirection.front;
+      final bool isFrontCamera = cameraController.description.lensDirection == CameraLensDirection.front;
 
       final List<DetectedObject> filteredObjects = objects.where((object) {
         final rect = object.boundingBox;
         if (rect.width <= 0 || rect.height <= 0) return false;
 
         final double area = rect.width * rect.height;
-        final bool sizeOk =
-            area > (minSizeRatio * frameArea) &&
-            area < (maxSizeRatio * frameArea);
-        final bool posOk =
-            rect.left >= cropX &&
-            rect.top >= relaxedFrameTop &&
-            rect.right <= (cropX + cropWidth) &&
-            rect.bottom <= relaxedFrameBottom;
+        final bool sizeOk = area > (minSizeRatio * frameArea) && area < (maxSizeRatio * frameArea);
+        final bool posOk = rect.left >= cropX && rect.top >= relaxedFrameTop && rect.right <= (cropX + cropWidth) && rect.bottom <= relaxedFrameBottom;
         return sizeOk && posOk;
       }).toList();
 
@@ -260,14 +240,9 @@ class DocumentDetectionService {
       // If filtered candidates exist, pick the best among them.
       // Otherwise, fall back to all detected objects so we can still give
       // guidance even when no object fully satisfies the constraints.
-      final List<DetectedObject> selectionPool = filteredObjects.isNotEmpty
-          ? filteredObjects
-          : objects;
+      final List<DetectedObject> selectionPool = filteredObjects.isNotEmpty ? filteredObjects : objects;
 
-      final DetectedObject bestObject = _selectBestDetectedObject(
-        selectionPool,
-        targetAspectRatio: targetAspectRatio,
-      );
+      final DetectedObject bestObject = _selectBestDetectedObject(selectionPool, targetAspectRatio: targetAspectRatio);
 
       // Map the best candidate to screen space and report it
       final Rect? bestRectOnScreen = _mapBoundingBoxToScreenRect(
@@ -281,9 +256,7 @@ class DocumentDetectionService {
         isMirrored: isFrontCamera,
       );
       // Only surface the best rect if it passed all filters
-      onBestDetectedRectUpdated?.call(
-        filteredObjects.isNotEmpty ? bestRectOnScreen : null,
-      );
+      onBestDetectedRectUpdated?.call(filteredObjects.isNotEmpty ? bestRectOnScreen : null);
 
       // ---------------------------------------------------------------------------
       // STEP 9: Final alignment evaluation
@@ -291,15 +264,10 @@ class DocumentDetectionService {
       final Rect boundingBox = bestObject.boundingBox;
       final double objectArea = boundingBox.width * boundingBox.height;
 
-      final bool sizeAligned =
-          objectArea > (minSizeRatio * frameArea) &&
-          objectArea < (maxSizeRatio * frameArea);
+      final bool sizeAligned = objectArea > (minSizeRatio * frameArea) && objectArea < (maxSizeRatio * frameArea);
 
       final bool positionAligned =
-          boundingBox.left >= cropX &&
-          boundingBox.top >= relaxedFrameTop &&
-          boundingBox.right <= (cropX + cropWidth) &&
-          boundingBox.bottom <= relaxedFrameBottom;
+          boundingBox.left >= cropX && boundingBox.top >= relaxedFrameTop && boundingBox.right <= (cropX + cropWidth) && boundingBox.bottom <= relaxedFrameBottom;
 
       final bool isAligned = sizeAligned && positionAligned;
 
@@ -336,16 +304,19 @@ class DocumentDetectionService {
       // ---------------------------------------------------------------------------
       // Compute directional adjustment hints when position is off
       final List<String> adjustments = [];
-      if (!positionAligned) {
-        if (boundingBox.left < cropX) {
-          adjustments.add('Move right');
-        }
-        if (boundingBox.right > cropX + cropWidth) {
-          adjustments.add('Move left');
-        }
+      bool overLeft = false;
+      bool overRight = false;
+      bool overTop = false;
+      bool overBottom = false;
 
-        final bool overTop = boundingBox.top < relaxedFrameTop;
-        final bool overBottom = boundingBox.bottom > relaxedFrameBottom;
+      if (!positionAligned) {
+        overLeft = boundingBox.left < cropX;
+        overRight = boundingBox.right > cropX + cropWidth;
+        overTop = boundingBox.top < relaxedFrameTop;
+        overBottom = boundingBox.bottom > relaxedFrameBottom;
+
+        if (overLeft) adjustments.add('Move right');
+        if (overRight) adjustments.add('Move left');
 
         if (overTop && overBottom) {
           adjustments.add('Document overflows top and bottom');
@@ -374,6 +345,7 @@ class DocumentDetectionService {
       // Emit the guidance message to the UI
       _updateDetectionStatus(
         onStatusUpdated,
+        onStatusNotified,
         isAligned: isAligned,
         adjustments: adjustments,
         sizeAligned: sizeAligned,
@@ -381,6 +353,10 @@ class DocumentDetectionService {
         maxSizeRatio: maxSizeRatio,
         objectArea: objectArea,
         frameArea: frameArea,
+        overLeft: overLeft,
+        overRight: overRight,
+        overTop: overTop,
+        overBottom: overBottom,
       );
 
       return isAligned;
@@ -402,10 +378,7 @@ class DocumentDetectionService {
   ///
   /// Ties in aspect ratio difference are broken by choosing the larger object,
   /// since a larger detection is more likely to represent the full document.
-  DetectedObject _selectBestDetectedObject(
-    List<DetectedObject> objects, {
-    required double targetAspectRatio,
-  }) {
+  DetectedObject _selectBestDetectedObject(List<DetectedObject> objects, {required double targetAspectRatio}) {
     DetectedObject best = objects.first;
     double bestAspectDiff = double.infinity;
     double bestArea = -1;
@@ -419,8 +392,7 @@ class DocumentDetectionService {
       final double area = rect.width * rect.height;
 
       // Prefer closer aspect ratio; break ties by larger area
-      if (aspectDiff < bestAspectDiff ||
-          (aspectDiff == bestAspectDiff && area > bestArea)) {
+      if (aspectDiff < bestAspectDiff || (aspectDiff == bestAspectDiff && area > bestArea)) {
         best = object;
         bestAspectDiff = aspectDiff;
         bestArea = area;
@@ -494,7 +466,8 @@ Rect? _mapBoundingBoxToScreenRect({
 ///   4. Both off      → combined position + size message
 ///   5. Fallback      → 'Adjust document position'
 void _updateDetectionStatus(
-  ValueChanged<String>? onStatusUpdated, {
+  ValueChanged<String>? onStatusUpdated,
+  ValueChanged<DocumentDetectionStatus>? onStatusNotified, {
   required bool isAligned,
   required List<String> adjustments,
   required bool sizeAligned,
@@ -502,7 +475,23 @@ void _updateDetectionStatus(
   required double maxSizeRatio,
   required double objectArea,
   required double frameArea,
+  required bool overLeft,
+  required bool overRight,
+  required bool overTop,
+  required bool overBottom,
 }) {
+  // Resolve enum status first (drives both notifiers)
+  final DocumentDetectionStatus status = _resolveStatus(
+    isAligned: isAligned,
+    sizeAligned: sizeAligned,
+    objectTooSmall: objectArea < (minSizeRatio * frameArea),
+    overLeft: overLeft,
+    overRight: overRight,
+    overTop: overTop,
+    overBottom: overBottom,
+  );
+  onStatusNotified?.call(status);
+
   if (onStatusUpdated == null) return;
 
   // Document is fully aligned — prompt the user to hold still for capture
@@ -538,4 +527,28 @@ void _updateDetectionStatus(
   }
 
   onStatusUpdated(message);
+}
+
+/// Resolves the primary [DocumentDetectionStatus] from alignment boolean flags.
+///
+/// Priority: aligned > size (tooSmall/tooLarge) > overflow > directional > fallback.
+DocumentDetectionStatus _resolveStatus({
+  required bool isAligned,
+  required bool sizeAligned,
+  required bool objectTooSmall,
+  required bool overLeft,
+  required bool overRight,
+  required bool overTop,
+  required bool overBottom,
+}) {
+  if (isAligned) return DocumentDetectionStatus.aligned;
+  if (!sizeAligned) {
+    return objectTooSmall ? DocumentDetectionStatus.tooSmall : DocumentDetectionStatus.tooLarge;
+  }
+  if (overTop && overBottom) return DocumentDetectionStatus.documentOverflows;
+  if (overLeft) return DocumentDetectionStatus.tooFarLeft;
+  if (overRight) return DocumentDetectionStatus.tooFarRight;
+  if (overTop) return DocumentDetectionStatus.tooHigh;
+  if (overBottom) return DocumentDetectionStatus.tooLow;
+  return DocumentDetectionStatus.adjustPosition;
 }

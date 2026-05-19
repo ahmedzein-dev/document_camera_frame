@@ -9,6 +9,7 @@ export 'src/logic/document_camera_logic.dart';
 // Models
 export 'src/models/document_capture_data.dart';
 export 'src/models/document_detection_config.dart';
+export 'src/models/document_detection_status.dart';
 // Services
 export 'src/services/cam_scanner_service.dart';
 export 'src/services/camera_service.dart';
