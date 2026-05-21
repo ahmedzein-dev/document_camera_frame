@@ -1,3 +1,12 @@
+# 2.6.8
+
+## Fixed
+
+- **Improved frame height cap**: Reduced the maximum frame height from 45% to 43% of the screen height, creating better visual spacing between the document frame and action buttons on tall frames (e.g. passport).
+- **Internal refactor**: `maxFrameHeight` is now computed once in `DocumentCameraLogic` and reused, eliminating the repeated `MediaQuery` calculation.
+
+---
+
 # 2.6.7
 
 ## Fixed
