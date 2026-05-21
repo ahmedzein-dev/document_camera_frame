@@ -3,7 +3,6 @@ import 'package:document_camera_frame/document_camera_frame.dart';
 import 'package:document_camera_frame/src/core/context_extensions.dart';
 
 import '../../core/app_constants.dart';
-import '../../logic/document_camera_logic.dart';
 import 'camera_guidance_overlay.dart';
 import 'corner_box.dart';
 

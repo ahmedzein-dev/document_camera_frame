@@ -32,7 +32,7 @@ class _SelectionScreenState extends State<SelectionScreen> {
       subtitle: 'International travel document',
       icon: Icons.book_rounded,
       frameWidth: 300,
-      frameHeight: 420,
+      frameHeight: 374,
       isTwoSided: false,
     ),
     DocTypeInfo(

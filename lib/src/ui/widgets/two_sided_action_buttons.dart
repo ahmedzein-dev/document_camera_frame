@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import '../../../document_camera_frame.dart';
 import 'camera_switcher.dart';
@@ -48,12 +50,7 @@ class TwoSidedActionButtons extends StatelessWidget {
   final DocumentCameraController controller;
 
   // Callbacks
-  final Future<void> Function(
-    BuildContext context,
-    int screenWidth,
-    int screenHeight,
-  )
-  onManualCapture;
+  final Future<void> Function(BuildContext context, int screenWidth, int screenHeight) onManualCapture;
   final Function() onSave;
   final VoidCallback? onRetake;
   final Function() onNext;
@@ -123,8 +120,7 @@ class TwoSidedActionButtons extends StatelessWidget {
     }
     // If both sides are required, only allow save if on the back side
     // AND the data is complete.
-    return currentSideNotifier.value == DocumentSide.back &&
-        data.isCompleteFor(requireBothSides: requireBothSides);
+    return currentSideNotifier.value == DocumentSide.back && data.isCompleteFor(requireBothSides: requireBothSides);
   }
 
   bool _showNextButton() {
@@ -160,14 +156,7 @@ class TwoSidedActionButtons extends StatelessWidget {
 
   // Helper method to get dynamic padding based on button count
   EdgeInsets _getDynamicPadding() {
-    final buttonCount = _getVisibleButtonCount();
-
-    // Use smaller padding when there are 3 or more buttons
-    if (buttonCount >= 3) {
-      return actionButtonPadding ?? const EdgeInsets.only(bottom: 12.0);
-    } else {
-      return actionButtonPadding ?? const EdgeInsets.only(bottom: 12.0);
-    }
+    return actionButtonPadding ?? const EdgeInsets.only(bottom: 12.0);
   }
 
   @override
@@ -198,11 +187,7 @@ class TwoSidedActionButtons extends StatelessWidget {
                                 style: actionButtonStyle,
                                 textStyle:
                                     actionButtonTextStyle ??
-                                    const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black,
-                                    ),
+                                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
                                 width: actionButtonWidth,
                                 height: _getDynamicButtonHeight(),
                               ),
@@ -218,18 +203,11 @@ class TwoSidedActionButtons extends StatelessWidget {
                                     actionButtonStyle ??
                                     ElevatedButton.styleFrom(
                                       backgroundColor: Colors.transparent,
-                                      side: const BorderSide(
-                                        width: 1,
-                                        color: Colors.white,
-                                      ),
+                                      side: const BorderSide(width: 1, color: Colors.white),
                                     ),
                                 textStyle:
                                     actionButtonTextStyle ??
-                                    const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white,
-                                    ),
+                                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
                                 width: actionButtonWidth,
                                 height: _getDynamicButtonHeight(),
                               ),
@@ -244,11 +222,7 @@ class TwoSidedActionButtons extends StatelessWidget {
                                 style: actionButtonStyle,
                                 textStyle:
                                     actionButtonTextStyle ??
-                                    const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black,
-                                    ),
+                                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
                                 width: actionButtonWidth,
                                 height: _getDynamicButtonHeight(),
                               ),
@@ -263,18 +237,11 @@ class TwoSidedActionButtons extends StatelessWidget {
                                   retakeButtonStyle ??
                                   ElevatedButton.styleFrom(
                                     backgroundColor: Colors.transparent,
-                                    side: const BorderSide(
-                                      width: 1,
-                                      color: Colors.white,
-                                    ),
+                                    side: const BorderSide(width: 1, color: Colors.white),
                                   ),
                               textStyle:
                                   retakeButtonTextStyle ??
-                                  const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white,
-                                  ),
+                                  const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
                               width: actionButtonWidth,
                               height: _getDynamicButtonHeight(),
                             ),
@@ -283,11 +250,7 @@ class TwoSidedActionButtons extends StatelessWidget {
                           // Capture mode with camera switcher
                           Padding(
                             padding:
-                                captureButtonPadding ??
-                                const EdgeInsets.symmetric(
-                                  horizontal: 8.0,
-                                  vertical: 32.0,
-                                ),
+                                captureButtonPadding ?? const EdgeInsets.symmetric(horizontal: 8.0, vertical: 32.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
@@ -300,18 +263,12 @@ class TwoSidedActionButtons extends StatelessWidget {
                                         if (isLoading) return;
                                         await onManualCapture(
                                           context,
-                                          MediaQuery.of(
-                                            context,
-                                          ).size.width.toInt(),
-                                          MediaQuery.of(
-                                            context,
-                                          ).size.height.toInt(),
+                                          MediaQuery.of(context).size.width.toInt(),
+                                          MediaQuery.of(context).size.height.toInt(),
                                         );
                                       },
-                                      captureInnerCircleRadius:
-                                          captureInnerCircleRadius,
-                                      captureOuterCircleRadius:
-                                          captureOuterCircleRadius,
+                                      captureInnerCircleRadius: captureInnerCircleRadius,
+                                      captureOuterCircleRadius: captureOuterCircleRadius,
                                     );
                                   },
                                 ),

@@ -1,3 +1,5 @@
+import 'dart:math' show max;
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
@@ -151,36 +153,29 @@ class DocumentDetectionService {
       // ---------------------------------------------------------------------------
       // STEP 4: Compute the frame rect in analysis coordinate space
       // ---------------------------------------------------------------------------
-      // The camera preview on screen may be letterboxed — the raw preview stream
-      // is taller than the visible display area, clipping the top and bottom.
-      // We must account for this vertical offset when mapping screen pixels to
-      // analysis pixels, otherwise the alignment check will be shifted vertically.
-      final previewSize = cameraController.value.previewSize;
+      // The camera preview is rendered with cover-fit (see _CoverFitCameraPreview):
+      // a uniform coverScale maps analysis pixels to screen pixels so the larger
+      // axis fills the screen exactly and the smaller axis overflows (clipped).
+      // We invert that same scale to map the on-screen frame back to analysis space.
       final double displayWidth = screenWidth.toDouble();
       final double displayHeight = screenHeight.toDouble();
 
-      // Compute the preview's true aspect ratio from camera-reported dimensions.
-      // Fallback to analysis dimensions if previewSize is unavailable.
-      final double previewAspectRatio = previewSize != null ? previewSize.height / previewSize.width : analysisHeight / analysisWidth;
+      // Uniform scale from analysis space to screen space under cover-fit.
+      final double coverScale = max(
+        displayWidth / analysisWidth,
+        displayHeight / analysisHeight,
+      );
 
-      // The preview is fitted to the display width. Its full (unclipped) height
-      // may exceed the visible display area, creating a vertical letterbox offset.
-      final double fittedPreviewHeight = displayWidth / previewAspectRatio;
-      final double verticalOffset = (fittedPreviewHeight - displayHeight) / 2;
+      // Symmetric clip on each axis (the overflowing portion not visible on screen).
+      final double horizontalClip = (analysisWidth * coverScale - displayWidth) / 2;
+      final double verticalClip = (analysisHeight * coverScale - displayHeight) / 2;
 
-      // Scale the on-screen frame to analysis coordinates.
-      // Width uses display width ratio; height uses fittedPreviewHeight (not displayHeight)
-      // to correctly account for the letterbox offset.
-      final int cropWidth = (frameWidth / displayWidth * analysisWidth).round();
-      final int cropHeight = (frameHeight / fittedPreviewHeight * analysisHeight).round();
-
-      // Horizontal center of the frame in analysis space
+      // Map the on-screen frame rect back to analysis coordinates.
+      // The frame is centered, so this reduces to a simple center crop.
+      final int cropWidth = (frameWidth / coverScale).round();
+      final int cropHeight = (frameHeight / coverScale).round();
       final int cropX = (analysisWidth - cropWidth) ~/ 2;
-
-      // Vertical position of the frame top, adjusted for letterbox offset
-      final double frameTopOnScreen = (displayHeight - frameHeight) / 2;
-      final double frameTopOnPreview = frameTopOnScreen + verticalOffset;
-      final int cropY = ((frameTopOnPreview / fittedPreviewHeight) * analysisHeight).round();
+      final int cropY = (analysisHeight - cropHeight) ~/ 2;
 
       // ---------------------------------------------------------------------------
       // STEP 5: Alignment thresholds (from config)
@@ -225,8 +220,9 @@ class DocumentDetectionService {
               analysisHeight: analysisHeight,
               displayWidth: displayWidth,
               displayHeight: displayHeight,
-              fittedPreviewHeight: fittedPreviewHeight,
-              verticalOffset: verticalOffset,
+              coverScale: coverScale,
+              horizontalClip: horizontalClip,
+              verticalClip: verticalClip,
               isMirrored: isFrontCamera,
             ),
           )
@@ -251,8 +247,9 @@ class DocumentDetectionService {
         analysisHeight: analysisHeight,
         displayWidth: displayWidth,
         displayHeight: displayHeight,
-        fittedPreviewHeight: fittedPreviewHeight,
-        verticalOffset: verticalOffset,
+        coverScale: coverScale,
+        horizontalClip: horizontalClip,
+        verticalClip: verticalClip,
         isMirrored: isFrontCamera,
       );
       // Only surface the best rect if it passed all filters
@@ -412,7 +409,7 @@ class DocumentDetectionService {
 /// suitable for overlay drawing.
 ///
 /// Accounts for:
-/// - Preview letterbox vertical offset (Android).
+/// - Cover-fit clipping offsets on both axes.
 /// - Horizontal mirroring for front (selfie) cameras.
 /// - Clamping to display bounds so overlays never render off-screen.
 ///
@@ -423,21 +420,19 @@ Rect? _mapBoundingBoxToScreenRect({
   required int analysisHeight,
   required double displayWidth,
   required double displayHeight,
-  required double fittedPreviewHeight,
-  required double verticalOffset,
+  required double coverScale,
+  required double horizontalClip,
+  required double verticalClip,
   required bool isMirrored,
 }) {
   if (analysisWidth == 0 || analysisHeight == 0) return null;
 
-  // Scale factors from analysis space to screen space
-  final double scaleX = displayWidth / analysisWidth;
-  final double scaleY = fittedPreviewHeight / analysisHeight;
-
-  // Convert to screen coordinates, compensating for vertical letterbox offset
-  double left = boundingBox.left * scaleX;
-  final double top = boundingBox.top * scaleY - verticalOffset;
-  final double width = boundingBox.width * scaleX;
-  final double height = boundingBox.height * scaleY;
+  // Under cover-fit both axes share a single scale; subtract the symmetric
+  // clip offsets to convert from analysis space to visible screen space.
+  double left = boundingBox.left * coverScale - horizontalClip;
+  final double top = boundingBox.top * coverScale - verticalClip;
+  final double width = boundingBox.width * coverScale;
+  final double height = boundingBox.height * coverScale;
 
   // Mirror horizontally for front camera (selfie preview is flipped)
   if (isMirrored) {

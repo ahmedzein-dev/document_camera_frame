@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../document_camera_frame.dart';
-import '../../logic/document_camera_logic.dart';
-import '../widgets/document_camera_preview_layer.dart';
 import '../widgets/document_camera_overlay_layer.dart';
 
 /// A customizable camera view for capturing both sides of document images.
@@ -208,7 +206,7 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
     if (widget._isCamScanner) {
       _logic = DocumentCameraLogic(
         context: context,
-        onCameraError: () => widget.onCameraError?.call('Camera error'),
+        onCameraError: (Object e) => widget.onCameraError?.call(e),
         onFrontCaptured: widget.onFrontCaptured,
         onBackCaptured: widget.onBackCaptured,
         onDocumentSaved: (data) {
@@ -232,7 +230,7 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
 
     _logic = DocumentCameraLogic(
       context: context,
-      onCameraError: () => widget.onCameraError?.call('Camera error'),
+      onCameraError: (Object e) => widget.onCameraError?.call(e),
       onFrontCaptured: widget.onFrontCaptured,
       onBackCaptured: widget.onBackCaptured,
       onDocumentSaved: (data) {

@@ -55,7 +55,7 @@ class CapturedImagePreview extends StatelessWidget {
                       borderRadius: BorderRadius.circular(cornerBorderRadius),
                       image: DecorationImage(
                         image: FileImage(File(imagePath)),
-                        fit: BoxFit.fill,
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),

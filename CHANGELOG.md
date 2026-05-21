@@ -1,3 +1,62 @@
+# 2.6.7
+
+## Fixed
+
+- **Camera preview no longer stretches/distorts on mismatched sensors**: `_CoverFitCameraPreview`
+  now computes the cover scale directly from `controller.value.previewSize`, modelling
+  `CameraPreview`'s internal `AspectRatio` layout for both portrait and landscape orientations.
+  The previous `size.aspectRatio × controller.value.aspectRatio` formula produced an incorrect
+  scale factor in landscape, causing visible squashing. ([`document_camera_preview_layer.dart`])
+
+- **Crop rectangle now matches what the user sees**: `ImageProcessingService.cropImageToFrame`
+  was using a stretch-fit linear formula (`imgW × frameW / screenW`) that assumed the camera
+  texture filled the screen 1:1 — only valid under `BoxFit.fill`. It now uses
+  `coverScale = max(screenW / imgW, screenH / imgH)` to back-project the on-screen frame into
+  image-pixel space, matching the cover-fit preview exactly. ([`image_processing_service.dart`])
+
+- **Auto-capture alignment fixed after cover-fit preview change**: `DocumentDetectionService`
+  was using letterbox-fit geometry (`fittedPreviewHeight`, `verticalOffset`) to map ML Kit
+  bounding boxes to screen coordinates and to place the alignment frame in analysis space.
+  With cover-fit rendering that geometry produces a negative vertical offset, misaligning
+  every detection. Both the frame crop rect (Step 4) and `_mapBoundingBoxToScreenRect` now use
+  `coverScale` with symmetric `horizontalClip` / `verticalClip` offsets.
+  ([`document_detection_service.dart`])
+
+- **Android EXIF orientation guard in crop math**: On some Android devices `img.decodeImage`
+  returns sensor-native (landscape) bytes without applying the EXIF rotation tag. When the
+  decoded image dimensions disagree with the screen orientation, `cropImageToFrame` now swaps
+  the effective width/height before computing `coverScale`, preventing a crop centred on the
+  wrong axis. ([`image_processing_service.dart`])
+
+- **Crop bounds clamping prevents out-of-bounds crash**: Floating-point rounding could cause
+  `cropX + cropWidth` to exceed `originalImage.width` by one pixel, throwing inside
+  `img.copyCrop`. Crop dimensions and origin are now clamped after rounding.
+  ([`image_processing_service.dart`])
+
+- **Review screen no longer distorts captured image**: `CapturedImagePreview` was using
+  `BoxFit.fill`, stretching the cropped result to fill its container regardless of aspect ratio.
+  Changed to `BoxFit.cover`. ([`captured_image_preview.dart`])
+
+- **`onCameraError` now delivers the actual exception**: The callback was typed as `VoidCallback`
+  internally and every call site silently discarded the caught error, always forwarding the
+  hardcoded string `'Camera error'`. The type is now `void Function(Object error)?` (aligning
+  the implementation with the existing public API docs) and all seven call sites pass the real
+  exception through — including errors surfaced by `DocumentDetectionService`.
+  ([`document_camera_logic.dart`], [`document_camera_frame.dart`])
+
+## Migration
+
+- **`onCameraError` signature** — if you passed a no-argument lambda, add the error parameter:
+  ```dart
+  // Before (2.6.x)
+  onCameraError: () { /* … */ }
+
+  // After (2.7.0)
+  onCameraError: (Object error) { /* … */ }
+  ```
+
+---
+
 # 2.6.4 - 2.6.6 
 
 ## Fixed

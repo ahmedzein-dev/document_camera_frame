@@ -16,7 +16,7 @@ import '../services/pdf_generation_service.dart';
 
 class DocumentCameraLogic {
   final BuildContext context;
-  final VoidCallback? onCameraError;
+  final void Function(Object error)? onCameraError;
   final Function(String)? onFrontCaptured;
   final Function(String)? onBackCaptured;
   final Function(DocumentCaptureData)? onDocumentSaved;
@@ -72,6 +72,7 @@ class DocumentCameraLogic {
 
   double updatedFrameWidth = 0;
   double updatedFrameHeight = 0;
+  double maxFrameHeight = 0;
 
   bool get _isMinimal => uiMode == DocumentCameraUIMode.minimal;
 
@@ -85,15 +86,15 @@ class DocumentCameraLogic {
     final screenHeight = MediaQuery.of(context).size.height;
 
     final maxWidth = screenWidth;
-    final maxHeight = 0.45 * screenHeight;
+    maxFrameHeight = 0.43 * screenHeight;
 
     updatedFrameWidth = frameWidth > maxWidth ? maxWidth : frameWidth;
-    updatedFrameHeight = frameHeight > maxHeight ? maxHeight : frameHeight;
+    updatedFrameHeight = frameHeight > maxFrameHeight ? maxFrameHeight : frameHeight;
   }
 
   Future<void> _initializeComponents(int? cameraIndex) async {
     if (enableAutoCapture) {
-      documentDetectionService = DocumentDetectionService(onError: (e) => onCameraError?.call(), config: detectionConfig);
+      documentDetectionService = DocumentDetectionService(onError: (e) => onCameraError?.call(e), config: detectionConfig);
       documentDetectionService!.initialize();
     }
 
@@ -110,7 +111,7 @@ class DocumentCameraLogic {
       }
     } catch (e) {
       debugPrint('Camera initialization failed: $e');
-      onCameraError?.call();
+      onCameraError?.call(e);
     }
   }
 
@@ -125,7 +126,7 @@ class DocumentCameraLogic {
     } catch (e) {
       debugPrint('Failed to start image stream: $e');
       isImageStreamActive = false;
-      onCameraError?.call();
+      onCameraError?.call(e);
     }
   }
 
@@ -139,7 +140,7 @@ class DocumentCameraLogic {
       await camController.stopImageStream();
     } catch (e) {
       debugPrint('Failed to stop image stream: $e');
-      onCameraError?.call();
+      onCameraError?.call(e);
     } finally {
       isImageStreamActive = false;
     }
@@ -199,7 +200,7 @@ class DocumentCameraLogic {
       }
     } catch (e) {
       debugPrint('Image processing error: $e');
-      onCameraError?.call();
+      onCameraError?.call(e);
     } finally {
       isDetectorBusy = false;
     }
@@ -225,7 +226,7 @@ class DocumentCameraLogic {
       _handleCapture(controller.imagePath);
     } catch (e) {
       debugPrint('Capture failed: $e');
-      onCameraError?.call();
+      onCameraError?.call(e);
     } finally {
       isLoadingNotifier.value = false;
     }
@@ -390,7 +391,7 @@ class DocumentCameraLogic {
       await startImageStream();
     } catch (e) {
       debugPrint('Failed to restart image stream: $e');
-      onCameraError?.call();
+      onCameraError?.call(e);
     }
   }
 

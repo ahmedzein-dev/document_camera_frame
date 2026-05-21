@@ -1,3 +1,5 @@
+import 'dart:math' show max;
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import '../../core/enums.dart';
@@ -103,12 +105,30 @@ class _CoverFitCameraPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    // controller.value.aspectRatio is the preview's landscape aspect ratio (>= 1).
-    // size.aspectRatio is displayWidth / displayHeight (< 1 in portrait).
-    // The product compares screen vs. preview proportions; inverting when < 1
-    // gives the scale factor needed to cover the screen on both axes.
-    var scale = size.aspectRatio * controller.value.aspectRatio;
-    if (scale < 1) scale = 1 / scale;
+    final previewSize = controller.value.previewSize;
+    if (previewSize == null) return const SizedBox.shrink();
+
+    // CameraPreview applies the portrait aspect ratio (1/r) in portrait mode
+    // and the landscape aspect ratio (r) in landscape mode internally.
+    // Compute the natural layout size it takes under loose constraints, then
+    // derive the cover scale: max(screenW / nativeW, screenH / nativeH).
+    final bool isPortrait = size.width < size.height;
+    final double cameraAspect = isPortrait
+        ? previewSize.height / previewSize.width // portrait: nativeH/nativeW ≈ 0.75 for 4:3
+        : previewSize.width / previewSize.height; // landscape: nativeW/nativeH ≈ 1.33 for 4:3
+
+    // Natural size CameraPreview occupies when given loose constraints at screen size
+    final double nativeW, nativeH;
+    if (size.width <= size.height * cameraAspect) {
+      nativeW = size.width;
+      nativeH = size.width / cameraAspect;
+    } else {
+      nativeH = size.height;
+      nativeW = size.height * cameraAspect;
+    }
+
+    final double scale = max(size.width / nativeW, size.height / nativeH);
+
     return ClipRect(
       child: Transform.scale(
         scale: scale,
