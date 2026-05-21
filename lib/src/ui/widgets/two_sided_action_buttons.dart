@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import '../../../document_camera_frame.dart';
 import 'camera_switcher.dart';
