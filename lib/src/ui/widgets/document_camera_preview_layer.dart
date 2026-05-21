@@ -114,8 +114,11 @@ class _CoverFitCameraPreview extends StatelessWidget {
     // derive the cover scale: max(screenW / nativeW, screenH / nativeH).
     final bool isPortrait = size.width < size.height;
     final double cameraAspect = isPortrait
-        ? previewSize.height / previewSize.width // portrait: nativeH/nativeW ≈ 0.75 for 4:3
-        : previewSize.width / previewSize.height; // landscape: nativeW/nativeH ≈ 1.33 for 4:3
+        ? previewSize.height /
+              previewSize
+                  .width // portrait: nativeH/nativeW ≈ 0.75 for 4:3
+        : previewSize.width /
+              previewSize.height; // landscape: nativeW/nativeH ≈ 1.33 for 4:3
 
     // Natural size CameraPreview occupies when given loose constraints at screen size
     final double nativeW, nativeH;

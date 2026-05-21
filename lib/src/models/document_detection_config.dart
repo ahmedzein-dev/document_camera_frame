@@ -20,9 +20,12 @@ final class DocumentDetectionConfig {
   /// Defaults to `0.0`.
   final double frameTolerance;
 
-  const DocumentDetectionConfig({this.minSizeRatio = 0.50, this.maxSizeRatio = 0.70, this.frameTolerance = 0.0})
-    : assert(minSizeRatio >= 0.0 && minSizeRatio <= 1.0),
-      assert(maxSizeRatio > 0.0 && maxSizeRatio <= 1.0),
-      assert(minSizeRatio < maxSizeRatio),
-      assert(frameTolerance >= 0.0 && frameTolerance <= 1.0);
+  const DocumentDetectionConfig({
+    this.minSizeRatio = 0.50,
+    this.maxSizeRatio = 0.70,
+    this.frameTolerance = 0.0,
+  }) : assert(minSizeRatio >= 0.0 && minSizeRatio <= 1.0),
+       assert(maxSizeRatio > 0.0 && maxSizeRatio <= 1.0),
+       assert(minSizeRatio < maxSizeRatio),
+       assert(frameTolerance >= 0.0 && frameTolerance <= 1.0);
 }

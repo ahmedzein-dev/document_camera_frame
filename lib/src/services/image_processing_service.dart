@@ -50,7 +50,8 @@ class ImageProcessingService {
     // disagree with the screen orientation we swap the effective image width/height
     // so coverScale is computed against the visual (portrait) proportions.
     final bool orientationMismatch =
-        (originalImage.width > originalImage.height) != (screenWidth > screenHeight);
+        (originalImage.width > originalImage.height) !=
+        (screenWidth > screenHeight);
     final double effectiveImgW = orientationMismatch
         ? originalImage.height.toDouble()
         : originalImage.width.toDouble();
@@ -58,15 +59,30 @@ class ImageProcessingService {
         ? originalImage.width.toDouble()
         : originalImage.height.toDouble();
 
-    final double coverScale = max(screenWidth / effectiveImgW, screenHeight / effectiveImgH);
+    final double coverScale = max(
+      screenWidth / effectiveImgW,
+      screenHeight / effectiveImgH,
+    );
 
     // Clamp dimensions first so the origin clamp below never sees a negative range.
-    int cropWidth = (frameWidth / coverScale).round().clamp(0, originalImage.width);
-    int cropHeight = (frameHeight / coverScale).round().clamp(0, originalImage.height);
+    int cropWidth = (frameWidth / coverScale).round().clamp(
+      0,
+      originalImage.width,
+    );
+    int cropHeight = (frameHeight / coverScale).round().clamp(
+      0,
+      originalImage.height,
+    );
 
     // Center the crop; clamp origin so floating-point rounding never exceeds bounds.
-    int cropX = ((originalImage.width - cropWidth) ~/ 2).clamp(0, originalImage.width - cropWidth);
-    int cropY = ((originalImage.height - cropHeight) ~/ 2).clamp(0, originalImage.height - cropHeight);
+    int cropX = ((originalImage.width - cropWidth) ~/ 2).clamp(
+      0,
+      originalImage.width - cropWidth,
+    );
+    int cropY = ((originalImage.height - cropHeight) ~/ 2).clamp(
+      0,
+      originalImage.height - cropHeight,
+    );
 
     final img.Image croppedImage = img.copyCrop(
       originalImage,
