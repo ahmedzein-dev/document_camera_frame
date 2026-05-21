@@ -112,6 +112,12 @@ class DocumentCameraFrame extends StatefulWidget {
   ///   but with on-device OCR automatically enabled.
   final DocumentCameraUIMode uiMode;
 
+  /// Tuning parameters for the document alignment detector used during
+  /// auto-capture (size ratios, position tolerance).
+  ///
+  /// Has no effect when auto-capture is disabled or in camScanner mode.
+  final DocumentDetectionConfig detectionConfig;
+
   /// Constructor for the [DocumentCameraFrame].
   const DocumentCameraFrame({
     super.key,
@@ -144,6 +150,7 @@ class DocumentCameraFrame extends StatefulWidget {
     this.imageQuality = 90,
     this.initialFlashMode = FlashMode.auto,
     this.uiMode = DocumentCameraUIMode.defaultMode,
+    this.detectionConfig = const DocumentDetectionConfig(),
   });
 
   bool get _isCamScanner => uiMode == DocumentCameraUIMode.camScanner;
@@ -217,6 +224,7 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
         imageQuality: widget.imageQuality,
         initialFlashMode: widget.initialFlashMode,
         uiMode: widget.uiMode,
+        detectionConfig: widget.detectionConfig,
       );
       WidgetsBinding.instance.addPostFrameCallback((_) => _launchCamScanner());
       return;
@@ -240,6 +248,7 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
       imageQuality: widget.imageQuality,
       initialFlashMode: widget.initialFlashMode,
       uiMode: widget.uiMode,
+      detectionConfig: widget.detectionConfig,
     );
 
     if (widget._effectiveShowSideIndicator) {

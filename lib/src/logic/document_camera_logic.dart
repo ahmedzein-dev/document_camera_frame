@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
@@ -7,6 +8,8 @@ import '../controllers/document_camera_controller.dart';
 import '../core/app_constants.dart';
 import '../core/enums.dart';
 import '../models/document_capture_data.dart';
+import '../models/document_detection_config.dart';
+import '../models/document_detection_status.dart';
 import '../services/document_detection_service.dart';
 import '../services/ocr_service.dart';
 import '../services/pdf_generation_service.dart';
@@ -27,6 +30,7 @@ class DocumentCameraLogic {
   final int imageQuality;
   final FlashMode initialFlashMode;
   final DocumentCameraUIMode uiMode;
+  final DocumentDetectionConfig detectionConfig;
 
   DocumentCameraLogic({
     required this.context,
@@ -44,6 +48,7 @@ class DocumentCameraLogic {
     this.imageQuality = 90,
     this.initialFlashMode = FlashMode.auto,
     required this.uiMode,
+    this.detectionConfig = const DocumentDetectionConfig(),
   });
 
   Timer? _debounceTimer;
@@ -56,16 +61,11 @@ class DocumentCameraLogic {
   final ValueNotifier<bool> isInitializedNotifier = ValueNotifier(false);
   final ValueNotifier<bool> isLoadingNotifier = ValueNotifier(false);
   final ValueNotifier<String> capturedImageNotifier = ValueNotifier('');
-  final ValueNotifier<DocumentSide> currentSideNotifier = ValueNotifier(
-    DocumentSide.front,
-  );
-  final ValueNotifier<DocumentCaptureData> documentDataNotifier = ValueNotifier(
-    DocumentCaptureData(),
-  );
+  final ValueNotifier<DocumentSide> currentSideNotifier = ValueNotifier(DocumentSide.front);
+  final ValueNotifier<DocumentCaptureData> documentDataNotifier = ValueNotifier(DocumentCaptureData());
   final ValueNotifier<bool> isDocumentAlignedNotifier = ValueNotifier(false);
-  final ValueNotifier<String?> detectionStatusNotifier = ValueNotifier<String?>(
-    null,
-  );
+  final ValueNotifier<String?> detectionStatusNotifier = ValueNotifier<String?>(null);
+  final ValueNotifier<DocumentDetectionStatus?> detectionStatusEnumNotifier = ValueNotifier<DocumentDetectionStatus?>(null);
 
   bool isDetectorBusy = false;
   bool isImageStreamActive = false;
@@ -75,11 +75,7 @@ class DocumentCameraLogic {
 
   bool get _isMinimal => uiMode == DocumentCameraUIMode.minimal;
 
-  void initialize({
-    required double frameWidth,
-    required double frameHeight,
-    int? cameraIndex,
-  }) {
+  void initialize({required double frameWidth, required double frameHeight, int? cameraIndex}) {
     _calculateFrameDimensions(frameWidth, frameHeight);
     _initializeComponents(cameraIndex);
   }
@@ -97,9 +93,7 @@ class DocumentCameraLogic {
 
   Future<void> _initializeComponents(int? cameraIndex) async {
     if (enableAutoCapture) {
-      documentDetectionService = DocumentDetectionService(
-        onError: (e) => onCameraError?.call(),
-      );
+      documentDetectionService = DocumentDetectionService(onError: (e) => onCameraError?.call(), config: detectionConfig);
       documentDetectionService!.initialize();
     }
 
@@ -108,11 +102,7 @@ class DocumentCameraLogic {
 
   Future<void> initializeCamera(int? cameraIndex) async {
     try {
-      await controller.initialize(
-        cameraIndex ?? 0,
-        imageFormatGroup: ImageFormatGroup.nv21,
-        initialFlashMode: initialFlashMode,
-      );
+      await controller.initialize(cameraIndex ?? 0, imageFormatGroup: ImageFormatGroup.nv21, initialFlashMode: initialFlashMode);
       isInitializedNotifier.value = true;
 
       if (enableAutoCapture) {
@@ -125,9 +115,7 @@ class DocumentCameraLogic {
   }
 
   Future<void> startImageStream() async {
-    if (isImageStreamActive ||
-        controller.cameraController == null ||
-        !controller.cameraController!.value.isInitialized) {
+    if (isImageStreamActive || controller.cameraController == null || !controller.cameraController!.value.isInitialized) {
       return;
     }
 
@@ -143,9 +131,7 @@ class DocumentCameraLogic {
 
   Future<void> stopImageStream() async {
     final camController = controller.cameraController;
-    if (!isImageStreamActive ||
-        camController == null ||
-        !camController.value.isStreamingImages) {
+    if (!isImageStreamActive || camController == null || !camController.value.isStreamingImages) {
       return;
     }
 
@@ -185,6 +171,9 @@ class DocumentCameraLogic {
         onStatusUpdated: (status) {
           detectionStatusNotifier.value = status;
         },
+        onStatusNotified: (status) {
+          detectionStatusEnumNotifier.value = status;
+        },
       );
 
       isDocumentAlignedNotifier.value = isAligned;
@@ -195,11 +184,7 @@ class DocumentCameraLogic {
 
           _debounceTimer = Timer(const Duration(seconds: 1), () async {
             if (isDocumentAlignedNotifier.value) {
-              await captureAndHandleImageUnified(
-                context,
-                MediaQuery.of(context).size.width.toInt(),
-                MediaQuery.of(context).size.height.toInt(),
-              );
+              await captureAndHandleImageUnified(context, MediaQuery.of(context).size.width.toInt(), MediaQuery.of(context).size.height.toInt());
             }
             _isDebouncing = false;
             _debounceTimer = null;
@@ -220,11 +205,7 @@ class DocumentCameraLogic {
     }
   }
 
-  Future<void> captureAndHandleImageUnified(
-    BuildContext context,
-    int screenWidth,
-    int screenHeight,
-  ) async {
+  Future<void> captureAndHandleImageUnified(BuildContext context, int screenWidth, int screenHeight) async {
     if (isLoadingNotifier.value) {
       return;
     }
@@ -236,18 +217,9 @@ class DocumentCameraLogic {
         await stopImageStream();
       }
 
-      final double heightToCapture = _isMinimal
-          ? updatedFrameHeight
-          : updatedFrameHeight + AppConstants.bottomFrameContainerHeight;
+      final double heightToCapture = _isMinimal ? updatedFrameHeight : updatedFrameHeight + AppConstants.bottomFrameContainerHeight;
 
-      await controller.takeAndCropPicture(
-        updatedFrameWidth,
-        heightToCapture,
-        screenWidth,
-        screenHeight,
-        outputFormat: outputFormat,
-        imageQuality: imageQuality,
-      );
+      await controller.takeAndCropPicture(updatedFrameWidth, heightToCapture, screenWidth, screenHeight, outputFormat: outputFormat, imageQuality: imageQuality);
 
       capturedImageNotifier.value = controller.previewPath;
       _handleCapture(controller.imagePath);
@@ -265,16 +237,10 @@ class DocumentCameraLogic {
     final effectivePreview = previewPath ?? controller.previewPath;
 
     if (currentSide == DocumentSide.front) {
-      documentDataNotifier.value = currentData.copyWith(
-        frontImagePath: imagePath,
-        frontPreviewPath: effectivePreview,
-      );
+      documentDataNotifier.value = currentData.copyWith(frontImagePath: imagePath, frontPreviewPath: effectivePreview);
       onFrontCaptured?.call(imagePath);
     } else {
-      documentDataNotifier.value = currentData.copyWith(
-        backImagePath: imagePath,
-        backPreviewPath: effectivePreview,
-      );
+      documentDataNotifier.value = currentData.copyWith(backImagePath: imagePath, backPreviewPath: effectivePreview);
       onBackCaptured?.call(imagePath);
     }
   }
@@ -291,8 +257,7 @@ class DocumentCameraLogic {
       capturedImageNotifier.value = controller.imagePath;
     }
 
-    if (enableAutoCapture &&
-        (data.backImagePath == null || data.backImagePath!.isEmpty)) {
+    if (enableAutoCapture && (data.backImagePath == null || data.backImagePath!.isEmpty)) {
       restartImageStreamSafely();
     }
   }
@@ -309,16 +274,14 @@ class DocumentCameraLogic {
       capturedImageNotifier.value = controller.imagePath;
     }
 
-    if (enableAutoCapture &&
-        (data.frontImagePath == null || data.frontImagePath!.isEmpty)) {
+    if (enableAutoCapture && (data.frontImagePath == null || data.frontImagePath!.isEmpty)) {
       restartImageStreamSafely();
     }
   }
 
   Future<void> handleSave() async {
     final data = documentDataNotifier.value;
-    if (!requireBothSides ||
-        data.isCompleteFor(requireBothSides: requireBothSides)) {
+    if (!requireBothSides || data.isCompleteFor(requireBothSides: requireBothSides)) {
       DocumentCaptureData resultData = data;
 
       // ── OCR ────────────────────────────────────────────────────────────────
@@ -329,19 +292,10 @@ class DocumentCameraLogic {
           final frontPath = data.frontPreviewPath ?? data.frontImagePath;
           final backPath = data.backPreviewPath ?? data.backImagePath;
           final results = await Future.wait<String?>([
-            if (frontPath != null && frontPath.isNotEmpty)
-              ocrService.extractText(frontPath)
-            else
-              Future<String?>.value(null),
-            if (backPath != null && backPath.isNotEmpty)
-              ocrService.extractText(backPath)
-            else
-              Future<String?>.value(null),
+            if (frontPath != null && frontPath.isNotEmpty) ocrService.extractText(frontPath) else Future<String?>.value(null),
+            if (backPath != null && backPath.isNotEmpty) ocrService.extractText(backPath) else Future<String?>.value(null),
           ]);
-          resultData = data.copyWith(
-            frontOcrText: results[0],
-            backOcrText: results[1],
-          );
+          resultData = data.copyWith(frontOcrText: results[0], backOcrText: results[1]);
         } catch (e) {
           debugPrint('OCR extraction failed: $e');
         } finally {
@@ -358,12 +312,7 @@ class DocumentCameraLogic {
           final backPath = resultData.backImagePath;
 
           if (frontPath != null && frontPath.isNotEmpty) {
-            final pdfPath = await pdfService.generatePdf(
-              frontImagePath: frontPath,
-              backImagePath: backPath,
-              pageSize: pdfPageSize,
-              imageQuality: imageQuality,
-            );
+            final pdfPath = await pdfService.generatePdf(frontImagePath: frontPath, backImagePath: backPath, pageSize: pdfPageSize, imageQuality: imageQuality);
 
             // Clean up temporary image files after PDF generation.
             try {
@@ -377,11 +326,7 @@ class DocumentCameraLogic {
               debugPrint('Failed to delete temporary image files: $e');
             }
 
-            resultData = DocumentCaptureData(
-              pdfPath: pdfPath,
-              frontOcrText: resultData.frontOcrText,
-              backOcrText: resultData.backOcrText,
-            );
+            resultData = DocumentCaptureData(pdfPath: pdfPath, frontOcrText: resultData.frontOcrText, backOcrText: resultData.backOcrText);
           }
         } catch (e) {
           debugPrint('PDF generation failed: $e');
@@ -479,6 +424,7 @@ class DocumentCameraLogic {
     documentDataNotifier.dispose();
     isDocumentAlignedNotifier.dispose();
     detectionStatusNotifier.dispose();
+    detectionStatusEnumNotifier.dispose();
     _debounceTimer?.cancel();
     _debounceTimer = null;
   }

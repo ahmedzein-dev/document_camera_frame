@@ -50,9 +50,13 @@ class DocumentCameraPreviewLayer extends StatelessWidget {
         return Stack(
           fit: StackFit.expand,
           children: [
-            // Camera preview
+            // Camera preview — cover-fit so the sensor aspect is preserved
+            // (no horizontal/vertical squeeze). One axis is scaled up to fill
+            // the screen; overflow on the other axis is clipped.
             if (logic.controller.cameraController != null)
-              CameraPreview(logic.controller.cameraController!),
+              _CoverFitCameraPreview(
+                controller: logic.controller.cameraController!,
+              ),
 
             // Captured image preview
             CapturedImagePreview(
@@ -82,6 +86,34 @@ class DocumentCameraPreviewLayer extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+/// Workaround for the stretched/squeezed `CameraPreview` when the camera
+/// sensor aspect ratio doesn't match the screen.
+///
+/// Known upstream issue (camera plugin): https://github.com/flutter/flutter/issues/180499
+/// Solution adapted from: https://stackoverflow.com/questions/49946153/flutter-camera-appears-stretched
+class _CoverFitCameraPreview extends StatelessWidget {
+  final CameraController controller;
+
+  const _CoverFitCameraPreview({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    // controller.value.aspectRatio is the preview's landscape aspect ratio (>= 1).
+    // size.aspectRatio is displayWidth / displayHeight (< 1 in portrait).
+    // The product compares screen vs. preview proportions; inverting when < 1
+    // gives the scale factor needed to cover the screen on both axes.
+    var scale = size.aspectRatio * controller.value.aspectRatio;
+    if (scale < 1) scale = 1 / scale;
+    return ClipRect(
+      child: Transform.scale(
+        scale: scale,
+        child: Center(child: CameraPreview(controller)),
+      ),
     );
   }
 }

@@ -36,8 +36,20 @@ class ImageProcessingService {
       imageFile.readAsBytesSync(),
     )!;
 
-    final int cropWidth = originalImage.width * frameWidth ~/ screenWidth;
-    final int cropHeight = originalImage.height * frameHeight ~/ screenHeight;
+    // The preview is rendered with cover-fit (see _CoverFitCameraPreview):
+    // the captured image is scaled by `coverScale = max(scrW/imgW, scrH/imgH)`
+    // and centered, with the longer axis overflowing off-screen. To map the
+    // on-screen frame back to image-pixel space we divide by that same scale,
+    // which keeps the crop rectangle visually identical to the frame the user
+    // saw — no aspect distortion, no offset.
+    final double scaleX = screenWidth / originalImage.width;
+    final double scaleY = screenHeight / originalImage.height;
+    final double coverScale = scaleX > scaleY ? scaleX : scaleY;
+
+    int cropWidth = (frameWidth / coverScale).round();
+    int cropHeight = (frameHeight / coverScale).round();
+    if (cropWidth > originalImage.width) cropWidth = originalImage.width;
+    if (cropHeight > originalImage.height) cropHeight = originalImage.height;
 
     final int cropX = (originalImage.width - cropWidth) ~/ 2;
     final int cropY = (originalImage.height - cropHeight) ~/ 2;
