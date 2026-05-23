@@ -1,3 +1,12 @@
+# 2.6.9
+
+## Fixed
+
+- **Android `compileSdk` bumped to 35**: The package's own `android/build.gradle` was set to `compileSdk 34`, causing a build failure for any app that pulls in Google ML Kit or CameraX (which require API 35+). Updated to `compileSdk 35` to resolve this without requiring any changes in consumer apps.
+- **README & Troubleshooting updated**: Android setup section now clearly documents `compileSdk 35` and `targetSdk 35` as requirements, with an explicit warning and troubleshooting entry for the "compile against version 35" build error.
+
+---
+
 # 2.6.8
 
 ## Fixed

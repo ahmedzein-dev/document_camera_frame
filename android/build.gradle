@@ -26,7 +26,7 @@ apply plugin: 'kotlin-android'
 
 android {
     namespace 'io.github.ahmedzein.document_camera_frame'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         minSdk 21

@@ -426,15 +426,25 @@ permissions:
 
 ### Android Setup
 
-1. Update the `minSdkVersion` to 21 or higher in `android/app/build.gradle`:
+1. Update your `android/app/build.gradle` to set `compileSdk` to **35** and `minSdk` to **21**:
 
 ```gradle
 android {
+    compileSdk 35
+
     defaultConfig {
         minSdk 21
+        targetSdk 35
     }
 }
 ```
+
+> **Important:** This package depends on Google ML Kit and CameraX libraries that require `compileSdk 35` or higher. If you only set `minSdk 21` without updating `compileSdk`, your build will fail with:
+> ```
+> Dependency requires libraries and applications that depend on it
+> to compile against version 35 or later of the Android APIs.
+> ```
+> Also make sure **Android 15 (API 35)** is installed via Android Studio → SDK Manager.
 
 2. Add these permissions to your `AndroidManifest.xml` file:
 
@@ -623,8 +633,13 @@ are the possible error codes:
 
 **Camera not initializing:**
 - ✅ Check camera permissions in device settings
-- ✅ Ensure `minSdkVersion` is at least **21** (Android)
+- ✅ Ensure `minSdk` is at least **21** and `compileSdk` is at least **35** (Android)
 - ✅ Verify camera permissions in **Info.plist** (iOS)
+
+**Android build fails with "compile against version 35" error:**
+- ✅ Set `compileSdk 35` and `targetSdk 35` in `android/app/build.gradle`
+- ✅ Install **Android 15 (API 35)** via Android Studio → SDK Manager
+- ✅ Run `flutter clean && flutter pub get` after updating
 
 **Build errors:**
 - 💡 Run `flutter clean && flutter pub get`
