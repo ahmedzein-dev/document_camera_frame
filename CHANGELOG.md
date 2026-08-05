@@ -1,3 +1,20 @@
+# 2.6.10
+
+## Fixed
+
+- **Demo GIFs in the README now render at equal heights**: The four demo GIFs were exported at four
+  different resolutions (653×1338, 424×872, 359×738, and 457×939) and embedded with plain Markdown
+  image syntax, which carries no size attributes — so each rendered at its own intrinsic height,
+  staggering the comparison table by up to 466 px per row. All four are now normalized to 340×699,
+  and the table embeds them with an explicit `<img width="340">`.
+- **Demo GIF payload reduced from 26.2 MB to 8.9 MB**: The three largest files (7.1–7.4 MB) sat close
+  to pub.dev's 10 MB image-proxy limit and its 8-second fetch timeout, risking intermittently broken
+  images on the package page. Re-encoded to a 64-color palette with lossy compression; original
+  per-frame timing is preserved. No effect on the published archive — `assets/` is excluded via
+  `.pubignore`.
+
+---
+
 # 2.6.9
 
 ## Fixed
