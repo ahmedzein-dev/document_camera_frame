@@ -10,7 +10,10 @@ Pod::Spec.new do |s|
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Ahmad Zein' => 'ahmedzein.dev@gmail.com' }
   s.source           = { :path => '.' }
-  s.source_files     = 'Classes/**/*.swift'
+  # Points into the Swift Package layout so CocoaPods and SwiftPM compile the exact
+  # same sources. This previously read 'Classes/**/*.swift', which gave the two build
+  # systems separate copies that drifted apart.
+  s.source_files     = 'document_camera_frame/Sources/**/*.swift'
   s.dependency 'Flutter'
   s.platform         = :ios, '13.0'
   s.swift_version    = '5.0'

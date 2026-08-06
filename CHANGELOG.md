@@ -1,3 +1,24 @@
+# 2.6.11
+
+## Fixed
+
+- **iOS build failure under Swift Package Manager ([#11](https://github.com/ahmedzein-dev/document_camera_frame/issues/11))**:
+  `Package.swift` declared its library product as `document_camera_frame`, but Flutter generates
+  its dependency as `plugin.name.replaceAll('_', '-')` and therefore looked for
+  `document-camera-frame`, failing with *"product 'document-camera-frame' required by package
+  'fluttergeneratedpluginswiftpackage' ... not found"*. The product is now hyphen-separated,
+  matching every first-party Flutter plugin. Swift Package Manager uses the library name as the
+  `CFBundleIdentifier` when linked dynamically, and that cannot contain underscores. The package
+  and target names remain underscore-separated, which is what Flutter expects.
+- **The iOS implementation was missing from the Swift Package entirely**: the SwiftPM target held
+  only a 4-line placeholder while the real plugin lived under `ios/Classes/` for CocoaPods. Fixing
+  the product name alone would have converted the build error into a silent runtime failure, with
+  `DocumentCameraFramePlugin` never registering its method channel and `camScanner` mode failing
+  on device. CocoaPods and SwiftPM now compile one shared source file, and the podspec's
+  `source_files` points into the Swift Package layout.
+
+---
+
 # 2.6.10
 
 ## Fixed

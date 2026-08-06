@@ -7,7 +7,12 @@ let package = Package(
         .iOS(.v13)
     ],
     products: [
-        .library(name: "document_camera_frame", targets: ["document_camera_frame"])
+        // The library (product) name must be hyphen-separated: Swift Package Manager
+        // uses it as the CFBundleIdentifier when linked dynamically, and that cannot
+        // contain underscores. Flutter generates its dependency on this product as
+        // `plugin.name.replaceAll('_', '-')`, so it must match exactly.
+        // The package name and target name stay underscore-separated.
+        .library(name: "document-camera-frame", targets: ["document_camera_frame"])
     ],
     targets: [
         .target(

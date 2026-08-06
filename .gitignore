@@ -32,3 +32,5 @@ build/
 
 # FVM Version Cache
 .fvm/
+# Swift Package Manager build artifacts
+.build/
