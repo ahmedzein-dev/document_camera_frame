@@ -1,2 +1,6 @@
 # Ignore all assets/gifs from being published
 assets/
+
+# This file replaces .gitignore for the package root when publishing, so build
+# output has to be listed here too. `flutter test` writes about 46 MB to build/.
+build/
