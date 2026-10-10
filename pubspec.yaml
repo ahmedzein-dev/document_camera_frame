@@ -1,6 +1,6 @@
 name: document_camera_frame
 description: Flutter package for capturing and cropping document images with a customizable camera interface.
-version: 2.6.11
+version: 2.6.12
 homepage: https://github.com/ahmedzein-dev/document_camera_frame
 issue_tracker: https://github.com/ahmedzein-dev/document_camera_frame/issues
 
@@ -18,14 +18,15 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.9
   image: ^4.8.0
   camera: ^0.12.0+1
   path_provider: ^2.1.5
   flutter_animate: ^4.5.2
-  google_mlkit_object_detection: ^0.15.1
-  google_mlkit_text_recognition: ^0.15.1
-  google_mlkit_document_scanner: ^0.4.1
+  # Ranges, not carets: the newest ML Kit releases need Flutter 3.44, and apps
+  # on older Flutter should still resolve to the versions that support it.
+  google_mlkit_object_detection: ">=0.15.1 <0.18.0"
+  google_mlkit_text_recognition: ">=0.15.1 <0.18.0"
+  google_mlkit_document_scanner: ">=0.4.1 <0.7.0"
   pdf: ^3.12.0
 
 dev_dependencies:

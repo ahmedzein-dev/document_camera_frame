@@ -1,3 +1,23 @@
+# 2.6.12
+
+## Changed
+
+- **Google ML Kit constraints now allow the latest releases**: `google_mlkit_object_detection` and
+  `google_mlkit_text_recognition` accept `>=0.15.1 <0.18.0`, and `google_mlkit_document_scanner`
+  accepts `>=0.4.1 <0.7.0`. The old `^0.15.1` and `^0.4.1` carets excluded every newer release,
+  which cost the package its "dependencies supported in the latest version" pub points. These are
+  ranges rather than new carets because the newest releases (0.17.x and 0.6.x) require Flutter
+  3.44 and Dart 3.12. Apps on Flutter 3.44 or newer resolve them, and apps on older Flutter keep
+  resolving 0.16.x and 0.5.x, or the versions they already lock. The Dart APIs this package calls
+  are identical across every version in these ranges, and the iOS ML Kit pods stay at
+  GoogleMLKit 9.0.0. The example app builds for Android and the iOS simulator against 0.16.0 and
+  0.5.0.
+- **Removed the unused `cupertino_icons` dependency**: nothing in the package imports it. Raising
+  it to `^2.0.0` instead would have required Flutter 3.44 and conflicted with apps that depend on
+  `cupertino_icons: ^1.0.x`.
+
+---
+
 # 2.6.11
 
 ## Fixed
