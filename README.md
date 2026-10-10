@@ -426,25 +426,28 @@ permissions:
 
 ### Android Setup
 
-1. Update your `android/app/build.gradle` to set `compileSdk` to **35** and `minSdk` to **21**:
+1. Update your `android/app/build.gradle` to set `compileSdk` to **36** and `minSdk` to **24**. On
+   Flutter 3.41, `flutter.compileSdkVersion` and `flutter.minSdkVersion` already have these values:
 
 ```gradle
 android {
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
-        minSdk 21
+        minSdk 24
         targetSdk 35
     }
 }
 ```
 
-> **Important:** This package depends on Google ML Kit and CameraX libraries that require `compileSdk 35` or higher. If you only set `minSdk 21` without updating `compileSdk`, your build will fail with:
+> **Important:** The `camera` plugin this package uses now ships CameraX 1.6, which requires
+> `compileSdk 36` or higher, and it needs `minSdk 23` or higher. With `compileSdk 35`, your build
+> fails with:
 > ```
-> Dependency requires libraries and applications that depend on it
-> to compile against version 35 or later of the Android APIs.
+> Dependency 'androidx.camera:camera-core:1.6.0' requires libraries and applications that
+> depend on it to compile against version 36 or later of the Android APIs.
 > ```
-> Also make sure **Android 15 (API 35)** is installed via Android Studio → SDK Manager.
+> Also make sure **Android 16 (API 36)** is installed via Android Studio → SDK Manager.
 
 2. Add these permissions to your `AndroidManifest.xml` file:
 
@@ -633,12 +636,12 @@ are the possible error codes:
 
 **Camera not initializing:**
 - ✅ Check camera permissions in device settings
-- ✅ Ensure `minSdk` is at least **21** and `compileSdk` is at least **35** (Android)
+- ✅ Ensure `minSdk` is at least **24** and `compileSdk` is at least **36** (Android)
 - ✅ Verify camera permissions in **Info.plist** (iOS)
 
-**Android build fails with "compile against version 35" error:**
-- ✅ Set `compileSdk 35` and `targetSdk 35` in `android/app/build.gradle`
-- ✅ Install **Android 15 (API 35)** via Android Studio → SDK Manager
+**Android build fails with "compile against version 36" error:**
+- ✅ Set `compileSdk 36` in `android/app/build.gradle`
+- ✅ Install **Android 16 (API 36)** via Android Studio → SDK Manager
 - ✅ Run `flutter clean && flutter pub get` after updating
 
 **Build errors:**

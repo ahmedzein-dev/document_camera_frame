@@ -16,6 +16,14 @@
   it to `^2.0.0` instead would have required Flutter 3.44 and conflicted with apps that depend on
   `cupertino_icons: ^1.0.x`.
 
+## Documentation
+
+- **Android setup now asks for `compileSdk 36` and `minSdk 24`**: the `camera` plugin's Android
+  implementation (`camera_android_camerax` 0.7.2) ships CameraX 1.6, which requires
+  `compileSdk 36` and `minSdk 23`, and Flutter 3.41 defaults to `minSdk 24`. Following the old
+  `compileSdk 35` advice now fails with *"requires libraries and applications that depend on it to
+  compile against version 36 or later of the Android APIs"*.
+
 ---
 
 # 2.6.11
