@@ -14,6 +14,8 @@ class TwoSidedBottomFrameContainer extends StatelessWidget {
   final ValueNotifier<DocumentSide> currentSideNotifier;
   final ValueNotifier<DocumentCaptureData> documentDataNotifier;
 
+  final String? frontLabelText;
+  final String? backLabelText;
   final String? bottomHintText;
   final Widget? sideInfoOverlay;
 
@@ -26,6 +28,8 @@ class TwoSidedBottomFrameContainer extends StatelessWidget {
     required this.documentDataNotifier,
     this.bottomFrameContainerChild,
     this.bottomHintText,
+    this.frontLabelText,
+    this.backLabelText,
     this.sideInfoOverlay,
   });
 
@@ -51,7 +55,7 @@ class TwoSidedBottomFrameContainer extends StatelessWidget {
                 valueListenable: currentSideNotifier,
                 builder: (context, side, _) {
                   final isFront = side == DocumentSide.front;
-                  final label = isFront ? 'Front' : 'Back';
+                  final label = isFront ? (frontLabelText ?? 'Front') : (backLabelText ?? 'Back');
                   final icon = isFront
                       ? Icons.credit_card_outlined
                       : Icons.credit_card;
