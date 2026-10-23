@@ -72,6 +72,12 @@ class DocumentCameraFrame extends StatefulWidget {
   /// Optional bottom hint text shown in the bottom container.
   final String? bottomHintText;
 
+  /// Optional front label text shown in the bottom container.
+  final String? frontLabelText;
+
+  /// Optional back label text shown in the bottom container.
+  final String? backLabelText;
+
   /// Optional widget shown on the right (e.g. a check icon).
   final Widget? sideInfoOverlay;
 
@@ -139,6 +145,8 @@ class DocumentCameraFrame extends StatefulWidget {
     this.cameraIndex,
     this.requireBothSides = true,
     this.bottomHintText,
+    this.frontLabelText,
+    this.backLabelText,
     this.sideInfoOverlay,
     this.enableAutoCapture = false,
     this.showDetectionStatusText = true,
@@ -428,12 +436,14 @@ class _DocumentCameraFrameState extends State<DocumentCameraFrame>
                 frameStyle: widget.frameStyle,
                 animationStyle: widget.animationStyle,
                 bottomHintText: widget.bottomHintText,
+                frontLabelText: widget.frontLabelText,
+                backLabelText: widget.backLabelText,
                 sideInfoOverlay: widget.sideInfoOverlay,
                 bottomFrameContainerChild: widget.bottomFrameContainerChild,
                 sideIndicatorStyle: widget.sideIndicatorStyle,
                 progressStyle: widget.progressStyle,
                 progressAnimation: _progressAnimation,
-                showDetectionStatusText: widget._effectiveShowDetectionText,
+                showDetectionStatusText: widget.showDetectionStatusText && widget._effectiveShowDetectionText,
                 showSideIndicator: widget._effectiveShowSideIndicator,
                 showInstruction: widget._effectiveShowInstruction,
                 showScreenTitle: widget._effectiveShowScreenTitle,

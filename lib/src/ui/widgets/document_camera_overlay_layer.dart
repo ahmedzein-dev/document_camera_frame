@@ -28,6 +28,8 @@ class DocumentCameraOverlayLayer extends StatelessWidget {
   final DocumentCameraFrameStyle frameStyle;
   final DocumentCameraAnimationStyle animationStyle;
   final String? bottomHintText;
+  final String? frontLabelText;
+  final String? backLabelText;
   final Widget? sideInfoOverlay;
   final Widget? bottomFrameContainerChild;
   final DocumentCameraSideIndicatorStyle sideIndicatorStyle;
@@ -62,6 +64,8 @@ class DocumentCameraOverlayLayer extends StatelessWidget {
     required this.frameStyle,
     required this.animationStyle,
     required this.bottomHintText,
+    required this.frontLabelText,
+    required this.backLabelText,
     required this.sideInfoOverlay,
     this.bottomFrameContainerChild,
     required this.sideIndicatorStyle,
@@ -166,6 +170,8 @@ class DocumentCameraOverlayLayer extends StatelessWidget {
             documentDataNotifier: logic.documentDataNotifier,
             bottomFrameContainerChild: bottomFrameContainerChild,
             bottomHintText: bottomHintText,
+            frontLabelText: frontLabelText,
+            backLabelText: backLabelText,
             sideInfoOverlay: sideInfoOverlay,
           ),
 
