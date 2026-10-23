@@ -1,3 +1,12 @@
+# 2.6.13
+
+## Added
+
+- **`frontLabelText` and `backLabelText` parameters on `DocumentCameraFrame`**: Customize the "Front" / "Back" labels shown in the bottom frame container — useful for localization or custom document types. Both are optional and default to the existing `'Front'` / `'Back'` strings.
+- **`showDetectionStatusText` now respected in all UI modes**: Previously the flag was not combined with the mode's own effective value, so it had no effect in some modes. Fixed so both conditions must be true for the status text to appear.
+
+---
+
 # 2.6.12
 
 ## Changed
